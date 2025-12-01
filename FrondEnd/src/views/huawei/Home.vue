@@ -67,7 +67,8 @@
               <p class="text-gray-600 mb-4">{{ solution.description }}</p>
               <ul class="space-y-2">
                 <li v-for="feature in solution.features" :key="feature" class="text-sm text-gray-500 flex items-center">
-                  <span class="w-1.5 h-1.5 bg-huawei-secondary rounded-full mr-2"></span>{{ feature }}</li>
+                  <span class="w-1.5 h-1.5 bg-huawei-secondary rounded-full mr-2"></span>{{ feature }}
+                </li>
               </ul>
             </div>
           </div>
@@ -110,7 +111,7 @@
               <div class="flex-1">
                 <h3 class="text-xl font-bold text-gray-900 mb-2">{{ bid.title }}</h3>
                 <div class="flex gap-6 text-sm text-gray-600"><span>预算: <strong class="text-huawei-primary">{{
-                      bid.budget }}</strong></span><span>范围: {{ bid.scope }}</span></div>
+                  bid.budget }}</strong></span><span>范围: {{ bid.scope }}</span></div>
               </div>
               <div class="text-right">
                 <div class="text-sm text-gray-500 mb-2">截止: {{ bid.deadline }}</div><span
@@ -132,7 +133,8 @@
             class="bg-white text-gray-900 rounded-2xl overflow-hidden hover:shadow-2xl transition-all transform hover:-translate-y-2 cursor-pointer">
             <div
               class="h-48 overflow-hidden bg-gradient-to-br from-huawei-primary/20 to-huawei-secondary/20 flex items-center justify-center">
-              <img :src="insight.image" :alt="insight.title" class="w-full h-full object-cover opacity-80" /></div>
+              <img :src="insight.image" :alt="insight.title" class="w-full h-full object-cover opacity-80" />
+            </div>
             <div class="p-6">
               <div class="flex items-center justify-between mb-3 text-sm"><span
                   class="text-huawei-primary font-semibold">{{ insight.category }}</span><span class="text-gray-500">下载:

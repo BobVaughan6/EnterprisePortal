@@ -1,7 +1,7 @@
 {
   "name": "bidding-portal-demo",
   "version": "1.0.0",
-  "description": "工程咨询公司招投标门户网站样式Demo - 6种行业标杆企业设计风格",
+  "description": "工程咨询公司招投标门户",
   "type": "module",
   "scripts": {
     "dev": "vite",
