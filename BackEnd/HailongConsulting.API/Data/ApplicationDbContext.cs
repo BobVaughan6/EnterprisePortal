@@ -23,6 +23,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<PolicyRegulation> PolicyRegulations { get; set; }
     public DbSet<PolicyInformation> PolicyInformation { get; set; }
     public DbSet<NoticeAnnouncement> NoticeAnnouncements { get; set; }
+    
+    // 系统配置相关
+    public DbSet<CarouselBanner> CarouselBanners { get; set; }
+    public DbSet<CompanyProfile> CompanyProfiles { get; set; }
+    public DbSet<MajorAchievement> MajorAchievements { get; set; }
+    public DbSet<FriendlyLink> FriendlyLinks { get; set; }
+    public DbSet<VisitStatistic> VisitStatistics { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -122,6 +129,45 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasIndex(e => e.PublishTime);
             entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // CarouselBanner配置
+        modelBuilder.Entity<CarouselBanner>(entity =>
+        {
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // CompanyProfile配置
+        modelBuilder.Entity<CompanyProfile>(entity =>
+        {
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // MajorAchievement配置
+        modelBuilder.Entity<MajorAchievement>(entity =>
+        {
+            entity.HasIndex(e => e.CompletionDate);
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // FriendlyLink配置
+        modelBuilder.Entity<FriendlyLink>(entity =>
+        {
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // VisitStatistic配置
+        modelBuilder.Entity<VisitStatistic>(entity =>
+        {
+            entity.HasIndex(e => e.VisitDate);
+            entity.HasIndex(e => e.PageUrl);
+            entity.HasIndex(e => e.VisitorIp);
             entity.HasIndex(e => e.IsDeleted);
         });
     }

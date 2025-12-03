@@ -1,0 +1,171 @@
+namespace HailongConsulting.API.Models.DTOs;
+
+/// <summary>
+/// 轮播图DTO
+/// </summary>
+public class CarouselBannerDto
+{
+    public uint Id { get; set; }
+    public string? Title { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
+    public string? LinkUrl { get; set; }
+    public int SortOrder { get; set; }
+    public bool Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// 创建轮播图DTO
+/// </summary>
+public class CreateCarouselBannerDto
+{
+    public string? Title { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
+    public string? LinkUrl { get; set; }
+    public int SortOrder { get; set; } = 0;
+    public bool Status { get; set; } = true;
+}
+
+/// <summary>
+/// 更新轮播图DTO
+/// </summary>
+public class UpdateCarouselBannerDto
+{
+    public string? Title { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? LinkUrl { get; set; }
+    public int? SortOrder { get; set; }
+    public bool? Status { get; set; }
+}
+
+/// <summary>
+/// 企业简介DTO
+/// </summary>
+public class CompanyProfileDto
+{
+    public uint Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// 更新企业简介DTO
+/// </summary>
+public class UpdateCompanyProfileDto
+{
+    public string Title { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+}
+
+/// <summary>
+/// 重要业绩DTO
+/// </summary>
+public class MajorAchievementDto
+{
+    public uint Id { get; set; }
+    public string ProjectName { get; set; } = string.Empty;
+    public string? ProjectType { get; set; }
+    public decimal? ProjectAmount { get; set; }
+    public string? ClientName { get; set; }
+    public DateOnly? CompletionDate { get; set; }
+    public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
+    public int SortOrder { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// 创建重要业绩DTO
+/// </summary>
+public class CreateMajorAchievementDto
+{
+    public string ProjectName { get; set; } = string.Empty;
+    public string? ProjectType { get; set; }
+    public decimal? ProjectAmount { get; set; }
+    public string? ClientName { get; set; }
+    public DateOnly? CompletionDate { get; set; }
+    public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
+    public int SortOrder { get; set; } = 0;
+}
+
+/// <summary>
+/// 更新重要业绩DTO
+/// </summary>
+public class UpdateMajorAchievementDto
+{
+    public string? ProjectName { get; set; }
+    public string? ProjectType { get; set; }
+    public decimal? ProjectAmount { get; set; }
+    public string? ClientName { get; set; }
+    public DateOnly? CompletionDate { get; set; }
+    public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
+    public int? SortOrder { get; set; }
+}
+
+/// <summary>
+/// 友情链接DTO
+/// </summary>
+public class FriendlyLinkDto
+{
+    public uint Id { get; set; }
+    public string LinkName { get; set; } = string.Empty;
+    public string LinkUrl { get; set; } = string.Empty;
+    public string? LogoUrl { get; set; }
+    public int SortOrder { get; set; }
+    public bool Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// 创建友情链接DTO
+/// </summary>
+public class CreateFriendlyLinkDto
+{
+    public string LinkName { get; set; } = string.Empty;
+    public string LinkUrl { get; set; } = string.Empty;
+    public string? LogoUrl { get; set; }
+    public int SortOrder { get; set; } = 0;
+    public bool Status { get; set; } = true;
+}
+
+/// <summary>
+/// 更新友情链接DTO
+/// </summary>
+public class UpdateFriendlyLinkDto
+{
+    public string? LinkName { get; set; }
+    public string? LinkUrl { get; set; }
+    public string? LogoUrl { get; set; }
+    public int? SortOrder { get; set; }
+    public bool? Status { get; set; }
+}
+
+/// <summary>
+/// 访问统计DTO
+/// </summary>
+public class VisitStatisticDto
+{
+    public uint TotalVisits { get; set; }
+    public uint TodayVisits { get; set; }
+    public uint YesterdayVisits { get; set; }
+    public uint ThisMonthVisits { get; set; }
+}
+
+/// <summary>
+/// 记录访问DTO
+/// </summary>
+public class RecordVisitDto
+{
+    public string? PageUrl { get; set; }
+    public string? PageTitle { get; set; }
+    public string? Referer { get; set; }
+}

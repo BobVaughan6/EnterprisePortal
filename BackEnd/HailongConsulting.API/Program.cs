@@ -89,6 +89,9 @@ builder.Services.AddScoped<IConstructionProjectRepository, ConstructionProjectRe
 builder.Services.AddScoped<IConstructionProjectService, ConstructionProjectService>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddScoped<IInfoPublishService, InfoPublishService>();
+builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
+builder.Services.AddScoped<IConfigService, ConfigService>();
+builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger
