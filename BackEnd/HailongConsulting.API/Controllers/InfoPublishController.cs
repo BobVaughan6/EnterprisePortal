@@ -31,16 +31,16 @@ namespace HailongConsulting.API.Controllers
             try
             {
                 var result = await _infoPublishService.CreateAsync(dto, files);
-                return Ok(ApiResponse<InfoPublishDto>.SuccessResponse(result, "创建成功"));
+                return Ok(ApiResponse<InfoPublishDto>.SuccessResult(result, "创建成功"));
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ApiResponse<InfoPublishDto>.ErrorResponse(ex.Message));
+                return BadRequest(ApiResponse<InfoPublishDto>.FailResult(ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "创建信息失败");
-                return StatusCode(500, ApiResponse<InfoPublishDto>.ErrorResponse("创建失败"));
+                return StatusCode(500, ApiResponse<InfoPublishDto>.FailResult("创建失败"));
             }
         }
 
@@ -58,20 +58,20 @@ namespace HailongConsulting.API.Controllers
             {
                 if (string.IsNullOrWhiteSpace(category))
                 {
-                    return BadRequest(ApiResponse<PagedResult<InfoPublishDto>>.ErrorResponse("分类参数不能为空"));
+                    return BadRequest(ApiResponse<PagedResult<InfoPublishDto>>.FailResult("分类参数不能为空"));
                 }
 
                 var result = await _infoPublishService.GetPagedAsync(category, keyword, pageIndex, pageSize);
-                return Ok(ApiResponse<PagedResult<InfoPublishDto>>.SuccessResponse(result));
+                return Ok(ApiResponse<PagedResult<InfoPublishDto>>.SuccessResult(result));
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ApiResponse<PagedResult<InfoPublishDto>>.ErrorResponse(ex.Message));
+                return BadRequest(ApiResponse<PagedResult<InfoPublishDto>>.FailResult(ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "查询信息失败");
-                return StatusCode(500, ApiResponse<PagedResult<InfoPublishDto>>.ErrorResponse("查询失败"));
+                return StatusCode(500, ApiResponse<PagedResult<InfoPublishDto>>.FailResult("查询失败"));
             }
         }
 
@@ -87,21 +87,21 @@ namespace HailongConsulting.API.Controllers
             {
                 if (string.IsNullOrWhiteSpace(category))
                 {
-                    return BadRequest(ApiResponse<InfoPublishDto>.ErrorResponse("分类参数不能为空"));
+                    return BadRequest(ApiResponse<InfoPublishDto>.FailResult("分类参数不能为空"));
                 }
 
                 var result = await _infoPublishService.GetByIdAsync(category, id);
                 if (result == null)
                 {
-                    return NotFound(ApiResponse<InfoPublishDto>.ErrorResponse("未找到该信息"));
+                    return NotFound(ApiResponse<InfoPublishDto>.FailResult("未找到该信息"));
                 }
 
-                return Ok(ApiResponse<InfoPublishDto>.SuccessResponse(result));
+                return Ok(ApiResponse<InfoPublishDto>.SuccessResult(result));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "获取信息详情失败");
-                return StatusCode(500, ApiResponse<InfoPublishDto>.ErrorResponse("获取失败"));
+                return StatusCode(500, ApiResponse<InfoPublishDto>.FailResult("获取失败"));
             }
         }
 
@@ -119,24 +119,24 @@ namespace HailongConsulting.API.Controllers
             {
                 if (string.IsNullOrWhiteSpace(category))
                 {
-                    return BadRequest(ApiResponse<InfoPublishDto>.ErrorResponse("分类参数不能为空"));
+                    return BadRequest(ApiResponse<InfoPublishDto>.FailResult("分类参数不能为空"));
                 }
 
                 var result = await _infoPublishService.UpdateAsync(category, id, dto, files);
-                return Ok(ApiResponse<InfoPublishDto>.SuccessResponse(result, "更新成功"));
+                return Ok(ApiResponse<InfoPublishDto>.SuccessResult(result, "更新成功"));
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ApiResponse<InfoPublishDto>.ErrorResponse(ex.Message));
+                return NotFound(ApiResponse<InfoPublishDto>.FailResult(ex.Message));
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ApiResponse<InfoPublishDto>.ErrorResponse(ex.Message));
+                return BadRequest(ApiResponse<InfoPublishDto>.FailResult(ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "更新信息失败");
-                return StatusCode(500, ApiResponse<InfoPublishDto>.ErrorResponse("更新失败"));
+                return StatusCode(500, ApiResponse<InfoPublishDto>.FailResult("更新失败"));
             }
         }
 
@@ -152,21 +152,21 @@ namespace HailongConsulting.API.Controllers
             {
                 if (string.IsNullOrWhiteSpace(category))
                 {
-                    return BadRequest(ApiResponse<bool>.ErrorResponse("分类参数不能为空"));
+                    return BadRequest(ApiResponse<bool>.FailResult("分类参数不能为空"));
                 }
 
                 var result = await _infoPublishService.DeleteAsync(category, id);
                 if (!result)
                 {
-                    return NotFound(ApiResponse<bool>.ErrorResponse("未找到该信息"));
+                    return NotFound(ApiResponse<bool>.FailResult("未找到该信息"));
                 }
 
-                return Ok(ApiResponse<bool>.SuccessResponse(true, "删除成功"));
+                return Ok(ApiResponse<bool>.SuccessResult(true, "删除成功"));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除信息失败");
-                return StatusCode(500, ApiResponse<bool>.ErrorResponse("删除失败"));
+                return StatusCode(500, ApiResponse<bool>.FailResult("删除失败"));
             }
         }
     }

@@ -30,12 +30,12 @@ public class HomeController : ControllerBase
         try
         {
             var statistics = await _homeService.GetStatisticsOverviewAsync();
-            return Ok(ApiResponse<object>.Success(statistics));
+            return Ok(ApiResponse<object>.SuccessResult(statistics));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "获取首页统计概览失败");
-            return StatusCode(500, ApiResponse<object>.Error("获取统计数据失败"));
+            return StatusCode(500, ApiResponse<object>.FailResult("获取统计数据失败"));
         }
     }
 
@@ -49,12 +49,12 @@ public class HomeController : ControllerBase
         try
         {
             var announcements = await _homeService.GetRecentAnnouncementsAsync();
-            return Ok(ApiResponse<object>.Success(announcements));
+            return Ok(ApiResponse<object>.SuccessResult(announcements));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "获取最新公告列表失败");
-            return StatusCode(500, ApiResponse<object>.Error("获取最新公告失败"));
+            return StatusCode(500, ApiResponse<object>.FailResult("获取最新公告失败"));
         }
     }
 
@@ -68,12 +68,12 @@ public class HomeController : ControllerBase
         try
         {
             var achievements = await _homeService.GetAchievementsAsync();
-            return Ok(ApiResponse<object>.Success(achievements));
+            return Ok(ApiResponse<object>.SuccessResult(achievements));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "获取重要业绩列表失败");
-            return StatusCode(500, ApiResponse<object>.Error("获取业绩列表失败"));
+            return StatusCode(500, ApiResponse<object>.FailResult("获取业绩列表失败"));
         }
     }
 }

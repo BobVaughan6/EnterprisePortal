@@ -92,6 +92,8 @@ builder.Services.AddScoped<IInfoPublishService, InfoPublishService>();
 builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
 builder.Services.AddScoped<IConfigService, ConfigService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IGlobalSearchRepository, GlobalSearchRepository>();
+builder.Services.AddScoped<IGlobalSearchService, GlobalSearchService>();
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger
