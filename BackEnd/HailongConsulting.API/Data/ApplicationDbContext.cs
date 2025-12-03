@@ -18,6 +18,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<Client> Clients { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<GovProcurementAnnouncement> GovProcurementAnnouncements { get; set; }
+    public DbSet<ConstructionProjectAnnouncement> ConstructionProjectAnnouncements { get; set; }
+    public DbSet<CompanyAnnouncement> CompanyAnnouncements { get; set; }
+    public DbSet<PolicyRegulation> PolicyRegulations { get; set; }
+    public DbSet<PolicyInformation> PolicyInformation { get; set; }
+    public DbSet<NoticeAnnouncement> NoticeAnnouncements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +78,48 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasIndex(e => e.NoticeType);
             entity.HasIndex(e => e.ProjectRegion);
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // ConstructionProjectAnnouncement配置
+        modelBuilder.Entity<ConstructionProjectAnnouncement>(entity =>
+        {
+            entity.HasIndex(e => e.NoticeType);
+            entity.HasIndex(e => e.ProjectRegion);
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // CompanyAnnouncement配置
+        modelBuilder.Entity<CompanyAnnouncement>(entity =>
+        {
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // PolicyRegulation配置
+        modelBuilder.Entity<PolicyRegulation>(entity =>
+        {
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // PolicyInformation配置
+        modelBuilder.Entity<PolicyInformation>(entity =>
+        {
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // NoticeAnnouncement配置
+        modelBuilder.Entity<NoticeAnnouncement>(entity =>
+        {
             entity.HasIndex(e => e.PublishTime);
             entity.HasIndex(e => e.IsTop);
             entity.HasIndex(e => e.IsDeleted);

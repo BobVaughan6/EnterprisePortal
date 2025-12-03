@@ -85,6 +85,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IGovProcurementRepository, GovProcurementRepository>();
 builder.Services.AddScoped<IGovProcurementService, GovProcurementService>();
+builder.Services.AddScoped<IConstructionProjectRepository, ConstructionProjectRepository>();
+builder.Services.AddScoped<IConstructionProjectService, ConstructionProjectService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+builder.Services.AddScoped<IInfoPublishService, InfoPublishService>();
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger
@@ -157,6 +161,9 @@ app.UseExceptionHandling();
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
+
+// 启用静态文件服务（用于访问上传的附件）
+app.UseStaticFiles();
 
 // 使用CORS
 app.UseCors("AllowAll");
