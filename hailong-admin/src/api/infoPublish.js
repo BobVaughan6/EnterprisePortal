@@ -47,14 +47,12 @@ export const infoPublishApi = {
   /**
    * 更新信息
    * @param {number} id 
-   * @param {string} category 
-   * @param {FormData} formData 
+   * @param {FormData} formData - 包含category和其他字段的表单数据
    */
-  update(id, category, formData) {
+  update(id, formData) {
     return request({
       url: `/api/info-publish/${id}`,
       method: 'PUT',
-      params: { category },
       data: formData,
       headers: {
         'Content-Type': 'multipart/form-data'
