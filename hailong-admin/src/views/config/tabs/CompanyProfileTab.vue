@@ -63,6 +63,17 @@
         <div style="margin-top: 8px; color: #909399; font-size: 12px;">
           建议尺寸：800x600px
         </div>
+      </el-form-item>
+      
+      <el-form-item>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting">
+          保存
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, shallowRef } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -74,14 +85,13 @@ const loading = ref(false)
 const submitting = ref(false)
 const formRef = ref(null)
 const editorRef = shallowRef()
-<script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
-import { configApi } from '@/api'
-import Quill from 'quill'
-import 'quill/dist/quill.snow.css'
 
-const loading = ref(false)
+const formData = reactive({
+  title: '',
+  content: '',
+  imageUrl: ''
+})
+
 const formRules = {
   title: [
     { required: true, message: '请输入企业标题', trigger: 'blur' }
@@ -100,34 +110,8 @@ const editorConfig = {
 
 const handleCreated = (editor) => {
   editorRef.value = editor
-}       [{ 'align': [] }],
-        ['link', 'image'],
-        ['clean']
-      ]
-    }
-  })
-  
-  // 监听内容变化
-  quillEditor.on('text-change', () => {
-    formData.content = quillEditor.root.innerHTML
-  })
 }
 
-const loadData = async () => {
-  loading.value = true
-  try {
-    const res = await configApi.getCompanyProfile()
-    if (res.success && res.data) {
-      formData.title = res.data.title || ''
-      formData.content = res.data.content || ''
-      formData.imageUrl = res.data.imageUrl || ''
-      
-      // 设置编辑器内容
-      if (quillEditor && formData.content) {
-        quillEditor.root.innerHTML = formData.content
-      }
-    } else {
-      // 如果没有数据，初始化为空
 const loadData = async () => {
   loading.value = true
   try {
@@ -148,16 +132,8 @@ const loadData = async () => {
   } finally {
     loading.value = false
   }
-}     const submitData = {
-        title: formData.title,
-        content: formData.content,
-        imageUrl: formData.imageUrl || null
-      }
-      
-      const res = await configApi.updateCompanyProfile(submitData)
-      
-      if (res.success) {
-        ElMessage.success('保存成功')
+}
+
 const handleSubmit = async () => {
   if (!formRef.value) return
   
@@ -189,10 +165,6 @@ const handleSubmit = async () => {
   })
 }
 
-:deep(.ql-editor) {
-  min-height: 400px;
-}
-</style>
 onMounted(() => {
   loadData()
 })
@@ -202,7 +174,10 @@ onBeforeUnmount(() => {
   if (editor) {
     editor.destroy()
   }
-})<style scoped>
+})
+</script>
+
+<style scoped>
 .tab-content {
   padding: 20px 0;
 }
