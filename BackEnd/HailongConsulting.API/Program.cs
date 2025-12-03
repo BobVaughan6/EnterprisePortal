@@ -83,6 +83,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IGovProcurementRepository, GovProcurementRepository>();
+builder.Services.AddScoped<IGovProcurementService, GovProcurementService>();
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger

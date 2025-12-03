@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Project> Projects { get; set; }
     public DbSet<Client> Clients { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<GovProcurementAnnouncement> GovProcurementAnnouncements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -65,6 +66,16 @@ public class ApplicationDbContext : DbContext
                 .WithMany(c => c.SubCategories)
                 .HasForeignKey(c => c.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // GovProcurementAnnouncement配置
+        modelBuilder.Entity<GovProcurementAnnouncement>(entity =>
+        {
+            entity.HasIndex(e => e.NoticeType);
+            entity.HasIndex(e => e.ProjectRegion);
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.IsDeleted);
         });
     }
 
