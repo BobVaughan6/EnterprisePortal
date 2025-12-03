@@ -25,6 +25,15 @@ INSERT INTO `admin_users` (`username`, `password`, `real_name`, `email`, `phone`
 ('editor', SHA2('123456', 256), '内容编辑', 'editor@hailong.com', '13800138001', 2, 1);
 
 -- ============================================
+-- 2.1 初始化用户表（用于API认证）
+-- 密码：admin123（使用MD5加密）
+-- ============================================
+
+INSERT INTO `users` (`username`, `password_hash`, `email`, `phone`, `full_name`, `role`, `is_active`) VALUES
+('admin', MD5('admin123'), 'admin@hailong.com', '13800138000', '系统管理员', 'admin', 1),
+('test', MD5('test123'), 'test@hailong.com', '13800138001', '测试用户', 'user', 1);
+
+-- ============================================
 -- 3. 初始化项目区域字典
 -- ============================================
 

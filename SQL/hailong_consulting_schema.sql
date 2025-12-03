@@ -35,7 +35,29 @@ CREATE TABLE `admin_users` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员账号表';
 
--- 1.2 角色表
+-- 1.2 用户表（用于API认证）
+CREATE TABLE `users` (
+  `user_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+  `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
+  `password_hash` VARCHAR(255) NOT NULL COMMENT '密码哈希（MD5）',
+  `email` VARCHAR(100) NOT NULL COMMENT '邮箱',
+  `phone` VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+  `full_name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
+  `role` VARCHAR(20) NOT NULL DEFAULT 'user' COMMENT '角色：admin-管理员，user-普通用户',
+  `refresh_token` VARCHAR(255) DEFAULT NULL COMMENT '刷新令牌',
+  `refresh_token_expiry` DATETIME DEFAULT NULL COMMENT '刷新令牌过期时间',
+  `is_active` TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `last_login` DATETIME DEFAULT NULL COMMENT '最后登录时间',
+  INDEX `idx_username` (`username`),
+  INDEX `idx_email` (`email`),
+  INDEX `idx_refresh_token` (`refresh_token`),
+  INDEX `idx_role` (`role`),
+  INDEX `idx_is_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表（API认证）';
+
+-- 1.3 角色表
 CREATE TABLE `admin_roles` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '角色ID',
   `role_name` VARCHAR(50) NOT NULL COMMENT '角色名称',
