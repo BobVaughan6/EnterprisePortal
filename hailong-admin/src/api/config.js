@@ -138,7 +138,7 @@ export const configApi = {
    */
   getFriendlyLinks() {
     return request({
-      url: '/api/config/friendly-links',
+      url: '/api/config/links',
       method: 'GET'
     })
   },
@@ -148,7 +148,7 @@ export const configApi = {
    */
   getFriendlyLink(id) {
     return request({
-      url: `/api/config/friendly-links/${id}`,
+      url: `/api/config/links/${id}`,
       method: 'GET'
     })
   },
@@ -158,7 +158,7 @@ export const configApi = {
    */
   createFriendlyLink(data) {
     return request({
-      url: '/api/config/friendly-links',
+      url: '/api/config/links',
       method: 'POST',
       data
     })
@@ -169,7 +169,7 @@ export const configApi = {
    */
   updateFriendlyLink(id, data) {
     return request({
-      url: `/api/config/friendly-links/${id}`,
+      url: `/api/config/links/${id}`,
       method: 'PUT',
       data
     })
@@ -180,7 +180,7 @@ export const configApi = {
    */
   deleteFriendlyLink(id) {
     return request({
-      url: `/api/config/friendly-links/${id}`,
+      url: `/api/config/links/${id}`,
       method: 'DELETE'
     })
   }
