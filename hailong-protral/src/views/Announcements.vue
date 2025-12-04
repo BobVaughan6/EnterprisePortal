@@ -14,128 +14,179 @@
     <div class="py-16 bg-white">
       <div class="container-wide">
         <div class="animate-fade-in">
-      <!-- Tab切换 -->
-      <div class="bg-white rounded-xl shadow-sm p-2 mb-6">
-        <div class="flex gap-2">
-          <button
-            v-for="tab in tabs"
-            :key="tab.value"
-            @click="activeTab = tab.value"
-            :class="[
-              'flex-1 py-3 px-6 rounded-lg font-medium transition-all',
-              activeTab === tab.value
-                ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
-                : 'text-gray-600 hover:bg-gray-50'
-            ]"
-          >
-            {{ tab.label }}
-          </button>
-        </div>
-      </div>
-
-      <!-- 高级搜索区域 -->
-      <div class="bg-white rounded-xl shadow-sm mb-6 overflow-hidden">
-        <div
-          class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-          @click="searchExpanded = !searchExpanded"
-        >
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span class="font-medium text-gray-700">高级搜索</span>
+      <!-- 搜索筛选区域 -->
+      <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <!-- 关键字搜索 - 主搜索框 -->
+        <div class="mb-5">
+          <div class="flex gap-3">
+            <div class="relative flex-1">
+              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                v-model="searchParams.keyword"
+                type="text"
+                placeholder="请输入项目名称、招标单位等关键字"
+                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
+                @keyup.enter="handleSearch"
+              />
+            </div>
+            <button
+              @click="handleSearch"
+              class="px-8 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium"
+            >
+              搜索
+            </button>
+            <button
+              @click="handleReset"
+              class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+            >
+              重置
+            </button>
           </div>
-          <svg
-            :class="['w-5 h-5 text-gray-400 transition-transform', searchExpanded ? 'rotate-180' : '']"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
         </div>
 
-        <transition name="expand">
-          <div v-show="searchExpanded" class="border-t border-gray-100 p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-              <!-- 关键词搜索 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">关键词</label>
-                <input
-                  v-model="searchParams.keyword"
-                  type="text"
-                  placeholder="请输入关键词"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
-                />
-              </div>
+        <!-- 筛选条件 -->
+        <div class="space-y-3 pt-3 border-t border-gray-100">
+          <!-- 业务类型和采购类型 -->
+          <div class="flex items-center gap-4 flex-wrap">
+            <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">业务类型</label>
+            <button
+              v-for="type in businessTypes"
+              :key="type.value"
+              @click="searchParams.businessType = type.value"
+              :class="[
+                'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
+                searchParams.businessType === type.value
+                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              {{ type.label }}
+            </button>
 
-              <!-- 公告类型 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">公告类型</label>
+            <!-- 采购类型 - 仅在选择政府采购时显示 -->
+            <template v-if="searchParams.businessType === 'GOV_PROCUREMENT'">
+              <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16 ml-6">采购类型</label>
+              <button
+                v-for="type in procurementTypes"
+                :key="type.value"
+                @click="searchParams.procurementType = type.value"
+                :class="[
+                  'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
+                  searchParams.procurementType === type.value
+                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ]"
+              >
+                {{ type.label }}
+              </button>
+            </template>
+          </div>
+
+          <!-- 公告类型 -->
+          <div class="flex items-center gap-4">
+            <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">公告类型</label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="type in currentAnnouncementTypes"
+                :key="type.value"
+                @click="searchParams.type = type.value"
+                :class="[
+                  'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
+                  searchParams.type === type.value
+                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ]"
+              >
+                {{ type.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 项目区域和发布时间 -->
+          <div class="flex items-center gap-4 flex-wrap">
+            <div class="flex items-center gap-4">
+              <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">项目区域</label>
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
                 <select
-                  v-model="searchParams.type"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
+                  v-model="searchParams.region"
+                  class="pl-9 pr-8 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm bg-white hover:border-hailong-primary cursor-pointer appearance-none"
+                  style="min-width: 120px;"
                 >
-                  <option value="">全部类型</option>
-                  <option v-for="type in announcementTypes" :key="type.value" :value="type.value">
-                    {{ type.label }}
+                  <option value="">全部区域</option>
+                  <option v-for="region in henanRegions" :key="region" :value="region">
+                    {{ region }}
                   </option>
+                  <option value="省外">省外</option>
                 </select>
+                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
+            </div>
 
-              <!-- 项目区域 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">项目区域</label>
-                <select
-                  v-model="searchParams.regions"
-                  multiple
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
-                  style="height: 42px"
-                >
-                  <option v-for="region in regions" :key="region.value" :value="region.value">
-                    {{ region.label }}
-                  </option>
-                </select>
-              </div>
+            <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">发布时间</label>
+            <button
+              v-for="time in timeRanges"
+              :key="time.value"
+              @click="selectTimeRange(time.value)"
+              :class="[
+                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all',
+                searchParams.timeRange === time.value
+                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              {{ time.label }}
+            </button>
+            <button
+              @click="showCustomDatePicker = !showCustomDatePicker"
+              :class="[
+                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1',
+                searchParams.timeRange === 'custom'
+                  ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              自定义
+            </button>
 
-              <!-- 开始日期 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">开始日期</label>
+            <!-- 自定义日期选择器 -->
+            <template v-if="showCustomDatePicker">
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
                 <input
+                  type="date"
                   v-model="searchParams.startDate"
-                  type="date"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
+                  @change="onCustomDateChange"
+                  class="pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm hover:border-hailong-primary"
                 />
               </div>
-
-              <!-- 结束日期 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">结束日期</label>
+              <span class="text-gray-500 text-sm font-medium">至</span>
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
                 <input
-                  v-model="searchParams.endDate"
                   type="date"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all"
+                  v-model="searchParams.endDate"
+                  @change="onCustomDateChange"
+                  class="pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm hover:border-hailong-primary"
                 />
               </div>
-            </div>
-
-            <!-- 搜索按钮 -->
-            <div class="flex gap-3">
-              <button
-                @click="handleSearch"
-                class="px-8 py-2 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all"
-              >
-                搜索
-              </button>
-              <button
-                @click="handleReset"
-                class="px-8 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all"
-              >
-                重置
-              </button>
-            </div>
+            </template>
           </div>
-        </transition>
+        </div>
       </div>
 
       <!-- 结果统计 -->
@@ -163,7 +214,8 @@
           @click="handleViewDetail(announcement.id)"
           :class="[
             'bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer border-l-4',
-            activeTab === 'GOV_PROCUREMENT' ? 'border-hailong-primary' : 'border-hailong-secondary'
+            searchParams.businessType === 'GOV_PROCUREMENT' ? 'border-hailong-primary' :
+            searchParams.businessType === 'CONSTRUCTION' ? 'border-hailong-secondary' : 'border-hailong-primary'
           ]"
         >
           <!-- 标题和类型 -->
@@ -177,11 +229,11 @@
                 getTypeStyle(announcement.type)
               ]"
             >
-              <svg v-if="announcement.type === '公开招标'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-if="announcement.type === '招标/采购公告'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
               </svg>
-              <svg v-else-if="announcement.type === '中标公示'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-else-if="announcement.type === '结果公告'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
               <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -293,45 +345,86 @@ import { getAnnouncementList, getAnnouncementTypes, getRegions, incrementViews }
 const router = useRouter()
 const route = useRoute()
 
-// Tab选项
-const tabs = [
+// 业务类型选项
+const businessTypes = [
+  { label: '全部', value: '' },
   { label: '政府采购', value: 'GOV_PROCUREMENT' },
   { label: '建设工程', value: 'CONSTRUCTION' }
 ]
 
-// 当前激活的Tab
-const activeTab = ref('GOV_PROCUREMENT')
+// 公告类型选项 - 全部业务类型
+const announcementTypesAll = [
+  { label: '全部', value: '' },
+  { label: '招标/采购公告', value: 'bidding' },
+  { label: '更正公告', value: 'correction' },
+  { label: '结果公告', value: 'result' }
+]
 
-// 搜索展开状态
-const searchExpanded = ref(false)
+// 公告类型选项 - 政府采购
+const announcementTypesGov = [
+  { label: '全部', value: '' },
+  { label: '招标公告', value: 'bidding' },
+  { label: '更正公告', value: 'correction' },
+  { label: '结果公告', value: 'result' }
+]
+
+// 公告类型选项 - 建设工程
+const announcementTypesConstruction = [
+  { label: '全部', value: '' },
+  { label: '采购公告', value: 'bidding' },
+  { label: '更正公告', value: 'correction' },
+  { label: '结果公告', value: 'result' }
+]
+
+// 采购类型选项（仅政府采购时显示）
+const procurementTypes = [
+  { label: '全部', value: '' },
+  { label: '货物', value: 'goods' },
+  { label: '服务', value: 'service' },
+  { label: '工程', value: 'project' }
+]
+
+// 根据业务类型动态获取公告类型选项
+const currentAnnouncementTypes = computed(() => {
+  if (searchParams.value.businessType === 'GOV_PROCUREMENT') {
+    return announcementTypesGov
+  } else if (searchParams.value.businessType === 'CONSTRUCTION') {
+    return announcementTypesConstruction
+  } else {
+    return announcementTypesAll
+  }
+})
+
+// 河南省市区列表
+const henanRegions = [
+  '郑州市', '开封市', '洛阳市', '平顶山市', '安阳市', '鹤壁市',
+  '新乡市', '焦作市', '濮阳市', '许昌市', '漯河市', '三门峡市',
+  '南阳市', '商丘市', '信阳市', '周口市', '驻马店市', '济源市'
+]
+
+// 时间范围选项
+const timeRanges = [
+  { label: '全部', value: '' },
+  { label: '当天', value: 'today' },
+  { label: '近三天', value: '3days' },
+  { label: '近一周', value: 'week' },
+  { label: '近一月', value: 'month' }
+]
 
 // 搜索参数
 const searchParams = ref({
-  keyword: '',
+  businessType: '',
   type: '',
-  regions: [],
+  procurementType: '',
+  region: '',
+  timeRange: '',
   startDate: '',
-  endDate: ''
+  endDate: '',
+  keyword: ''
 })
 
-// 公告类型选项
-const announcementTypes = ref([
-  { label: '公开招标', value: 'PUBLIC_BIDDING' },
-  { label: '中标公示', value: 'WINNING_ANNOUNCEMENT' },
-  { label: '变更公告', value: 'CHANGE_ANNOUNCEMENT' }
-])
-
-// 区域选项
-const regions = ref([
-  { label: '北京市', value: 'BEIJING' },
-  { label: '上海市', value: 'SHANGHAI' },
-  { label: '广东省', value: 'GUANGDONG' },
-  { label: '浙江省', value: 'ZHEJIANG' },
-  { label: '江苏省', value: 'JIANGSU' },
-  { label: '山东省', value: 'SHANDONG' },
-  { label: '四川省', value: 'SICHUAN' },
-  { label: '湖北省', value: 'HUBEI' }
-])
+// 自定义日期选择器显示状态
+const showCustomDatePicker = ref(false)
 
 // 公告列表
 const announcements = ref([])
@@ -383,15 +476,48 @@ const displayPages = computed(() => {
   return pages
 })
 
+// 选择时间范围
+const selectTimeRange = (value) => {
+  searchParams.value.timeRange = value
+  showCustomDatePicker.value = false
+  
+  const today = new Date()
+  const endDate = today.toISOString().split('T')[0]
+  let startDate = ''
+  
+  switch (value) {
+    case 'today':
+      startDate = endDate
+      break
+    case '3days':
+      startDate = new Date(today.setDate(today.getDate() - 3)).toISOString().split('T')[0]
+      break
+    case 'week':
+      startDate = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0]
+      break
+    case 'month':
+      startDate = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0]
+      break
+  }
+  
+  searchParams.value.startDate = startDate
+  searchParams.value.endDate = endDate
+}
+
+// 自定义日期变化
+const onCustomDateChange = () => {
+  searchParams.value.timeRange = 'custom'
+}
+
 // 加载公告列表
 const loadAnnouncements = async () => {
   loading.value = true
   try {
     const params = {
-      category: activeTab.value,
+      businessType: searchParams.value.businessType,
       keyword: searchParams.value.keyword,
       type: searchParams.value.type,
-      regions: searchParams.value.regions,
+      region: searchParams.value.region,
       startDate: searchParams.value.startDate,
       endDate: searchParams.value.endDate,
       page: currentPage.value,
@@ -406,7 +532,7 @@ const loadAnnouncements = async () => {
     // 模拟数据
     await new Promise(resolve => setTimeout(resolve, 500))
     
-    const mockData = generateMockData(activeTab.value)
+    const mockData = generateMockData(searchParams.value.businessType)
     announcements.value = mockData.slice(
       (currentPage.value - 1) * pageSize.value,
       currentPage.value * pageSize.value
@@ -422,36 +548,38 @@ const loadAnnouncements = async () => {
 }
 
 // 生成模拟数据
-const generateMockData = (category) => {
+const generateMockData = (businessType) => {
   const data = []
   const count = 25
-  const types = ['公开招标', '中标公示', '变更公告']
+  const types = ['招标/采购公告', '更正公告', '结果公告']
   
   for (let i = 1; i <= count; i++) {
     const typeIndex = i % 3
     const type = types[typeIndex]
     
-    // 根据类型生成不同的标题
+    // 根据业务类型生成不同的标题
     let title = ''
+    const category = businessType || (i % 2 === 0 ? 'GOV_PROCUREMENT' : 'CONSTRUCTION')
+    
     if (category === 'GOV_PROCUREMENT') {
       const dept = ['教育局', '卫生局', '交通局', '财政局'][i % 4]
       const item = ['办公设备', '医疗器械', '教学设备', '车辆'][i % 4]
-      if (type === '公开招标') {
+      if (type === '招标/采购公告') {
         title = `某市${dept}${item}采购项目招标公告`
-      } else if (type === '中标公示') {
+      } else if (type === '结果公告') {
         title = `某市${dept}${item}采购项目中标公示`
       } else {
-        title = `某市${dept}${item}采购项目变更公告`
+        title = `某市${dept}${item}采购项目更正公告`
       }
     } else {
       const project = ['道路', '桥梁', '学校', '医院'][i % 4]
       const action = ['改造', '建设', '维修', '扩建'][i % 4]
-      if (type === '公开招标') {
+      if (type === '招标/采购公告') {
         title = `某市${project}${action}工程施工招标公告`
-      } else if (type === '中标公示') {
+      } else if (type === '结果公告') {
         title = `某市${project}${action}工程施工中标公示`
       } else {
-        title = `某市${project}${action}工程施工变更公告`
+        title = `某市${project}${action}工程施工更正公告`
       }
     }
     
@@ -460,9 +588,9 @@ const generateMockData = (category) => {
       title: title,
       type: type,
       bidder: `某市${['建设局', '交通局', '教育局', '卫生局'][i % 4]}`,
-      // 只有中标公示才有中标人
-      winner: type === '中标公示' ? `某${['建设', '科技', '工程', '实业'][i % 4]}有限公司` : null,
-      region: ['北京市', '上海市', '广东省', '浙江省', '江苏省'][i % 5],
+      // 只有结果公告才有中标人
+      winner: type === '结果公告' ? `某${['建设', '科技', '工程', '实业'][i % 4]}有限公司` : null,
+      region: henanRegions[i % henanRegions.length],
       publishDate: `2025-${String(11 + (i % 2)).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
       views: Math.floor(Math.random() * 1000) + 100
     })
@@ -472,22 +600,29 @@ const generateMockData = (category) => {
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = async () => {
   currentPage.value = 1
-  loadAnnouncements()
+  await loadAnnouncements()
+  
+  // 更新URL参数
+  updateUrlParams()
 }
 
 // 重置
 const handleReset = () => {
   searchParams.value = {
-    keyword: '',
+    businessType: '',
     type: '',
-    regions: [],
+    region: '',
+    timeRange: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
+    keyword: ''
   }
-  currentPage.value = 1
-  loadAnnouncements()
+  showCustomDatePicker.value = false
+  
+  selectTimeRange('')
+  handleSearch()
 }
 
 // 页码变化
@@ -501,11 +636,11 @@ const handlePageChange = (page) => {
 // 获取类型样式
 const getTypeStyle = (type) => {
   switch (type) {
-    case '公开招标':
+    case '招标/采购公告':
       return 'bg-hailong-primary/10 text-hailong-primary border border-hailong-primary/20'
-    case '中标公示':
+    case '结果公告':
       return 'bg-hailong-secondary/10 text-hailong-secondary border border-hailong-secondary/20'
-    case '变更公告':
+    case '更正公告':
       return 'bg-hailong-cyan/10 text-hailong-cyan border border-hailong-cyan/20'
     default:
       return 'bg-gray-100 text-gray-800 border border-gray-200'
@@ -525,19 +660,50 @@ const handleViewDetail = async (id) => {
   }
 }
 
-// 监听Tab变化
-watch(activeTab, () => {
-  currentPage.value = 1
-  loadAnnouncements()
-})
+// 更新URL参数
+const updateUrlParams = () => {
+  const query = {}
+  
+  if (searchParams.value.businessType) query.businessType = searchParams.value.businessType
+  if (searchParams.value.type) query.type = searchParams.value.type
+  if (searchParams.value.region) query.region = searchParams.value.region
+  if (searchParams.value.timeRange) query.timeRange = searchParams.value.timeRange
+  if (searchParams.value.startDate) query.startDate = searchParams.value.startDate
+  if (searchParams.value.endDate) query.endDate = searchParams.value.endDate
+  if (searchParams.value.keyword) query.keyword = searchParams.value.keyword
+  
+  router.replace({ query })
+}
+
+// 从URL参数恢复筛选条件
+const restoreFiltersFromUrl = () => {
+  const query = route.query
+  
+  if (query.businessType) searchParams.value.businessType = query.businessType
+  if (query.type) searchParams.value.type = query.type
+  if (query.region) searchParams.value.region = query.region
+  if (query.keyword) searchParams.value.keyword = query.keyword
+  
+  if (query.timeRange) {
+    searchParams.value.timeRange = query.timeRange
+    if (query.timeRange === 'custom') {
+      showCustomDatePicker.value = true
+      if (query.startDate) searchParams.value.startDate = query.startDate
+      if (query.endDate) searchParams.value.endDate = query.endDate
+    } else {
+      selectTimeRange(query.timeRange)
+    }
+  } else {
+    selectTimeRange('')
+  }
+}
 
 // 组件挂载时加载数据
 onMounted(() => {
-  // 从URL参数中获取tab类型
-  const tabParam = route.query.tab
-  if (tabParam && (tabParam === 'GOV_PROCUREMENT' || tabParam === 'CONSTRUCTION')) {
-    activeTab.value = tabParam
-  }
+  // 从URL恢复筛选条件
+  restoreFiltersFromUrl()
+  
+  // 获取数据
   loadAnnouncements()
 })
 </script>
