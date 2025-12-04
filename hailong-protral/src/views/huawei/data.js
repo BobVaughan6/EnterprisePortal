@@ -240,10 +240,10 @@ export const policyRegulations = [
 ]
 
 export const navLinks = [
-  { name: '首页', path: '/huawei' },
-  { name: '关于海隆', path: '/huawei/detail/about' },
-  { name: '公告信息', path: '/huawei/detail/announcements' },
-  { name: '政策法规', path: '/huawei/detail/policies' },
-  { name: '实用工具', path: '/huawei/detail/tools' },
-  { name: '联系我们', path: '/huawei/detail/contact' }
+  { name: '首页', path: '/' },
+  { name: '关于海隆', path: '/about' },
+  { name: '公告信息', path: '/detail/announcements' },
+  { name: '政策法规', path: '/detail/policies' },
+  { name: '实用工具', path: '/detail/tools' },
+  { name: '联系我们', path: '/detail/contact' }
 ]

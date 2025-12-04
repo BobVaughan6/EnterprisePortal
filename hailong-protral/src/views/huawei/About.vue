@@ -1,25 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-huawei-dark via-huawei-primary to-huawei-secondary">
     <!-- 导航栏 -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-huawei-dark/90 backdrop-blur-md text-white shadow-2xl border-b border-huawei-cyan/30">
-      <div class="container-wide">
-        <div class="flex items-center justify-between h-20">
-          <div class="flex items-center space-x-3">
-            <img :src="logoUrl" alt="海隆咨询" class="h-12 w-auto" />
-            <div class="text-3xl font-bold font-tech bg-gradient-to-r from-huawei-primary to-huawei-secondary bg-clip-text text-transparent">
-              海隆咨询
-            </div>
-          </div>
-          <div class="hidden md:flex items-center space-x-8">
-            <router-link v-for="link in navLinks" :key="link.name" :to="link.path"
-              class="hover:text-huawei-cyan transition-colors text-sm font-medium"
-              :class="{ 'text-huawei-cyan': link.path === '/huawei/detail/about' }">
-              {{ link.name }}
-            </router-link>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <Header />
 
     <!-- 页面标题 -->
     <div class="pt-32 pb-16 text-center text-white">
@@ -180,43 +162,7 @@
     </div>
 
     <!-- 页脚 -->
-    <footer class="bg-huawei-dark text-white py-12 border-t border-huawei-cyan/20">
-      <div class="container-wide">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <h3 class="text-xl font-bold mb-4 text-huawei-cyan font-tech">海隆咨询</h3>
-            <p class="text-sm text-gray-400">海纳百川，才望兼隆</p>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-4">业务范围</h4>
-            <ul class="space-y-2 text-sm text-gray-400">
-              <li><a href="#" class="hover:text-huawei-cyan">政府采购代理</a></li>
-              <li><a href="#" class="hover:text-huawei-cyan">工程招标代理</a></li>
-              <li><a href="#" class="hover:text-huawei-cyan">造价咨询</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-4">快速链接</h4>
-            <ul class="space-y-2 text-sm text-gray-400">
-              <li><router-link to="/huawei" class="hover:text-huawei-cyan">首页</router-link></li>
-              <li><router-link to="/huawei/detail/announcements" class="hover:text-huawei-cyan">公告信息</router-link></li>
-              <li><router-link to="/huawei/detail/policies" class="hover:text-huawei-cyan">政策法规</router-link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-4">联系我们</h4>
-            <ul class="space-y-2 text-sm text-gray-400">
-              <li>电话: 400-123-4567</li>
-              <li>邮箱: info@hailong.com</li>
-              <li>地址: 某市某区某街道</li>
-            </ul>
-          </div>
-        </div>
-        <div class="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-          <p>© 2025 海隆咨询有限公司 版权所有</p>
-        </div>
-      </div>
-    </footer>
+    <Footer />
 
     <!-- 图片预览模态框 -->
     <div v-if="showImagePreview"
@@ -238,8 +184,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { navLinks, businessScope } from './data.js'
-import logoUrl from '@/assets/logo.png'
+import { businessScope } from './data.js'
+import Header from '@/components/Header.vue'
+import Footer from '@/components/Footer.vue'
 
 // Tab配置
 const tabs = [
