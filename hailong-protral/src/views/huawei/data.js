@@ -1,208 +1,249 @@
-// 方案八：华为政企/数字化转型风格 - 数据配置
+// 海隆咨询 - 数据配置
 
 export const companyInfo = {
-  name: 'Huawei Enterprise',
-  slogan: '数字化 智能化 让城市更智慧',
-  description: '华为政企业务致力于成为数字中国的底座、智慧城市的使能者,通过云计算、大数据、人工智能、5G等新ICT技术,助力政府与企业数字化转型。',
+  name: '海隆咨询',
+  slogan: '海纳百川，才望兼隆',
+  description: '致力于成为工程建设的专业支撑者、行业发展的可信力量，以科学、规范、公正的咨询服务助力政府与企业项目高质量实施。',
   stats: [
-    { label: '服务城市', value: '700+', unit: '个' },
-    { label: '合作伙伴', value: '28000+', unit: '家' },
-    { label: '研发投入', value: '1600亿', unit: '人民币/年' },
-    { label: '专利数量', value: '120000+', unit: '件' }
+    { label: '服务项目', value: '5000+', unit: '个' },
+    { label: '合作客户', value: '800+', unit: '家' },
+    { label: '专业团队', value: '200+', unit: '人' },
+    { label: '服务年限', value: '15+', unit: '年' }
   ]
 }
 
-export const solutions = [
+// 企业简介
+export const companyProfile = {
+  title: '企业简介',
+  content: '海隆咨询是一家专业从事工程咨询服务的综合性企业，拥有政府采购代理、招标代理、造价咨询等多项资质。公司秉承"海纳百川，才望兼隆"的理念，为政府机关、企事业单位提供全方位、高质量的工程咨询服务。',
+  highlights: [
+    '专业资质齐全',
+    '经验丰富团队',
+    '服务质量优质',
+    '客户口碑良好'
+  ]
+}
+
+// 业务范围
+export const businessScope = [
   {
     id: 1,
-    name: '智慧城市',
-    icon: '🏙️',
-    description: '城市大脑、一网统管、一网通办',
-    features: ['城市运营中心', '智慧交通', '智慧安防', '智慧政务'],
-    image: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&h=400&fit=crop'
+    name: '政府采购代理',
+    description: '提供政府采购项目全流程代理服务',
+    features: ['采购需求编制', '招标文件制作', '开评标组织', '合同签订协助'],
+    image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop'
   },
   {
     id: 2,
-    name: '数字政府',
-    icon: '🏛️',
-    description: '政务云、政务大数据、互联网+政务',
-    features: ['政务云平台', '数据共享交换', '一网通办', '智能审批'],
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=400&fit=crop'
+    name: '工程招标代理',
+    description: '建设工程项目招标投标全程服务',
+    features: ['招标方案策划', '资格预审', '评标专家抽取', '中标公示发布'],
+    image: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&h=400&fit=crop'
   },
   {
     id: 3,
-    name: '智能制造',
-    icon: '🏭',
-    description: '工业互联网、智能工厂、数字化车间',
-    features: ['工业物联网', 'AI质检', '数字孪生', '智能运维'],
-    image: 'https://images.unsplash.com/photo-1565515636-07e2d2a78b9e?w=600&h=400&fit=crop'
+    name: '造价咨询',
+    description: '工程造价全过程咨询与管理',
+    features: ['工程预算编制', '工程量清单', '结算审核', '造价分析'],
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop'
   },
   {
     id: 4,
-    name: '智慧金融',
-    icon: '🏦',
-    description: '金融云、智能风控、开放银行',
-    features: ['分布式核心', '智能风控', 'AI客服', '开放平台'],
-    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&h=400&fit=crop'
+    name: '项目管理',
+    description: '工程项目全生命周期管理服务',
+    features: ['项目策划', '进度管控', '质量监督', '风险管理'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop'
   },
   {
     id: 5,
-    name: '智慧教育',
-    icon: '📚',
-    description: '教育云、智慧校园、在线教育',
-    features: ['教育云平台', '智慧教室', 'AI教学', '教育大数据'],
-    image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop'
+    name: '咨询服务',
+    description: '专业的工程技术咨询与顾问服务',
+    features: ['可行性研究', '方案论证', '技术咨询', '政策解读'],
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop'
   },
   {
     id: 6,
-    name: '智慧医疗',
-    icon: '🏥',
-    description: '医疗云、远程医疗、AI辅助诊断',
-    features: ['医疗云平台', '远程会诊', 'AI影像', '健康档案'],
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d04d1d?w=600&h=400&fit=crop'
+    name: '培训服务',
+    description: '招投标及工程管理专业培训',
+    features: ['政策培训', '业务培训', '技能提升', '资质考试'],
+    image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop'
   }
 ]
 
-export const cases = [
-  {
-    id: 1,
-    city: '深圳市',
-    title: '深圳智慧城市运营中心',
-    achievement: '一屏观全城、一网管全城',
-    impact: '城市治理效率提升40%',
-    image: 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=800&h=600&fit=crop'
+// 交易数据统计
+export const transactionData = {
+  title: '交易数据可视化',
+  yearlyStats: {
+    totalProjects: 1250,
+    totalAmount: '35.8亿',
+    govProcurement: 680,
+    construction: 570
   },
-  {
-    id: 2,
-    city: '上海市',
-    title: '上海"一网通办"政务服务平台',
-    achievement: '2000+政务服务事项在线办理',
-    impact: '办事时间缩短70%',
-    image: 'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=800&h=600&fit=crop'
-  },
-  {
-    id: 3,
-    city: '杭州市',
-    title: '杭州城市大脑',
-    achievement: '交通拥堵指数下降15%',
-    impact: '救护车到达时间缩短50%',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop'
-  }
-]
+  monthlyTrend: [
+    { month: '1月', projects: 85, amount: 2.5 },
+    { month: '2月', projects: 72, amount: 2.1 },
+    { month: '3月', projects: 105, amount: 3.2 },
+    { month: '4月', projects: 98, amount: 2.8 },
+    { month: '5月', projects: 112, amount: 3.5 },
+    { month: '6月', projects: 125, amount: 3.8 },
+    { month: '7月', projects: 108, amount: 3.1 },
+    { month: '8月', projects: 95, amount: 2.7 },
+    { month: '9月', projects: 118, amount: 3.4 },
+    { month: '10月', projects: 132, amount: 4.2 },
+    { month: '11月', projects: 128, amount: 3.9 },
+    { month: '12月', projects: 142, amount: 4.6 }
+  ]
+}
 
-export const insights = [
+// 重要业绩展示
+export const majorAchievements = [
   {
     id: 1,
-    title: '数字化转型白皮书2025',
-    category: '白皮书',
-    date: '2025-11-28',
-    summary: '全面解读数字化转型趋势、路径与实践...',
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=600&fit=crop',
-    downloads: 8500
+    title: '某市政府采购中心年度框架协议',
+    amount: '2.8亿',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop'
   },
   {
     id: 2,
-    title: '人工智能赋能千行百业',
-    category: '技术洞察',
-    date: '2025-11-22',
-    summary: '探讨AI技术在各行业的创新应用与价值创造...',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop',
-    downloads: 6200
+    title: '某高新区基础设施建设项目',
+    amount: '5.2亿',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop'
   },
   {
     id: 3,
-    title: '5G+工业互联网应用案例集',
-    category: '案例研究',
-    date: '2025-11-18',
-    summary: '汇集5G在工业领域的成功应用案例...',
-    image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&h=600&fit=crop',
-    downloads: 7100
+    title: '某医院医疗设备采购项目',
+    amount: '1.5亿',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop'
   },
   {
     id: 4,
-    title: '智慧城市建设指南',
-    category: '行业报告',
-    date: '2025-11-15',
-    summary: '智慧城市规划、建设、运营全流程指导...',
-    image: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&h=600&fit=crop',
-    downloads: 9300
+    title: '某学校智慧校园建设项目',
+    amount: '8500万',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=300&fit=crop'
   },
   {
     id: 5,
-    title: '数据安全与隐私保护实践',
-    category: '安全',
-    date: '2025-11-10',
-    summary: '数据全生命周期安全防护体系...',
-    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=600&fit=crop',
-    downloads: 5400
+    title: '某工业园区道路工程',
+    amount: '3.6亿',
+    year: '2023',
+    image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=300&fit=crop'
   },
   {
     id: 6,
-    title: '云原生架构最佳实践',
-    category: '技术架构',
-    date: '2025-11-05',
-    summary: '云原生应用开发、部署与运维指南...',
-    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=600&fit=crop',
-    downloads: 4800
+    title: '某政务服务中心装修项目',
+    amount: '6800万',
+    year: '2023',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'
   }
 ]
 
-export const biddings = [
+// 政府采购公告
+export const govProcurementAnnouncements = [
   {
     id: 1,
-    title: '某省级政务云平台建设项目',
-    budget: '¥3.2亿',
+    title: '某市教育局教学设备采购项目招标公告',
+    budget: '¥850万',
+    type: '公开招标',
+    deadline: '2025-12-20',
+    status: '进行中',
+    publishDate: '2025-12-01'
+  },
+  {
+    id: 2,
+    title: '某区政府办公设备及家具采购项目',
+    budget: '¥320万',
+    type: '竞争性谈判',
+    deadline: '2025-12-18',
+    status: '进行中',
+    publishDate: '2025-11-28'
+  },
+  {
+    id: 3,
+    title: '某医院医疗器械采购项目招标公告',
+    budget: '¥1200万',
     type: '公开招标',
     deadline: '2025-12-25',
-    status: '进行中',
-    scope: '云平台、大数据、AI'
-  },
-  {
-    id: 2,
-    title: '智慧城市运营中心建设',
-    budget: '¥1.8亿',
-    type: '邀请招标',
-    deadline: '2026-01-05',
-    status: '进行中',
-    scope: 'IOC、数据中台、应用'
-  },
-  {
-    id: 3,
-    title: '5G+工业互联网示范项目',
-    budget: '¥9500万',
-    type: '竞争性磋商',
-    deadline: '2026-01-12',
     status: '即将开始',
-    scope: '5G专网、工业互联网平台'
+    publishDate: '2025-11-25'
   }
 ]
 
-export const winningBids = [
+// 建设工程公告
+export const constructionAnnouncements = [
   {
     id: 1,
-    project: '某市新型智慧城市建设项目',
-    winner: '华为技术有限公司',
-    amount: '¥5.6亿',
-    date: '2025-11-22',
-    duration: '3年'
+    title: '某市政道路改造工程施工招标公告',
+    budget: '¥5600万',
+    type: '公开招标',
+    deadline: '2025-12-22',
+    status: '进行中',
+    publishDate: '2025-12-02'
   },
   {
     id: 2,
-    project: '数字政府一体化平台',
-    winner: '华为软件技术有限公司',
-    amount: '¥2.8亿',
-    date: '2025-11-15',
-    duration: '2年'
+    title: '某学校综合楼建设项目招标公告',
+    budget: '¥3800万',
+    type: '邀请招标',
+    deadline: '2025-12-19',
+    status: '进行中',
+    publishDate: '2025-11-29'
+  },
+  {
+    id: 3,
+    title: '某工业园区配套设施建设工程',
+    budget: '¥8200万',
+    type: '公开招标',
+    deadline: '2025-12-28',
+    status: '即将开始',
+    publishDate: '2025-11-26'
+  }
+]
+
+// 政策法规
+export const policyRegulations = [
+  {
+    id: 1,
+    title: '政府采购法实施条例（2024修订）',
+    category: '法律法规',
+    date: '2024-11-15',
+    summary: '最新修订的政府采购法实施条例，规范政府采购行为...',
+    downloads: 3200
+  },
+  {
+    id: 2,
+    title: '招标投标法实施细则',
+    category: '法律法规',
+    date: '2024-10-20',
+    summary: '招标投标活动的具体实施规范和要求...',
+    downloads: 2800
+  },
+  {
+    id: 3,
+    title: '工程造价咨询管理办法',
+    category: '部门规章',
+    date: '2024-09-10',
+    summary: '工程造价咨询企业和从业人员管理规定...',
+    downloads: 2100
+  },
+  {
+    id: 4,
+    title: '建设工程质量管理条例',
+    category: '行政法规',
+    date: '2024-08-05',
+    summary: '建设工程质量管理的基本要求和责任划分...',
+    downloads: 2500
   }
 ]
 
 export const navLinks = [
-  { name: '首页', path: '/' },
-  { name: '关于我们', path: '/detail/about' },
-  { name: '解决方案', path: '/detail/solutions' },
-  { name: '成功案例', path: '/detail/cases' },
-  { name: '行业洞察', path: '/detail/insights' },
-  { name: '招标信息', path: '/detail/bidding' },
-  { name: '生态合作', path: '/detail/partners' },
-  { name: '联系我们', path: '/detail/contact' }
+  { name: '首页', path: '/huawei' },
+  { name: '关于海隆', path: '/huawei/detail/about' },
+  { name: '公告信息', path: '/huawei/detail/announcements' },
+  { name: '政策法规', path: '/huawei/detail/policies' },
+  { name: '实用工具', path: '/huawei/detail/tools' },
+  { name: '联系我们', path: '/huawei/detail/contact' }
 ]
