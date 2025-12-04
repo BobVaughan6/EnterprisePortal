@@ -10,6 +10,11 @@ const routes = [
     path: '/detail/:id?',
     name: 'HuaweiDetail',
     component: () => import('@/views/huawei/Detail.vue')
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('@/views/huawei/About.vue')
   }
 ]
 
