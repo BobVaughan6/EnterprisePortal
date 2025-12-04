@@ -1,7 +1,7 @@
 {
   "name": "bidding-portal-demo",
   "version": "1.0.0",
-  "description": "工程咨询公司招投标门户",
+  "description": "海隆工程咨询有限公司门户",
   "type": "module",
   "scripts": {
     "dev": "vite",
