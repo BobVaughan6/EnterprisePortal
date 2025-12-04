@@ -108,21 +108,64 @@
           <div class="flex items-center gap-4 flex-wrap">
             <div class="flex items-center gap-4">
               <label class="text-sm font-medium text-gray-700 whitespace-nowrap w-16">项目区域</label>
+              
+              <!-- 省份选择 -->
               <div class="relative">
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <select
-                  v-model="searchParams.region"
+                  v-model="searchParams.province"
+                  @change="onProvinceChange"
                   class="pl-9 pr-8 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm bg-white hover:border-hailong-primary cursor-pointer appearance-none"
                   style="min-width: 120px;"
                 >
-                  <option value="">全部区域</option>
-                  <option v-for="region in henanRegions" :key="region" :value="region">
-                    {{ region }}
+                  <option value="">全部省份</option>
+                  <option v-for="province in provinces" :key="province.code" :value="province.code">
+                    {{ province.name }}
                   </option>
-                  <option value="省外">省外</option>
+                </select>
+                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+
+              <!-- 城市选择 -->
+              <div class="relative" v-if="searchParams.province">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <select
+                  v-model="searchParams.city"
+                  @change="onCityChange"
+                  class="pl-9 pr-8 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm bg-white hover:border-hailong-primary cursor-pointer appearance-none"
+                  style="min-width: 120px;"
+                >
+                  <option value="">全部城市</option>
+                  <option v-for="city in cities" :key="city.code" :value="city.code">
+                    {{ city.name }}
+                  </option>
+                </select>
+                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+
+              <!-- 区县选择 -->
+              <div class="relative" v-if="searchParams.city">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <select
+                  v-model="searchParams.district"
+                  class="pl-9 pr-8 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hailong-primary focus:border-transparent outline-none transition-all text-sm bg-white hover:border-hailong-primary cursor-pointer appearance-none"
+                  style="min-width: 120px;"
+                >
+                  <option value="">全部区县</option>
+                  <option v-for="district in districts" :key="district.code" :value="district.code">
+                    {{ district.name }}
+                  </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -229,7 +272,7 @@
                 getTypeStyle(announcement.type)
               ]"
             >
-              <svg v-if="announcement.type === '招标/采购公告'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-if="announcement.type === '招标公告' || announcement.type === '采购公告'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
               </svg>
@@ -341,6 +384,7 @@ import { useRouter, useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import { getAnnouncementList, getAnnouncementTypes, getRegions, incrementViews } from '@/api/announcement.js'
+import cityData from '@/assets/city.json'
 
 const router = useRouter()
 const route = useRoute()
@@ -395,12 +439,10 @@ const currentAnnouncementTypes = computed(() => {
   }
 })
 
-// 河南省市区列表
-const henanRegions = [
-  '郑州市', '开封市', '洛阳市', '平顶山市', '安阳市', '鹤壁市',
-  '新乡市', '焦作市', '濮阳市', '许昌市', '漯河市', '三门峡市',
-  '南阳市', '商丘市', '信阳市', '周口市', '驻马店市', '济源市'
-]
+// 省市区数据
+const provinces = ref(cityData.provinces)
+const cities = ref([])
+const districts = ref([])
 
 // 时间范围选项
 const timeRanges = [
@@ -416,12 +458,49 @@ const searchParams = ref({
   businessType: '',
   type: '',
   procurementType: '',
+  province: '',
+  city: '',
+  district: '',
   region: '',
   timeRange: '',
   startDate: '',
   endDate: '',
   keyword: ''
 })
+
+// 省份变化处理
+const onProvinceChange = () => {
+  // 重置城市和区县
+  searchParams.value.city = ''
+  searchParams.value.district = ''
+  districts.value = []
+  
+  if (searchParams.value.province) {
+    // 查找选中的省份
+    const selectedProvince = provinces.value.find(p => p.code === searchParams.value.province)
+    if (selectedProvince) {
+      cities.value = selectedProvince.cities || []
+    }
+  } else {
+    cities.value = []
+  }
+}
+
+// 城市变化处理
+const onCityChange = () => {
+  // 重置区县
+  searchParams.value.district = ''
+  
+  if (searchParams.value.city) {
+    // 查找选中的城市
+    const selectedCity = cities.value.find(c => c.code === searchParams.value.city)
+    if (selectedCity) {
+      districts.value = selectedCity.districts || []
+    }
+  } else {
+    districts.value = []
+  }
+}
 
 // 自定义日期选择器显示状态
 const showCustomDatePicker = ref(false)
@@ -513,11 +592,24 @@ const onCustomDateChange = () => {
 const loadAnnouncements = async () => {
   loading.value = true
   try {
+    // 构建区域参数
+    let regionParam = ''
+    if (searchParams.value.district) {
+      const district = districts.value.find(d => d.code === searchParams.value.district)
+      regionParam = district ? district.name : ''
+    } else if (searchParams.value.city) {
+      const city = cities.value.find(c => c.code === searchParams.value.city)
+      regionParam = city ? city.name : ''
+    } else if (searchParams.value.province) {
+      const province = provinces.value.find(p => p.code === searchParams.value.province)
+      regionParam = province ? province.name : ''
+    }
+    
     const params = {
       businessType: searchParams.value.businessType,
       keyword: searchParams.value.keyword,
       type: searchParams.value.type,
-      region: searchParams.value.region,
+      region: regionParam,
       startDate: searchParams.value.startDate,
       endDate: searchParams.value.endDate,
       page: currentPage.value,
@@ -551,46 +643,56 @@ const loadAnnouncements = async () => {
 const generateMockData = (businessType) => {
   const data = []
   const count = 25
-  const types = ['招标/采购公告', '更正公告', '结果公告']
+  const types = ['bidding', 'correction', 'result']
   
   for (let i = 1; i <= count; i++) {
     const typeIndex = i % 3
-    const type = types[typeIndex]
+    const typeValue = types[typeIndex]
     
-    // 根据业务类型生成不同的标题
+    // 根据业务类型生成不同的标题和类型名称
     let title = ''
+    let typeName = ''
     const category = businessType || (i % 2 === 0 ? 'GOV_PROCUREMENT' : 'CONSTRUCTION')
     
     if (category === 'GOV_PROCUREMENT') {
+      // 政府采购
       const dept = ['教育局', '卫生局', '交通局', '财政局'][i % 4]
       const item = ['办公设备', '医疗器械', '教学设备', '车辆'][i % 4]
-      if (type === '招标/采购公告') {
+      if (typeValue === 'bidding') {
         title = `某市${dept}${item}采购项目招标公告`
-      } else if (type === '结果公告') {
+        typeName = '招标公告'
+      } else if (typeValue === 'result') {
         title = `某市${dept}${item}采购项目中标公示`
+        typeName = '结果公告'
       } else {
         title = `某市${dept}${item}采购项目更正公告`
+        typeName = '更正公告'
       }
     } else {
+      // 建设工程
       const project = ['道路', '桥梁', '学校', '医院'][i % 4]
       const action = ['改造', '建设', '维修', '扩建'][i % 4]
-      if (type === '招标/采购公告') {
-        title = `某市${project}${action}工程施工招标公告`
-      } else if (type === '结果公告') {
+      if (typeValue === 'bidding') {
+        title = `某市${project}${action}工程施工采购公告`
+        typeName = '采购公告'
+      } else if (typeValue === 'result') {
         title = `某市${project}${action}工程施工中标公示`
+        typeName = '结果公告'
       } else {
         title = `某市${project}${action}工程施工更正公告`
+        typeName = '更正公告'
       }
     }
     
     data.push({
       id: i,
       title: title,
-      type: type,
+      type: typeName,
+      businessType: category,
       bidder: `某市${['建设局', '交通局', '教育局', '卫生局'][i % 4]}`,
       // 只有结果公告才有中标人
-      winner: type === '结果公告' ? `某${['建设', '科技', '工程', '实业'][i % 4]}有限公司` : null,
-      region: henanRegions[i % henanRegions.length],
+      winner: typeValue === 'result' ? `某${['建设', '科技', '工程', '实业'][i % 4]}有限公司` : null,
+      region: ['郑州市', '开封市', '洛阳市', '平顶山市', '安阳市', '鹤壁市', '新乡市', '焦作市', '濮阳市', '许昌市', '漯河市', '三门峡市', '南阳市', '商丘市', '信阳市', '周口市', '驻马店市', '济源市'][i % 18],
       publishDate: `2025-${String(11 + (i % 2)).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
       views: Math.floor(Math.random() * 1000) + 100
     })
@@ -613,12 +715,18 @@ const handleReset = () => {
   searchParams.value = {
     businessType: '',
     type: '',
+    procurementType: '',
+    province: '',
+    city: '',
+    district: '',
     region: '',
     timeRange: '',
     startDate: '',
     endDate: '',
     keyword: ''
   }
+  cities.value = []
+  districts.value = []
   showCustomDatePicker.value = false
   
   selectTimeRange('')
@@ -636,7 +744,8 @@ const handlePageChange = (page) => {
 // 获取类型样式
 const getTypeStyle = (type) => {
   switch (type) {
-    case '招标/采购公告':
+    case '招标公告':
+    case '采购公告':
       return 'bg-hailong-primary/10 text-hailong-primary border border-hailong-primary/20'
     case '结果公告':
       return 'bg-hailong-secondary/10 text-hailong-secondary border border-hailong-secondary/20'
@@ -666,7 +775,9 @@ const updateUrlParams = () => {
   
   if (searchParams.value.businessType) query.businessType = searchParams.value.businessType
   if (searchParams.value.type) query.type = searchParams.value.type
-  if (searchParams.value.region) query.region = searchParams.value.region
+  if (searchParams.value.province) query.province = searchParams.value.province
+  if (searchParams.value.city) query.city = searchParams.value.city
+  if (searchParams.value.district) query.district = searchParams.value.district
   if (searchParams.value.timeRange) query.timeRange = searchParams.value.timeRange
   if (searchParams.value.startDate) query.startDate = searchParams.value.startDate
   if (searchParams.value.endDate) query.endDate = searchParams.value.endDate
@@ -681,8 +792,22 @@ const restoreFiltersFromUrl = () => {
   
   if (query.businessType) searchParams.value.businessType = query.businessType
   if (query.type) searchParams.value.type = query.type
-  if (query.region) searchParams.value.region = query.region
   if (query.keyword) searchParams.value.keyword = query.keyword
+  
+  // 恢复省市区选择
+  if (query.province) {
+    searchParams.value.province = query.province
+    onProvinceChange()
+    
+    if (query.city) {
+      searchParams.value.city = query.city
+      onCityChange()
+      
+      if (query.district) {
+        searchParams.value.district = query.district
+      }
+    }
+  }
   
   if (query.timeRange) {
     searchParams.value.timeRange = query.timeRange
