@@ -143,14 +143,14 @@
     <div class="py-24 bg-white">
       <div class="container-wide">
         <div class="text-center mb-16">
-          <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">公告信息预览</h2>
+          <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">公告信息</h2>
           <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
             <div class="flex items-center justify-between mb-6">
-              <h3 class="text-2xl font-bold text-hailong-dark">政府采购公告</h3>
-              <router-link to="/hailong/detail/announcements"
+              <h3 class="text-2xl font-bold text-hailong-dark">政府采购</h3>
+              <router-link to="/announcements?tab=GOV_PROCUREMENT"
                 class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
             </div>
             <div class="space-y-4">
@@ -170,8 +170,8 @@
           </div>
           <div>
             <div class="flex items-center justify-between mb-6">
-              <h3 class="text-2xl font-bold text-hailong-dark">建设工程公告</h3>
-              <router-link to="/hailong/detail/announcements"
+              <h3 class="text-2xl font-bold text-hailong-dark">建设工程</h3>
+              <router-link to="/announcements?tab=CONSTRUCTION"
                 class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
             </div>
             <div class="space-y-4">

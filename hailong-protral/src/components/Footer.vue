@@ -19,8 +19,8 @@
           <ul class="space-y-2 text-sm text-gray-400">
             <li><router-link to="/" class="hover:text-hailong-cyan transition-colors">首页</router-link></li>
             <li><router-link to="/about" class="hover:text-hailong-cyan transition-colors">关于海隆</router-link></li>
-            <li><router-link to="/detail/announcements" class="hover:text-hailong-cyan transition-colors">公告信息</router-link></li>
-            <li><router-link to="/detail/policies" class="hover:text-hailong-cyan transition-colors">政策法规</router-link></li>
+            <li><router-link to="/announcements" class="hover:text-hailong-cyan transition-colors">公告信息</router-link></li>
+            <li><router-link to="/policies" class="hover:text-hailong-cyan transition-colors">政策法规</router-link></li>
           </ul>
         </div>
         <div>

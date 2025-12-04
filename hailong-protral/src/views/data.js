@@ -242,8 +242,8 @@ export const policyRegulations = [
 export const navLinks = [
   { name: '首页', path: '/' },
   { name: '关于海隆', path: '/about' },
-  { name: '公告信息', path: '/detail/announcements' },
-  { name: '政策法规', path: '/detail/policies' },
-  { name: '实用工具', path: '/detail/tools' },
-  { name: '联系我们', path: '/detail/contact' }
+  { name: '公告信息', path: '/announcements' },
+  { name: '政策法规', path: '/policies' },
+  { name: '实用工具', path: '/tools' },
+  { name: '联系我们', path: '/contact' }
 ]
