@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        huawei: {
+        hailong: {
           primary: '#2878FF',
           secondary: '#A259FF',
           dark: '#0F1419',

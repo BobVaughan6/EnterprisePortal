@@ -3,18 +3,18 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    name: 'HuaweiHome',
-    component: () => import('@/views/huawei/Home.vue')
+    name: 'hailongHome',
+    component: () => import('@/views/Home.vue')
   },
   {
     path: '/detail/:id?',
-    name: 'HuaweiDetail',
-    component: () => import('@/views/huawei/Detail.vue')
+    name: 'hailongDetail',
+    component: () => import('@/views/Detail.vue')
   },
   {
     path: '/about',
     name: 'About',
-    component: () => import('@/views/huawei/About.vue')
+    component: () => import('@/views/About.vue')
   }
 ]
 

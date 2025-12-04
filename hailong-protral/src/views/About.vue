@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-huawei-dark via-huawei-primary to-huawei-secondary">
+  <div class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary">
     <!-- 导航栏 -->
     <Header />
 
     <!-- 页面标题 -->
     <div class="pt-32 pb-16 text-center text-white">
-      <h1 class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-huawei-cyan to-white bg-clip-text text-transparent animate-fade-in">
+      <h1 class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
         关于海隆
       </h1>
       <p class="text-xl text-gray-200">海纳百川，才望兼隆</p>
@@ -18,7 +18,7 @@
           <button v-for="tab in tabs" :key="tab.id"
             @click="activeTab = tab.id"
             class="px-6 py-4 text-white font-medium whitespace-nowrap transition-all border-b-2"
-            :class="activeTab === tab.id ? 'border-huawei-cyan text-huawei-cyan' : 'border-transparent hover:text-huawei-cyan'">
+            :class="activeTab === tab.id ? 'border-hailong-cyan text-hailong-cyan' : 'border-transparent hover:text-hailong-cyan'">
             {{ tab.name }}
           </button>
         </div>
@@ -33,12 +33,12 @@
           <div class="max-w-5xl mx-auto">
             <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
               <div v-if="loading" class="p-12 text-center">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-huawei-primary"></div>
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
                 <p class="mt-4 text-gray-600">加载中...</p>
               </div>
               <div v-else-if="error" class="p-12 text-center">
                 <p class="text-red-600">{{ error }}</p>
-                <button @click="fetchCompanyProfile" class="mt-4 px-6 py-2 bg-huawei-primary text-white rounded-lg hover:bg-huawei-secondary transition-colors">
+                <button @click="fetchCompanyProfile" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
                   重新加载
                 </button>
               </div>
@@ -49,7 +49,7 @@
                     class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div class="p-12">
-                  <h2 class="text-4xl font-bold text-huawei-dark mb-8 font-tech">{{ companyProfile.title }}</h2>
+                  <h2 class="text-4xl font-bold text-hailong-dark mb-8 font-tech">{{ companyProfile.title }}</h2>
                   <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed" v-html="companyProfile.content"></div>
                 </div>
               </div>
@@ -60,23 +60,23 @@
         <!-- 企业资质与业务范围 -->
         <div v-show="activeTab === 'business'" class="animate-fade-in">
           <div class="mb-16">
-            <h2 class="text-4xl font-bold text-huawei-dark mb-8 text-center font-tech">业务范围</h2>
+            <h2 class="text-4xl font-bold text-hailong-dark mb-8 text-center font-tech">业务范围</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div v-for="business in businessScope" :key="business.id"
-                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-huawei-primary">
+                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
                 <div class="h-48 overflow-hidden">
                   <img :src="business.image" :alt="business.name"
                     @click="openImagePreview(business.image)"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer" />
                 </div>
                 <div class="p-6">
-                  <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-huawei-primary transition-colors">
+                  <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors">
                     {{ business.name }}
                   </h3>
                   <p class="text-gray-600 mb-4">{{ business.description }}</p>
                   <ul class="space-y-2">
                     <li v-for="feature in business.features" :key="feature" class="text-sm text-gray-500 flex items-center">
-                      <span class="w-1.5 h-1.5 bg-huawei-secondary rounded-full mr-2"></span>
+                      <span class="w-1.5 h-1.5 bg-hailong-secondary rounded-full mr-2"></span>
                       {{ feature }}
                     </li>
                   </ul>
@@ -86,13 +86,13 @@
           </div>
 
           <div class="max-w-5xl mx-auto">
-            <h2 class="text-4xl font-bold text-huawei-dark mb-8 text-center font-tech">企业资质</h2>
+            <h2 class="text-4xl font-bold text-hailong-dark mb-8 text-center font-tech">企业资质</h2>
             <div class="bg-white rounded-2xl p-12 shadow-lg border border-gray-200">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div v-for="qualification in qualifications" :key="qualification"
-                  class="flex items-center p-4 bg-gradient-to-br from-huawei-primary/5 to-huawei-secondary/5 rounded-xl">
-                  <div class="w-12 h-12 bg-huawei-primary/10 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-huawei-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="flex items-center p-4 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl">
+                  <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                   </div>
@@ -106,23 +106,23 @@
         <!-- 企业荣誉 -->
         <div v-show="activeTab === 'honors'" class="animate-fade-in">
           <div class="max-w-6xl mx-auto">
-            <h2 class="text-4xl font-bold text-huawei-dark mb-12 text-center font-tech">企业荣誉</h2>
+            <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">企业荣誉</h2>
             
             <div v-if="loadingAchievements" class="text-center py-12">
-              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-huawei-primary"></div>
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
               <p class="mt-4 text-gray-600">加载中...</p>
             </div>
             
             <div v-else-if="achievementsError" class="text-center py-12">
               <p class="text-red-600">{{ achievementsError }}</p>
-              <button @click="fetchAchievements" class="mt-4 px-6 py-2 bg-huawei-primary text-white rounded-lg hover:bg-huawei-secondary transition-colors">
+              <button @click="fetchAchievements" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
                 重新加载
               </button>
             </div>
             
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div v-for="achievement in achievements" :key="achievement.id"
-                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-huawei-primary">
+                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
                 <div v-if="achievement.imageUrl" class="h-48 overflow-hidden">
                   <img :src="achievement.imageUrl" :alt="achievement.projectName"
                     @click="openImagePreview(achievement.imageUrl)"
@@ -130,12 +130,12 @@
                 </div>
                 <div class="p-6">
                   <div class="flex items-center justify-between mb-3">
-                    <span class="px-3 py-1 bg-huawei-primary/10 text-huawei-primary rounded-full text-xs font-semibold">
+                    <span class="px-3 py-1 bg-hailong-primary/10 text-hailong-primary rounded-full text-xs font-semibold">
                       {{ achievement.projectType || '重要业绩' }}
                     </span>
                     <span class="text-sm text-gray-500">{{ formatDate(achievement.completionDate) }}</span>
                   </div>
-                  <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-huawei-primary transition-colors line-clamp-2">
+                  <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-hailong-primary transition-colors line-clamp-2">
                     {{ achievement.projectName }}
                   </h3>
                   <p v-if="achievement.description" class="text-gray-600 text-sm mb-3 line-clamp-2">
@@ -145,7 +145,7 @@
                     <span v-if="achievement.clientName" class="text-sm text-gray-500">
                       {{ achievement.clientName }}
                     </span>
-                    <span v-if="achievement.projectAmount" class="text-lg font-bold text-huawei-secondary">
+                    <span v-if="achievement.projectAmount" class="text-lg font-bold text-hailong-secondary">
                       {{ formatAmount(achievement.projectAmount) }}
                     </span>
                   </div>
@@ -169,7 +169,7 @@
       @click="closeImagePreview"
       class="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 animate-fade-in">
       <button @click="closeImagePreview"
-        class="absolute top-4 right-4 text-white hover:text-huawei-cyan transition-colors z-10">
+        class="absolute top-4 right-4 text-white hover:text-hailong-cyan transition-colors z-10">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>

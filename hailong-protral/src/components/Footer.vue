@@ -1,26 +1,26 @@
 <template>
-  <footer class="bg-huawei-dark text-white py-12 border-t border-huawei-cyan/20">
+  <footer class="bg-hailong-dark text-white py-12 border-t border-hailong-cyan/20">
     <div class="container-wide">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
-          <h3 class="text-xl font-bold mb-4 text-huawei-cyan font-tech">海隆咨询</h3>
+          <h3 class="text-xl font-bold mb-4 text-hailong-cyan font-tech">海隆咨询</h3>
           <p class="text-sm text-gray-400">海纳百川，才望兼隆</p>
         </div>
         <div>
           <h4 class="font-semibold mb-4">业务范围</h4>
           <ul class="space-y-2 text-sm text-gray-400">
-            <li><a href="#" class="hover:text-huawei-cyan transition-colors">政府采购代理</a></li>
-            <li><a href="#" class="hover:text-huawei-cyan transition-colors">工程招标代理</a></li>
-            <li><a href="#" class="hover:text-huawei-cyan transition-colors">造价咨询</a></li>
+            <li><a href="#" class="hover:text-hailong-cyan transition-colors">政府采购代理</a></li>
+            <li><a href="#" class="hover:text-hailong-cyan transition-colors">工程招标代理</a></li>
+            <li><a href="#" class="hover:text-hailong-cyan transition-colors">造价咨询</a></li>
           </ul>
         </div>
         <div>
           <h4 class="font-semibold mb-4">快速链接</h4>
           <ul class="space-y-2 text-sm text-gray-400">
-            <li><router-link to="/" class="hover:text-huawei-cyan transition-colors">首页</router-link></li>
-            <li><router-link to="/about" class="hover:text-huawei-cyan transition-colors">关于海隆</router-link></li>
-            <li><router-link to="/detail/announcements" class="hover:text-huawei-cyan transition-colors">公告信息</router-link></li>
-            <li><router-link to="/detail/policies" class="hover:text-huawei-cyan transition-colors">政策法规</router-link></li>
+            <li><router-link to="/" class="hover:text-hailong-cyan transition-colors">首页</router-link></li>
+            <li><router-link to="/about" class="hover:text-hailong-cyan transition-colors">关于海隆</router-link></li>
+            <li><router-link to="/detail/announcements" class="hover:text-hailong-cyan transition-colors">公告信息</router-link></li>
+            <li><router-link to="/detail/policies" class="hover:text-hailong-cyan transition-colors">政策法规</router-link></li>
           </ul>
         </div>
         <div>
