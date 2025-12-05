@@ -40,13 +40,22 @@
           <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">企业简介</h2>
           <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
         </div>
-        <div class="max-w-4xl mx-auto">
-          <div class="bg-white rounded-2xl p-12 shadow-lg border border-gray-200">
-            <p class="text-gray-700 text-lg leading-relaxed mb-8">{{ companyProfile.content }}</p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+            <!-- 左侧：企业简介文字 -->
+            <div class="lg:col-span-2">
+              <p class="text-gray-700 text-lg leading-relaxed">{{ companyProfile.content }}</p>
+            </div>
+            <!-- 右侧：企业特色标签 -->
+            <div class="grid grid-cols-2 gap-4">
               <div v-for="highlight in companyProfile.highlights" :key="highlight"
-                class="text-center p-4 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl">
-                <div class="text-hailong-primary font-semibold">{{ highlight }}</div>
+                class="text-center p-6 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
+                <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-hailong-primary/20 transition-colors">
+                  <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <div class="text-hailong-primary font-semibold text-sm group-hover:text-hailong-secondary transition-colors">{{ highlight }}</div>
               </div>
             </div>
           </div>
@@ -83,6 +92,27 @@
     <div class="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div class="container-wide">
         <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">企业资质</h2>
+          <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div v-for="qualification in qualifications" :key="qualification"
+              class="flex items-center p-4 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
+              <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-hailong-primary/20 transition-colors">
+                <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <span class="text-gray-800 font-medium text-sm group-hover:text-hailong-primary transition-colors">{{ qualification }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="py-24 bg-white">
+      <div class="container-wide">
+        <div class="text-center mb-16">
           <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">交易数据可视化</h2>
           <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
         </div>
@@ -104,13 +134,82 @@
             <div class="text-gray-600">建设工程</div>
           </div>
         </div>
-        <div class="bg-white rounded-2xl p-8 shadow-lg">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6">月度项目趋势</h3>
-          <div class="flex items-end justify-between h-64 gap-2">
-            <div v-for="data in transactionData.monthlyTrend" :key="data.month" class="flex-1 flex flex-col items-center">
-              <div class="w-full bg-gradient-to-t from-hailong-primary to-hailong-secondary rounded-t-lg transition-all hover:opacity-80"
-                :style="{ height: (data.projects / 150 * 100) + '%' }"></div>
-              <div class="text-xs text-gray-600 mt-2">{{ data.month }}</div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- 交易类型占比 -->
+          <div class="bg-white rounded-2xl p-8 shadow-lg">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">交易类型占比</h3>
+            <div class="flex flex-col items-center justify-center h-64">
+              <div class="relative w-48 h-48">
+                <!-- 饼图背景圆环 -->
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" stroke-width="20"/>
+                  <!-- 政府采购 -->
+                  <circle cx="50" cy="50" r="40" fill="none"
+                    :stroke="transactionData.typeDistribution[0].color"
+                    stroke-width="20"
+                    :stroke-dasharray="`${transactionData.typeDistribution[0].percentage * 2.51} 251`"
+                    class="transition-all duration-500 hover:stroke-width-[22]"/>
+                  <!-- 建设工程 -->
+                  <circle cx="50" cy="50" r="40" fill="none"
+                    :stroke="transactionData.typeDistribution[1].color"
+                    stroke-width="20"
+                    :stroke-dasharray="`${transactionData.typeDistribution[1].percentage * 2.51} 251`"
+                    :stroke-dashoffset="`-${transactionData.typeDistribution[0].percentage * 2.51}`"
+                    class="transition-all duration-500 hover:stroke-width-[22]"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="text-center">
+                    <div class="text-3xl font-bold text-gray-900">{{ transactionData.yearlyStats.totalProjects }}</div>
+                    <div class="text-sm text-gray-500">总项目</div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-6 space-y-3 w-full">
+                <div v-for="item in transactionData.typeDistribution" :key="item.type"
+                  class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: item.color }"></div>
+                    <span class="text-gray-700 font-medium">{{ item.type }}</span>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-lg font-bold" :style="{ color: item.color }">{{ item.count }}</div>
+                    <div class="text-xs text-gray-500">{{ item.percentage }}%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 地区排行 -->
+          <div class="bg-white rounded-2xl p-8 shadow-lg">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">地区项目排行</h3>
+            <div class="space-y-3">
+              <div v-for="(region, index) in transactionData.regionRanking" :key="region.region"
+                class="group relative">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center flex-1">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold text-sm"
+                      :class="[
+                        index === 0 ? 'bg-yellow-100 text-yellow-600' :
+                        index === 1 ? 'bg-gray-100 text-gray-600' :
+                        index === 2 ? 'bg-orange-100 text-orange-600' :
+                        'bg-blue-50 text-blue-600'
+                      ]">
+                      {{ index + 1 }}
+                    </div>
+                    <span class="text-gray-700 font-medium">{{ region.region }}</span>
+                  </div>
+                  <div class="text-right ml-4">
+                    <div class="text-lg font-bold text-hailong-primary">{{ region.projects }}</div>
+                    <div class="text-xs text-gray-500">{{ region.amount }}亿</div>
+                  </div>
+                </div>
+                <div class="relative h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-hailong-primary to-hailong-secondary rounded-full transition-all duration-500 group-hover:opacity-80"
+                    :style="{ width: (region.projects / transactionData.regionRanking[0].projects * 100) + '%' }">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -211,6 +310,18 @@
 import { companyInfo, companyProfile, businessScope, transactionData, majorAchievements, govProcurementAnnouncements, constructionAnnouncements } from './data.js'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+
+// 企业资质列表
+const qualifications = [
+  '政府采购代理机构资格证书',
+  '工程招标代理机构资格证书',
+  '工程造价咨询企业资质证书',
+  '工程监理企业资质证书',
+  'ISO9001质量管理体系认证',
+  'ISO14001环境管理体系认证',
+  'OHSAS18001职业健康安全管理体系认证',
+  'AAA级信用企业'
+]
 
 // 格式化金额显示（单位：万元）
 const formatAmount = (amount) => {

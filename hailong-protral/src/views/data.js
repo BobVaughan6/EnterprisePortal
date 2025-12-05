@@ -79,19 +79,18 @@ export const transactionData = {
     govProcurement: 680,
     construction: 570
   },
-  monthlyTrend: [
-    { month: '1月', projects: 85, amount: 2.5 },
-    { month: '2月', projects: 72, amount: 2.1 },
-    { month: '3月', projects: 105, amount: 3.2 },
-    { month: '4月', projects: 98, amount: 2.8 },
-    { month: '5月', projects: 112, amount: 3.5 },
-    { month: '6月', projects: 125, amount: 3.8 },
-    { month: '7月', projects: 108, amount: 3.1 },
-    { month: '8月', projects: 95, amount: 2.7 },
-    { month: '9月', projects: 118, amount: 3.4 },
-    { month: '10月', projects: 132, amount: 4.2 },
-    { month: '11月', projects: 128, amount: 3.9 },
-    { month: '12月', projects: 142, amount: 4.6 }
+  // 交易类型占比
+  typeDistribution: [
+    { type: '政府采购', count: 680, percentage: 54.4, color: '#0EA5E9' },
+    { type: '建设工程', count: 570, percentage: 45.6, color: '#10B981' }
+  ],
+  // 地区排行（前10）
+  regionRanking: [
+    { region: '市本级', projects: 285, amount: 8.5 },
+    { region: '高新区', projects: 198, amount: 6.2 },
+    { region: '经开区', projects: 165, amount: 5.1 },
+    { region: '城东区', projects: 142, amount: 4.3 },
+    { region: '城西区', projects: 128, amount: 3.8 }
   ]
 }
 

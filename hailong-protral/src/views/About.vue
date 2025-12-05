@@ -57,47 +57,57 @@
           </div>
         </div>
 
-        <!-- 企业资质与业务范围 -->
+        <!-- 业务范围 -->
         <div v-show="activeTab === 'business'" class="animate-fade-in">
-          <div class="mb-16">
-            <h2 class="text-4xl font-bold text-hailong-dark mb-8 text-center font-tech">业务范围</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div v-for="business in businessScope" :key="business.id"
-                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
-                <div class="h-48 overflow-hidden">
-                  <img :src="business.image" :alt="business.name"
-                    @click="openImagePreview(business.image)"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer" />
-                </div>
-                <div class="p-6">
-                  <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors">
-                    {{ business.name }}
-                  </h3>
-                  <p class="text-gray-600 mb-4">{{ business.description }}</p>
-                  <ul class="space-y-2">
-                    <li v-for="feature in business.features" :key="feature" class="text-sm text-gray-500 flex items-center">
-                      <span class="w-1.5 h-1.5 bg-hailong-secondary rounded-full mr-2"></span>
-                      {{ feature }}
-                    </li>
-                  </ul>
-                </div>
+          <h2 class="text-4xl font-bold text-hailong-dark mb-8 text-center font-tech">业务范围</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div v-for="business in businessScope" :key="business.id"
+              class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              <div class="h-48 overflow-hidden">
+                <img :src="business.image" :alt="business.name"
+                  @click="openImagePreview(business.image)"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer" />
+              </div>
+              <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors">
+                  {{ business.name }}
+                </h3>
+                <p class="text-gray-600 mb-4">{{ business.description }}</p>
+                <ul class="space-y-2">
+                  <li v-for="feature in business.features" :key="feature" class="text-sm text-gray-500 flex items-center">
+                    <span class="w-1.5 h-1.5 bg-hailong-secondary rounded-full mr-2"></span>
+                    {{ feature }}
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="max-w-5xl mx-auto">
-            <h2 class="text-4xl font-bold text-hailong-dark mb-8 text-center font-tech">企业资质</h2>
-            <div class="bg-white rounded-2xl p-12 shadow-lg border border-gray-200">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div v-for="qualification in qualifications" :key="qualification"
-                  class="flex items-center p-4 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl">
-                  <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4">
+        <!-- 企业资质 -->
+        <div v-show="activeTab === 'qualifications'" class="animate-fade-in">
+          <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">企业资质</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div v-for="qualification in qualifications" :key="qualification.id"
+              class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              <div class="relative h-40 overflow-hidden bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10">
+                <img :src="qualification.image" :alt="qualification.name"
+                  @click="openImagePreview(qualification.image)"
+                  class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 cursor-pointer" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-4">
+                  <div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center mb-2">
                     <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                   </div>
-                  <span class="text-gray-800 font-medium">{{ qualification }}</span>
                 </div>
+              </div>
+              <div class="p-5">
+                <h3 class="text-base font-bold text-gray-900 mb-2 group-hover:text-hailong-primary transition-colors line-clamp-2">
+                  {{ qualification.name }}
+                </h3>
+                <p class="text-sm text-gray-600 line-clamp-2">{{ qualification.description }}</p>
               </div>
             </div>
           </div>
@@ -191,7 +201,8 @@ import Footer from '@/components/Footer.vue'
 // Tab配置
 const tabs = [
   { id: 'intro', name: '企业简介' },
-  { id: 'business', name: '企业资质与业务范围' },
+  { id: 'business', name: '业务范围' },
+  { id: 'qualifications', name: '企业资质' },
   { id: 'honors', name: '企业荣誉' }
 ]
 
@@ -207,16 +218,56 @@ const companyProfile = ref({
 const loading = ref(false)
 const error = ref('')
 
-// 企业资质列表
+// 企业资质列表（带图片）
 const qualifications = [
-  '政府采购代理机构资格证书',
-  '工程招标代理机构资格证书',
-  '工程造价咨询企业资质证书',
-  '工程监理企业资质证书',
-  'ISO9001质量管理体系认证',
-  'ISO14001环境管理体系认证',
-  'OHSAS18001职业健康安全管理体系认证',
-  'AAA级信用企业'
+  {
+    id: 1,
+    name: '政府采购代理机构资格证书',
+    image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop',
+    description: '具备政府采购代理资质，为政府机关提供专业采购服务'
+  },
+  {
+    id: 2,
+    name: '工程招标代理机构资格证书',
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop',
+    description: '拥有工程招标代理资质，提供全流程招标代理服务'
+  },
+  {
+    id: 3,
+    name: '工程造价咨询企业资质证书',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop',
+    description: '专业工程造价咨询资质，提供精准造价分析'
+  },
+  {
+    id: 4,
+    name: '工程监理企业资质证书',
+    image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=600&fit=crop',
+    description: '工程监理资质认证，确保工程质量与安全'
+  },
+  {
+    id: 5,
+    name: 'ISO9001质量管理体系认证',
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=600&fit=crop',
+    description: '国际质量管理体系认证，保障服务质量'
+  },
+  {
+    id: 6,
+    name: 'ISO14001环境管理体系认证',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
+    description: '环境管理体系认证，践行绿色发展理念'
+  },
+  {
+    id: 7,
+    name: 'OHSAS18001职业健康安全管理体系认证',
+    image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop',
+    description: '职业健康安全管理认证，保障员工安全'
+  },
+  {
+    id: 8,
+    name: 'AAA级信用企业',
+    image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=600&fit=crop',
+    description: '最高信用等级认证，诚信经营典范'
+  }
 ]
 
 // 企业荣誉数据（重要业绩）
