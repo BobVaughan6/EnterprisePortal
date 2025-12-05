@@ -95,49 +95,50 @@ export const transactionData = {
   ]
 }
 
-// 重要业绩展示
+// 重要业绩展示（简化版：项目名称、项目类型、项目图片、项目金额）
+// 注意：金额单位统一为万元
 export const majorAchievements = [
   {
     id: 1,
-    title: '某市政府采购中心年度框架协议',
-    amount: '2.8亿',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop'
+    projectName: '某市政府采购中心年度框架协议',
+    projectType: '服务',
+    projectAmount: 28000, // 万元
+    imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop'
   },
   {
     id: 2,
-    title: '某高新区基础设施建设项目',
-    amount: '5.2亿',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop'
+    projectName: '某高新区基础设施建设项目',
+    projectType: '工程',
+    projectAmount: 52000, // 万元
+    imageUrl: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop'
   },
   {
     id: 3,
-    title: '某医院医疗设备采购项目',
-    amount: '1.5亿',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop'
+    projectName: '某医院医疗设备采购项目',
+    projectType: '货物',
+    projectAmount: 15000, // 万元
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop'
   },
   {
     id: 4,
-    title: '某学校智慧校园建设项目',
-    amount: '8500万',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=300&fit=crop'
+    projectName: '某学校智慧校园建设项目',
+    projectType: '服务',
+    projectAmount: 8500, // 万元
+    imageUrl: 'https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=300&fit=crop'
   },
   {
     id: 5,
-    title: '某工业园区道路工程',
-    amount: '3.6亿',
-    year: '2023',
-    image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=300&fit=crop'
+    projectName: '某工业园区道路工程',
+    projectType: '工程',
+    projectAmount: 36000, // 万元
+    imageUrl: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=300&fit=crop'
   },
   {
     id: 6,
-    title: '某政务服务中心装修项目',
-    amount: '6800万',
-    year: '2023',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'
+    projectName: '某政务服务中心装修项目',
+    projectType: '工程',
+    projectAmount: 6800, // 万元
+    imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'
   }
 ]
 

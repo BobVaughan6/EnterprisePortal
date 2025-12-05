@@ -76,101 +76,50 @@ CREATE TABLE `admin_roles` (
 -- 2. 公告信息模块（核心）
 -- ============================================
 
--- 2.1 政府采购公告表
-CREATE TABLE `government_procurement_notices` (
+-- 2.1 统一公告表（新版）
+CREATE TABLE `announcements` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '公告ID',
   `title` VARCHAR(255) NOT NULL COMMENT '公告标题',
-  `notice_type` VARCHAR(50) NOT NULL COMMENT '公告类型：采购公告、更正公告、结果公告',
+  `business_type` VARCHAR(50) NOT NULL COMMENT '业务类型：GOV_PROCUREMENT-政府采购, CONSTRUCTION-建设工程',
+  `notice_type` VARCHAR(50) NOT NULL COMMENT '公告类型：bidding-招标/采购公告, correction-更正公告, result-结果公告',
+  `procurement_type` VARCHAR(50) DEFAULT NULL COMMENT '采购类型（仅政府采购）：goods-货物, service-服务, project-工程',
   `bidder` VARCHAR(255) DEFAULT NULL COMMENT '招标人',
   `winner` VARCHAR(255) DEFAULT NULL COMMENT '中标人',
-  `project_region` VARCHAR(50) NOT NULL COMMENT '项目区域：郑州、洛阳、开封、新乡等',
+  `province` VARCHAR(50) DEFAULT NULL COMMENT '省份',
+  `city` VARCHAR(50) DEFAULT NULL COMMENT '城市',
+  `district` VARCHAR(50) DEFAULT NULL COMMENT '区县',
+  `project_region` VARCHAR(200) DEFAULT NULL COMMENT '项目区域（完整地址，用于显示和搜索）',
   `content` LONGTEXT NOT NULL COMMENT '公告内容（富文本）',
   `publisher` VARCHAR(50) DEFAULT NULL COMMENT '发布人',
   `publish_time` DATETIME DEFAULT NULL COMMENT '发布时间',
-  `view_count` INT UNSIGNED DEFAULT 0 COMMENT '访问量',
+  `view_count` INT UNSIGNED DEFAULT 0 COMMENT '浏览次数',
   `attachment_path` VARCHAR(500) DEFAULT NULL COMMENT '附件路径',
   `is_top` TINYINT DEFAULT 0 COMMENT '是否置顶：0-否，1-是',
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX `idx_business_type` (`business_type`),
   INDEX `idx_notice_type` (`notice_type`),
+  INDEX `idx_province` (`province`),
+  INDEX `idx_city` (`city`),
+  INDEX `idx_district` (`district`),
   INDEX `idx_project_region` (`project_region`),
   INDEX `idx_publish_time` (`publish_time`),
   INDEX `idx_is_top` (`is_top`),
   INDEX `idx_is_deleted` (`is_deleted`),
   FULLTEXT INDEX `ft_title_content` (`title`, `content`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='政府采购公告表';
-
--- 2.2 建设工程公告表
-CREATE TABLE `construction_project_notices` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '公告ID',
-  `title` VARCHAR(255) NOT NULL COMMENT '公告标题',
-  `notice_type` VARCHAR(50) NOT NULL COMMENT '公告类型：招标公告、中标公告、变更公告',
-  `bidder` VARCHAR(255) DEFAULT NULL COMMENT '招标人',
-  `winner` VARCHAR(255) DEFAULT NULL COMMENT '中标人',
-  `project_region` VARCHAR(50) NOT NULL COMMENT '项目区域：郑州、洛阳、开封、新乡等',
-  `content` LONGTEXT NOT NULL COMMENT '公告内容（富文本）',
-  `publisher` VARCHAR(50) DEFAULT NULL COMMENT '发布人',
-  `publish_time` DATETIME DEFAULT NULL COMMENT '发布时间',
-  `view_count` INT UNSIGNED DEFAULT 0 COMMENT '访问量',
-  `attachment_path` VARCHAR(500) DEFAULT NULL COMMENT '附件路径',
-  `is_top` TINYINT DEFAULT 0 COMMENT '是否置顶：0-否，1-是',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_notice_type` (`notice_type`),
-  INDEX `idx_project_region` (`project_region`),
-  INDEX `idx_publish_time` (`publish_time`),
-  INDEX `idx_is_top` (`is_top`),
-  INDEX `idx_is_deleted` (`is_deleted`),
-  FULLTEXT INDEX `ft_title_content` (`title`, `content`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='建设工程公告表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='统一公告表';
 
 -- ============================================
 -- 3. 信息发布模块
 -- ============================================
 
--- 3.1 公司公告表
-CREATE TABLE `company_announcements` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '公告ID',
-  `title` VARCHAR(255) NOT NULL COMMENT '公告标题',
-  `content` LONGTEXT NOT NULL COMMENT '公告内容（富文本）',
-  `publish_time` DATETIME DEFAULT NULL COMMENT '发布时间',
-  `view_count` INT UNSIGNED DEFAULT 0 COMMENT '访问量',
-  `attachment_path` VARCHAR(500) DEFAULT NULL COMMENT '附件路径',
-  `is_top` TINYINT DEFAULT 0 COMMENT '是否置顶：0-否，1-是',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_publish_time` (`publish_time`),
-  INDEX `idx_is_top` (`is_top`),
-  INDEX `idx_is_deleted` (`is_deleted`),
-  FULLTEXT INDEX `ft_title_content` (`title`, `content`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公司公告表';
-
--- 3.2 政策法规表
-CREATE TABLE `policy_regulations` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '法规ID',
-  `title` VARCHAR(255) NOT NULL COMMENT '法规标题',
-  `content` LONGTEXT NOT NULL COMMENT '法规内容（富文本）',
-  `publish_time` DATETIME DEFAULT NULL COMMENT '发布时间',
-  `view_count` INT UNSIGNED DEFAULT 0 COMMENT '访问量',
-  `attachment_path` VARCHAR(500) DEFAULT NULL COMMENT '附件路径',
-  `is_top` TINYINT DEFAULT 0 COMMENT '是否置顶：0-否，1-是',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_publish_time` (`publish_time`),
-  INDEX `idx_is_top` (`is_top`),
-  INDEX `idx_is_deleted` (`is_deleted`),
-  FULLTEXT INDEX `ft_title_content` (`title`, `content`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='政策法规表';
-
--- 3.3 政策信息表
-CREATE TABLE `policy_information` (
+-- 3.1 统一信息发布表（合并公司公告、政策法规、政策信息、通知公告）
+CREATE TABLE `info_publications` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '信息ID',
-  `title` VARCHAR(255) NOT NULL COMMENT '信息标题',
-  `content` LONGTEXT NOT NULL COMMENT '信息内容（富文本）',
+  `type` VARCHAR(50) NOT NULL COMMENT '信息类型：COMPANY_NEWS-公司公告, POLICY_REGULATION-政策法规, POLICY_INFO-政策信息, NOTICE-通知公告',
+  `title` VARCHAR(255) NOT NULL COMMENT '标题',
+  `content` LONGTEXT NOT NULL COMMENT '内容（富文本）',
   `publish_time` DATETIME DEFAULT NULL COMMENT '发布时间',
   `view_count` INT UNSIGNED DEFAULT 0 COMMENT '访问量',
   `attachment_path` VARCHAR(500) DEFAULT NULL COMMENT '附件路径',
@@ -178,51 +127,18 @@ CREATE TABLE `policy_information` (
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX `idx_type` (`type`),
   INDEX `idx_publish_time` (`publish_time`),
   INDEX `idx_is_top` (`is_top`),
   INDEX `idx_is_deleted` (`is_deleted`),
   FULLTEXT INDEX `ft_title_content` (`title`, `content`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='政策信息表';
-
--- 3.4 通知公告表
-CREATE TABLE `notice_announcements` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '通知ID',
-  `title` VARCHAR(255) NOT NULL COMMENT '通知标题',
-  `content` LONGTEXT NOT NULL COMMENT '通知内容（富文本）',
-  `publish_time` DATETIME DEFAULT NULL COMMENT '发布时间',
-  `view_count` INT UNSIGNED DEFAULT 0 COMMENT '访问量',
-  `attachment_path` VARCHAR(500) DEFAULT NULL COMMENT '附件路径',
-  `is_top` TINYINT DEFAULT 0 COMMENT '是否置顶：0-否，1-是',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_publish_time` (`publish_time`),
-  INDEX `idx_is_top` (`is_top`),
-  INDEX `idx_is_deleted` (`is_deleted`),
-  FULLTEXT INDEX `ft_title_content` (`title`, `content`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知公告表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='统一信息发布表';
 
 -- ============================================
 -- 4. 系统配置模块
 -- ============================================
 
--- 4.1 轮播图表
-CREATE TABLE `carousel_banners` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '轮播图ID',
-  `title` VARCHAR(255) DEFAULT NULL COMMENT '轮播图标题',
-  `image_url` VARCHAR(500) NOT NULL COMMENT '图片URL',
-  `link_url` VARCHAR(500) DEFAULT NULL COMMENT '跳转链接',
-  `sort_order` INT DEFAULT 0 COMMENT '排序顺序（数字越小越靠前）',
-  `status` TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_sort_order` (`sort_order`),
-  INDEX `idx_status` (`status`),
-  INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='轮播图表';
-
--- 4.2 企业简介表
+-- 4.1 企业简介表
 CREATE TABLE `company_profile` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '简介ID',
   `title` VARCHAR(255) NOT NULL COMMENT '简介标题',
@@ -234,7 +150,7 @@ CREATE TABLE `company_profile` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='企业简介表';
 
--- 4.3 业务范围表
+-- 4.2 业务范围表
 CREATE TABLE `business_scope` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '业务ID',
   `title` VARCHAR(255) NOT NULL COMMENT '业务标题',
@@ -248,7 +164,7 @@ CREATE TABLE `business_scope` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='业务范围表';
 
--- 4.4 企业荣誉表
+-- 4.3 企业荣誉表
 CREATE TABLE `company_honors` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '荣誉ID',
   `title` VARCHAR(255) NOT NULL COMMENT '荣誉标题',
@@ -264,40 +180,21 @@ CREATE TABLE `company_honors` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='企业荣誉表';
 
--- 4.5 重要业绩表
+-- 4.4 重要业绩表
 CREATE TABLE `major_achievements` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '业绩ID',
   `project_name` VARCHAR(255) NOT NULL COMMENT '项目名称',
-  `project_type` VARCHAR(50) DEFAULT NULL COMMENT '项目类型',
-  `project_amount` DECIMAL(15,2) DEFAULT NULL COMMENT '项目金额（万元）',
-  `client_name` VARCHAR(255) DEFAULT NULL COMMENT '客户名称',
-  `completion_date` DATE DEFAULT NULL COMMENT '完成日期',
-  `description` TEXT DEFAULT NULL COMMENT '项目描述',
+  `project_type` VARCHAR(50) NOT NULL COMMENT '项目类型：工程、服务、货物',
+  `project_amount` DECIMAL(15,2) NOT NULL COMMENT '项目金额（万元）',
   `image_url` VARCHAR(500) DEFAULT NULL COMMENT '项目图片URL',
   `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_completion_date` (`completion_date`),
+  INDEX `idx_project_type` (`project_type`),
   INDEX `idx_sort_order` (`sort_order`),
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='重要业绩表';
-
--- 4.6 友情链接表
-CREATE TABLE `friendly_links` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '链接ID',
-  `link_name` VARCHAR(100) NOT NULL COMMENT '链接名称',
-  `link_url` VARCHAR(500) NOT NULL COMMENT '链接URL',
-  `logo_url` VARCHAR(500) DEFAULT NULL COMMENT 'Logo URL',
-  `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
-  `status` TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_sort_order` (`sort_order`),
-  INDEX `idx_status` (`status`),
-  INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='友情链接表';
 
 -- ============================================
 -- 5. 统计模块
@@ -322,45 +219,59 @@ CREATE TABLE `visit_statistics` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='访问统计表';
 
--- 5.2 交易数据表（用于首页可视化）
-CREATE TABLE `transaction_data` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '交易ID',
-  `project_name` VARCHAR(255) NOT NULL COMMENT '项目名称',
-  `project_type` VARCHAR(50) NOT NULL COMMENT '交易类型：政府采购、建设工程等',
-  `project_amount` DECIMAL(15,2) NOT NULL COMMENT '项目金额（万元）',
-  `project_region` VARCHAR(50) NOT NULL COMMENT '项目区域',
-  `transaction_date` DATE NOT NULL COMMENT '交易日期',
-  `client_name` VARCHAR(255) DEFAULT NULL COMMENT '客户名称',
-  `status` VARCHAR(50) DEFAULT '已完成' COMMENT '项目状态',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_project_type` (`project_type`),
-  INDEX `idx_project_region` (`project_region`),
-  INDEX `idx_transaction_date` (`transaction_date`),
-  INDEX `idx_status` (`status`),
-  INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='交易数据表';
 
 -- ============================================
--- 6. 项目区域字典表
+-- 6. 项目区域字典表（省市区三级结构）
 -- ============================================
 
 CREATE TABLE `region_dictionary` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '区域ID',
-  `region_code` VARCHAR(50) NOT NULL UNIQUE COMMENT '区域代码',
+  `region_code` VARCHAR(50) NOT NULL COMMENT '区域代码（如：410000、410100、410101）',
   `region_name` VARCHAR(50) NOT NULL COMMENT '区域名称',
-  `region_type` VARCHAR(20) NOT NULL COMMENT '区域类型：省内、省外',
-  `parent_id` INT UNSIGNED DEFAULT 0 COMMENT '父级区域ID',
+  `region_level` TINYINT NOT NULL COMMENT '区域级别：1-省份，2-城市，3-区县',
+  `parent_code` VARCHAR(50) DEFAULT NULL COMMENT '父级区域代码',
   `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_region_code` (`region_code`),
-  INDEX `idx_region_type` (`region_type`),
-  INDEX `idx_parent_id` (`parent_id`),
+  UNIQUE INDEX `idx_region_code` (`region_code`),
+  INDEX `idx_region_level` (`region_level`),
+  INDEX `idx_parent_code` (`parent_code`),
+  INDEX `idx_sort_order` (`sort_order`),
   INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='项目区域字典表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='项目区域字典表（省市区三级）';
+
+-- 插入河南省区域数据（基于city.json）
+INSERT INTO `region_dictionary` (`region_code`, `region_name`, `region_level`, `parent_code`, `sort_order`) VALUES
+-- 省份
+('410000', '河南省', 1, NULL, 1),
+-- 城市
+('410100', '郑州市', 2, '410000', 1),
+('410200', '开封市', 2, '410000', 2),
+('410300', '洛阳市', 2, '410000', 3),
+('410400', '平顶山市', 2, '410000', 4),
+('410500', '安阳市', 2, '410000', 5),
+('410600', '鹤壁市', 2, '410000', 6),
+('410700', '新乡市', 2, '410000', 7),
+('410800', '焦作市', 2, '410000', 8),
+('410900', '濮阳市', 2, '410000', 9),
+('411000', '许昌市', 2, '410000', 10),
+('411100', '漯河市', 2, '410000', 11),
+('411200', '三门峡市', 2, '410000', 12),
+('411300', '南阳市', 2, '410000', 13),
+('411400', '商丘市', 2, '410000', 14),
+('411500', '信阳市', 2, '410000', 15),
+('411600', '周口市', 2, '410000', 16),
+('411700', '驻马店市', 2, '410000', 17),
+('419001', '济源市', 2, '410000', 18),
+-- 郑州市区县
+('410101', '郑州市区', 3, '410100', 1),
+('410122', '中牟县', 3, '410100', 2),
+('410182', '荥阳市', 3, '410100', 3),
+('410183', '新郑市', 3, '410100', 4),
+('410184', '新密市', 3, '410100', 5),
+('410185', '登封市', 3, '410100', 6);
+-- 其他城市的区县数据可以根据需要继续添加...
 
 -- ============================================
 -- 7. 系统日志表
@@ -396,46 +307,15 @@ ALTER TABLE `admin_users`
   ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- ============================================
--- 创建视图：首页统计数据视图
+-- 创建视图：首页统计数据视图（基于统一公告表）
 -- ============================================
 
 CREATE OR REPLACE VIEW `v_homepage_statistics` AS
-SELECT 
-  (SELECT COUNT(*) FROM `transaction_data` WHERE `is_deleted` = 0) AS total_projects,
-  (SELECT COALESCE(SUM(`project_amount`), 0) FROM `transaction_data` WHERE `is_deleted` = 0) AS total_amount,
-  (SELECT COUNT(DISTINCT `project_region`) FROM `transaction_data` WHERE `is_deleted` = 0) AS total_regions,
-  (SELECT COUNT(*) FROM `government_procurement_notices` WHERE `is_deleted` = 0) AS gov_procurement_count,
-  (SELECT COUNT(*) FROM `construction_project_notices` WHERE `is_deleted` = 0) AS construction_count;
-
--- ============================================
--- 创建视图：交易类型占比统计
--- ============================================
-
-CREATE OR REPLACE VIEW `v_transaction_type_statistics` AS
-SELECT 
-  `project_type`,
-  COUNT(*) AS project_count,
-  COALESCE(SUM(`project_amount`), 0) AS total_amount,
-  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM `transaction_data` WHERE `is_deleted` = 0), 2) AS percentage
-FROM `transaction_data`
-WHERE `is_deleted` = 0
-GROUP BY `project_type`
-ORDER BY project_count DESC;
-
--- ============================================
--- 创建视图：地区排行统计
--- ============================================
-
-CREATE OR REPLACE VIEW `v_region_ranking_statistics` AS
-SELECT 
-  `project_region`,
-  COUNT(*) AS project_count,
-  COALESCE(SUM(`project_amount`), 0) AS total_amount
-FROM `transaction_data`
-WHERE `is_deleted` = 0
-GROUP BY `project_region`
-ORDER BY total_amount DESC, project_count DESC
-LIMIT 10;
+SELECT
+  (SELECT COUNT(*) FROM `announcements` WHERE `is_deleted` = 0) AS total_projects,
+  (SELECT COUNT(DISTINCT CONCAT_WS('-', `province`, `city`, `district`)) FROM `announcements` WHERE `is_deleted` = 0) AS total_regions,
+  (SELECT COUNT(*) FROM `announcements` WHERE `business_type` = 'GOV_PROCUREMENT' AND `is_deleted` = 0) AS gov_procurement_count,
+  (SELECT COUNT(*) FROM `announcements` WHERE `business_type` = 'CONSTRUCTION' AND `is_deleted` = 0) AS construction_count;
 
 -- ============================================
 -- 数据库结构创建完成

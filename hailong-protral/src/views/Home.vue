@@ -127,13 +127,24 @@
             <div v-for="achievement in [...majorAchievements, ...majorAchievements]" :key="achievement.id + Math.random()"
               class="flex-shrink-0 w-80 bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden hover:bg-white/20 transition-all cursor-pointer group">
               <div class="h-48 overflow-hidden">
-                <img :src="achievement.image" :alt="achievement.title"
+                <img :src="achievement.imageUrl" :alt="achievement.projectName"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <div class="p-6">
-                <div class="text-hailong-cyan text-sm font-semibold mb-2">{{ achievement.year }}年</div>
-                <h3 class="text-lg font-bold mb-3 line-clamp-2">{{ achievement.title }}</h3>
-                <div class="text-2xl font-bold text-hailong-secondary">{{ achievement.amount }}</div>
+                <div class="flex items-center justify-between mb-3">
+                  <span :class="[
+                    'px-3 py-1 rounded-full text-xs font-semibold',
+                    achievement.projectType === '工程' ? 'bg-hailong-primary/20 text-hailong-primary' :
+                    achievement.projectType === '服务' ? 'bg-hailong-secondary/20 text-hailong-secondary' :
+                    'bg-hailong-cyan/20 text-hailong-cyan'
+                  ]">
+                    {{ achievement.projectType }}
+                  </span>
+                </div>
+                <h3 class="text-lg font-bold mb-3 line-clamp-2">{{ achievement.projectName }}</h3>
+                <div class="text-2xl font-bold text-hailong-secondary">
+                  {{ formatAmount(achievement.projectAmount) }}
+                </div>
               </div>
             </div>
           </div>
@@ -200,6 +211,14 @@
 import { companyInfo, companyProfile, businessScope, transactionData, majorAchievements, govProcurementAnnouncements, constructionAnnouncements } from './data.js'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+
+// 格式化金额显示（单位：万元）
+const formatAmount = (amount) => {
+  if (amount >= 10000) {
+    return (amount / 10000).toFixed(1) + '亿'
+  }
+  return amount.toLocaleString() + '万'
+}
 </script>
 
 <style scoped>

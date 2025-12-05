@@ -26,14 +26,14 @@
         <div>
           <h4 class="font-semibold mb-4">联系我们</h4>
           <ul class="space-y-2 text-sm text-gray-400">
-            <li>电话: 400-123-4567</li>
-            <li>邮箱: info@hailong.com</li>
-            <li>地址: 某市某区某街道</li>
+            <li>电话: 0371-55894666</li>
+            <li>邮箱: 037155894666@henanhailong.com</li>
+            <li>地址: 郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层</li>
           </ul>
         </div>
       </div>
       <div class="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-        <p>© 2025 海隆咨询有限公司 版权所有</p>
+        <p>© 2025 海隆工程咨询有限公司 版权所有</p>
       </div>
     </div>
   </footer>
