@@ -20,6 +20,21 @@ const routes = [
     path: '/announcements',
     name: 'Announcements',
     component: () => import('@/views/Announcements.vue')
+  },
+  {
+    path: '/company-announcements',
+    name: 'CompanyAnnouncements',
+    component: () => import('@/views/CompanyAnnouncements.vue')
+  },
+  {
+    path: '/policies',
+    name: 'Policies',
+    component: () => import('@/views/Policies.vue')
+  },
+  {
+    path: '/tools',
+    name: 'Tools',
+    component: () => import('@/views/Tools.vue')
   }
 ]
 

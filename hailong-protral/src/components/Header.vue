@@ -9,11 +9,38 @@
           </div>
         </div>
         <div class="hidden md:flex items-center space-x-8">
-          <router-link v-for="link in navLinks" :key="link.name" :to="link.path"
-            class="hover:text-hailong-cyan transition-colors text-sm font-medium"
-            :class="{ 'text-hailong-cyan': isActive(link.path) }">
-            {{ link.name }}
-          </router-link>
+          <template v-for="link in navLinks" :key="link.name">
+            <!-- 带下拉菜单的导航项 -->
+            <div v-if="link.children" class="relative group">
+              <button
+                class="hover:text-hailong-cyan transition-colors text-sm font-medium flex items-center gap-1"
+                :class="{ 'text-hailong-cyan': isActiveParent(link) }"
+              >
+                {{ link.name }}
+                <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <!-- 下拉菜单 -->
+              <div class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
+                <router-link
+                  v-for="child in link.children"
+                  :key="child.name"
+                  :to="child.path"
+                  class="block px-4 py-3 text-gray-700 hover:bg-hailong-primary hover:text-white transition-colors text-sm"
+                  :class="{ 'bg-hailong-primary/10 text-hailong-primary': isActive(child.path) }"
+                >
+                  {{ child.name }}
+                </router-link>
+              </div>
+            </div>
+            <!-- 普通导航项 -->
+            <router-link v-else :to="link.path"
+              class="hover:text-hailong-cyan transition-colors text-sm font-medium"
+              :class="{ 'text-hailong-cyan': isActive(link.path) }">
+              {{ link.name }}
+            </router-link>
+          </template>
         </div>
         <!-- 移动端菜单按钮 -->
         <button @click="toggleMobileMenu" class="md:hidden text-white">
@@ -27,12 +54,47 @@
     <!-- 移动端菜单 -->
     <div v-if="showMobileMenu" class="md:hidden bg-hailong-dark/95 border-t border-hailong-cyan/30">
       <div class="container-wide py-4">
-        <router-link v-for="link in navLinks" :key="link.name" :to="link.path"
-          @click="showMobileMenu = false"
-          class="block py-3 px-4 hover:bg-hailong-primary/20 rounded-lg transition-colors"
-          :class="{ 'bg-hailong-primary/30 text-hailong-cyan': isActive(link.path) }">
-          {{ link.name }}
-        </router-link>
+        <template v-for="link in navLinks" :key="link.name">
+          <!-- 带子菜单的导航项 -->
+          <div v-if="link.children">
+            <button
+              @click="toggleMobileSubmenu(link.name)"
+              class="w-full flex items-center justify-between py-3 px-4 hover:bg-hailong-primary/20 rounded-lg transition-colors"
+              :class="{ 'bg-hailong-primary/30 text-hailong-cyan': isActiveParent(link) }"
+            >
+              <span>{{ link.name }}</span>
+              <svg
+                class="w-4 h-4 transition-transform"
+                :class="{ 'rotate-180': openMobileSubmenu === link.name }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <!-- 子菜单 -->
+            <div v-if="openMobileSubmenu === link.name" class="ml-4 mt-1 space-y-1">
+              <router-link
+                v-for="child in link.children"
+                :key="child.name"
+                :to="child.path"
+                @click="showMobileMenu = false"
+                class="block py-2 px-4 hover:bg-hailong-primary/20 rounded-lg transition-colors text-sm"
+                :class="{ 'bg-hailong-primary/30 text-hailong-cyan': isActive(child.path) }"
+              >
+                {{ child.name }}
+              </router-link>
+            </div>
+          </div>
+          <!-- 普通导航项 -->
+          <router-link v-else :to="link.path"
+            @click="showMobileMenu = false"
+            class="block py-3 px-4 hover:bg-hailong-primary/20 rounded-lg transition-colors"
+            :class="{ 'bg-hailong-primary/30 text-hailong-cyan': isActive(link.path) }">
+            {{ link.name }}
+          </router-link>
+        </template>
       </div>
     </div>
   </nav>
@@ -41,18 +103,41 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { navLinks } from '@/views/data.js'
 import logoUrl from '@/assets/logo.png'
 
 const route = useRoute()
 const showMobileMenu = ref(false)
+const openMobileSubmenu = ref(null)
+
+// 导航链接配置
+const navLinks = [
+  { name: '首页', path: '/' },
+  { name: '关于海隆', path: '/about' },
+  { name: '公告信息', path: '/announcements' },
+  { name: '新闻中心', path: '/company-announcements' },
+  { name: '政策法规', path: '/policies' },
+  { name: '实用工具', path: '/tools' },
+  { name: '联系我们', path: '/contact' }
+]
 
 const isActive = (path) => {
   return route.path === path || route.path.startsWith(path + '/')
 }
 
+const isActiveParent = (link) => {
+  if (link.children) {
+    return link.children.some(child => isActive(child.path))
+  }
+  return isActive(link.path)
+}
+
 const toggleMobileMenu = () => {
   showMobileMenu.value = !showMobileMenu.value
+  openMobileSubmenu.value = null
+}
+
+const toggleMobileSubmenu = (name) => {
+  openMobileSubmenu.value = openMobileSubmenu.value === name ? null : name
 }
 </script>
 

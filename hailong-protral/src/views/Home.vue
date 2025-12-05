@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary overflow-hidden">
+  <div
+    class="min-h-screen bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary overflow-hidden">
     <Header />
     <div class="relative h-screen flex items-center justify-center pt-20">
       <div class="absolute inset-0">
@@ -18,8 +19,7 @@
           class="text-7xl font-bold mb-6 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
           {{ companyInfo.slogan }}</h1>
         <p class="text-2xl text-gray-200 mb-12 max-w-4xl mx-auto">{{ companyInfo.description }}</p>
-        <button
-          @click="showContactModal = true"
+        <button @click="showContactModal = true"
           class="inline-block px-12 py-5 bg-gradient-to-r from-hailong-primary to-hailong-secondary rounded-full text-white text-lg font-medium hover:shadow-2xl hover:shadow-hailong-primary/50 transition-all transform hover:scale-105">
           立即咨询
         </button>
@@ -49,18 +49,23 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             <!-- 左侧：企业简介文字 -->
             <div class="lg:col-span-2">
-              <p class="text-gray-700 text-lg leading-relaxed">{{ companyProfile.content }}</p>
+              <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                {{ companyProfile.content }}
+              </p>
             </div>
             <!-- 右侧：企业特色标签 -->
             <div class="grid grid-cols-2 gap-4">
               <div v-for="highlight in companyProfile.highlights" :key="highlight"
                 class="text-center p-6 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
-                <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-hailong-primary/20 transition-colors">
+                <div
+                  class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-hailong-primary/20 transition-colors">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                 </div>
-                <div class="text-hailong-primary font-semibold text-sm group-hover:text-hailong-secondary transition-colors">{{ highlight }}</div>
+                <div
+                  class="text-hailong-primary font-semibold text-sm group-hover:text-hailong-secondary transition-colors">
+                  {{ highlight }}</div>
               </div>
             </div>
           </div>
@@ -68,7 +73,7 @@
       </div>
     </div>
 
-   
+
     <!-- 公告信息 - 改为浅蓝渐变 -->
     <div class="py-24 bg-gradient-to-b from-white to-blue-50/30">
       <div class="container-wide">
@@ -92,7 +97,8 @@
                 </div>
                 <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>
                 <div class="flex justify-between items-center text-sm">
-                  <span class="text-gray-600">预算: <strong class="text-hailong-primary">{{ announcement.budget }}</strong></span>
+                  <span class="text-gray-600">预算: <strong class="text-hailong-primary">{{ announcement.budget
+                      }}</strong></span>
                   <span class="text-gray-500">截止: {{ announcement.deadline }}</span>
                 </div>
               </div>
@@ -108,12 +114,14 @@
               <div v-for="announcement in constructionAnnouncements" :key="announcement.id"
                 class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-secondary">
                 <div class="flex justify-between items-start mb-3">
-                  <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.type }}</span>
+                  <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.type
+                    }}</span>
                   <span class="text-xs text-gray-500">{{ announcement.publishDate }}</span>
                 </div>
                 <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>
                 <div class="flex justify-between items-center text-sm">
-                  <span class="text-gray-600">预算: <strong class="text-hailong-secondary">{{ announcement.budget }}</strong></span>
+                  <span class="text-gray-600">预算: <strong class="text-hailong-secondary">{{ announcement.budget
+                      }}</strong></span>
                   <span class="text-gray-500">截止: {{ announcement.deadline }}</span>
                 </div>
               </div>
@@ -162,20 +170,23 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             <div v-for="qualification in qualifications" :key="qualification"
               class="flex items-center p-4 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
-              <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-hailong-primary/20 transition-colors">
+              <div
+                class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-hailong-primary/20 transition-colors">
                 <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <span class="text-gray-800 font-medium text-sm group-hover:text-hailong-primary transition-colors">{{ qualification }}</span>
+              <span class="text-gray-800 font-medium text-sm group-hover:text-hailong-primary transition-colors">{{
+                qualification }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- 重要业绩展示 - 保持深色 -->
-     <div class="py-24 bg-hailong-dark text-white">
+    <div class="py-24 bg-hailong-dark text-white">
       <div class="container-wide">
         <div class="text-center mb-16">
           <h2 class="text-5xl font-bold mb-4 font-tech">重要业绩展示</h2>
@@ -183,7 +194,8 @@
         </div>
         <div class="relative overflow-hidden">
           <div class="flex gap-6 animate-scroll">
-            <div v-for="achievement in [...majorAchievements, ...majorAchievements]" :key="achievement.id + Math.random()"
+            <div v-for="achievement in [...majorAchievements, ...majorAchievements]"
+              :key="achievement.id + Math.random()"
               class="flex-shrink-0 w-80 bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden hover:bg-white/20 transition-all cursor-pointer group">
               <div class="h-48 overflow-hidden">
                 <img :src="achievement.imageUrl" :alt="achievement.projectName"
@@ -194,8 +206,8 @@
                   <span :class="[
                     'px-3 py-1 rounded-full text-xs font-semibold',
                     achievement.projectType === '工程' ? 'bg-hailong-primary/20 text-hailong-primary' :
-                    achievement.projectType === '服务' ? 'bg-hailong-secondary/20 text-hailong-secondary' :
-                    'bg-hailong-cyan/20 text-hailong-cyan'
+                      achievement.projectType === '服务' ? 'bg-hailong-secondary/20 text-hailong-secondary' :
+                        'bg-hailong-cyan/20 text-hailong-cyan'
                   ]">
                     {{ achievement.projectType }}
                   </span>
@@ -220,19 +232,23 @@
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
-            <div class="text-4xl font-bold text-hailong-primary mb-2">{{ transactionData.yearlyStats.totalProjects }}</div>
+            <div class="text-4xl font-bold text-hailong-primary mb-2">{{ transactionData.yearlyStats.totalProjects }}
+            </div>
             <div class="text-gray-600">项目总数</div>
           </div>
           <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
-            <div class="text-4xl font-bold text-hailong-secondary mb-2">{{ transactionData.yearlyStats.totalAmount }}</div>
+            <div class="text-4xl font-bold text-hailong-secondary mb-2">{{ transactionData.yearlyStats.totalAmount }}
+            </div>
             <div class="text-gray-600">交易总额</div>
           </div>
           <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
-            <div class="text-4xl font-bold text-hailong-primary mb-2">{{ transactionData.yearlyStats.govProcurement }}</div>
+            <div class="text-4xl font-bold text-hailong-primary mb-2">{{ transactionData.yearlyStats.govProcurement }}
+            </div>
             <div class="text-gray-600">政府采购</div>
           </div>
           <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
-            <div class="text-4xl font-bold text-hailong-secondary mb-2">{{ transactionData.yearlyStats.construction }}</div>
+            <div class="text-4xl font-bold text-hailong-secondary mb-2">{{ transactionData.yearlyStats.construction }}
+            </div>
             <div class="text-gray-600">建设工程</div>
           </div>
         </div>
@@ -244,20 +260,16 @@
               <div class="relative w-48 h-48">
                 <!-- 饼图背景圆环 -->
                 <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" stroke-width="20"/>
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" stroke-width="20" />
                   <!-- 政府采购 -->
-                  <circle cx="50" cy="50" r="40" fill="none"
-                    :stroke="transactionData.typeDistribution[0].color"
-                    stroke-width="20"
-                    :stroke-dasharray="`${transactionData.typeDistribution[0].percentage * 2.51} 251`"
-                    class="transition-all duration-500 hover:stroke-width-[22]"/>
+                  <circle cx="50" cy="50" r="40" fill="none" :stroke="transactionData.typeDistribution[0].color"
+                    stroke-width="20" :stroke-dasharray="`${transactionData.typeDistribution[0].percentage * 2.51} 251`"
+                    class="transition-all duration-500 hover:stroke-width-[22]" />
                   <!-- 建设工程 -->
-                  <circle cx="50" cy="50" r="40" fill="none"
-                    :stroke="transactionData.typeDistribution[1].color"
-                    stroke-width="20"
-                    :stroke-dasharray="`${transactionData.typeDistribution[1].percentage * 2.51} 251`"
+                  <circle cx="50" cy="50" r="40" fill="none" :stroke="transactionData.typeDistribution[1].color"
+                    stroke-width="20" :stroke-dasharray="`${transactionData.typeDistribution[1].percentage * 2.51} 251`"
                     :stroke-dashoffset="`-${transactionData.typeDistribution[0].percentage * 2.51}`"
-                    class="transition-all duration-500 hover:stroke-width-[22]"/>
+                    class="transition-all duration-500 hover:stroke-width-[22]" />
                 </svg>
                 <div class="absolute inset-0 flex items-center justify-center">
                   <div class="text-center">
@@ -286,17 +298,15 @@
           <div class="bg-white rounded-2xl p-8 shadow-lg">
             <h3 class="text-2xl font-bold text-gray-900 mb-6">地区项目排行</h3>
             <div class="space-y-3">
-              <div v-for="(region, index) in transactionData.regionRanking" :key="region.region"
-                class="group relative">
+              <div v-for="(region, index) in transactionData.regionRanking" :key="region.region" class="group relative">
                 <div class="flex items-center justify-between mb-2">
                   <div class="flex items-center flex-1">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold text-sm"
-                      :class="[
-                        index === 0 ? 'bg-yellow-100 text-yellow-600' :
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold text-sm" :class="[
+                      index === 0 ? 'bg-yellow-100 text-yellow-600' :
                         index === 1 ? 'bg-gray-100 text-gray-600' :
-                        index === 2 ? 'bg-orange-100 text-orange-600' :
-                        'bg-blue-50 text-blue-600'
-                      ]">
+                          index === 2 ? 'bg-orange-100 text-orange-600' :
+                            'bg-blue-50 text-blue-600'
+                    ]">
                       {{ index + 1 }}
                     </div>
                     <span class="text-gray-700 font-medium">{{ region.region }}</span>
@@ -307,7 +317,8 @@
                   </div>
                 </div>
                 <div class="relative h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-hailong-primary to-hailong-secondary rounded-full transition-all duration-500 group-hover:opacity-80"
+                  <div
+                    class="absolute inset-y-0 left-0 bg-gradient-to-r from-hailong-primary to-hailong-secondary rounded-full transition-all duration-500 group-hover:opacity-80"
                     :style="{ width: (region.projects / transactionData.regionRanking[0].projects * 100) + '%' }">
                   </div>
                 </div>
@@ -320,29 +331,37 @@
 
 
     <!-- 联系我们区块 - 保持深色渐变 -->
-    <div class="relative py-24 bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary text-white overflow-hidden">
+    <div
+      class="relative py-24 bg-gradient-to-br from-hailong-dark via-hailong-primary to-hailong-secondary text-white overflow-hidden">
       <!-- 动态背景效果 -->
       <div class="absolute inset-0">
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-hailong-primary rounded-full filter blur-3xl opacity-20 animate-float"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-hailong-secondary rounded-full filter blur-3xl opacity-20 animate-float" style="animation-delay:1s"></div>
+        <div
+          class="absolute top-1/4 left-1/4 w-96 h-96 bg-hailong-primary rounded-full filter blur-3xl opacity-20 animate-float">
+        </div>
+        <div
+          class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-hailong-secondary rounded-full filter blur-3xl opacity-20 animate-float"
+          style="animation-delay:1s"></div>
         <div v-for="i in 20" :key="'contact-' + i" class="absolute w-1 h-1 bg-hailong-cyan rounded-full animate-ping"
           :style="{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 2}s` }">
         </div>
       </div>
-      
+
       <div class="container-wide relative z-10">
         <div class="text-center mb-16">
           <h2 class="text-5xl font-bold mb-4 font-tech">联系我们</h2>
           <div class="w-24 h-1 bg-white/50 mx-auto"></div>
           <p class="mt-4 text-xl text-white/80">期待与您的合作，共创美好未来</p>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- 联系电话 -->
           <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/20 transition-all group">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div
+              class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                </path>
               </svg>
             </div>
             <h3 class="text-xl font-bold mb-3">联系电话</h3>
@@ -351,9 +370,12 @@
 
           <!-- 邮箱地址 -->
           <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/20 transition-all group">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div
+              class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                </path>
               </svg>
             </div>
             <h3 class="text-xl font-bold mb-3">邮箱地址</h3>
@@ -362,10 +384,13 @@
 
           <!-- 公司地址 -->
           <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/20 transition-all group">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div
+              class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
             </div>
             <h3 class="text-xl font-bold mb-3">公司地址</h3>
@@ -378,11 +403,9 @@
     <Footer />
 
     <!-- 联系信息模态框 -->
-    <div v-if="showContactModal"
-      @click="showContactModal = false"
+    <div v-if="showContactModal" @click="showContactModal = false"
       class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-      <div @click.stop
-        class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div @click.stop class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <!-- 模态框头部 -->
         <div class="bg-gradient-to-r from-hailong-primary to-hailong-secondary p-6 text-white relative">
           <button @click="showContactModal = false"
@@ -401,9 +424,12 @@
             <!-- 联系方式列表 -->
             <div class="space-y-6 flex flex-col justify-center">
               <div class="flex items-start">
-                <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                <div
+                  class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                    </path>
                   </svg>
                 </div>
                 <div>
@@ -413,9 +439,12 @@
               </div>
 
               <div class="flex items-start">
-                <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                <div
+                  class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                    </path>
                   </svg>
                 </div>
                 <div>
@@ -425,10 +454,13 @@
               </div>
 
               <div class="flex items-start">
-                <div class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                <div
+                  class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                   <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   </svg>
                 </div>
                 <div>
@@ -440,10 +472,12 @@
             </div>
 
             <!-- 工作时间 -->
-            <div class="flex flex-col items-center justify-center bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-xl p-6 h-full">
+            <div
+              class="flex flex-col items-center justify-center bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 rounded-xl p-6 h-full">
               <div class="w-20 h-20 bg-hailong-primary/20 rounded-full flex items-center justify-center mb-4">
                 <svg class="w-10 h-10 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <h4 class="font-bold text-gray-900 text-lg mb-2">工作时间</h4>
@@ -500,6 +534,7 @@ const formatAmount = (amount) => {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
