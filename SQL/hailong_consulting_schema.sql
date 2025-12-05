@@ -143,6 +143,7 @@ CREATE TABLE `company_profile` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '简介ID',
   `title` VARCHAR(255) NOT NULL COMMENT '简介标题',
   `content` LONGTEXT NOT NULL COMMENT '简介内容（富文本）',
+  `highlights` TEXT DEFAULT NULL COMMENT '企业特色标签（JSON数组格式，如：["专业资质齐全","经验丰富团队"]）',
   `image_url` VARCHAR(500) DEFAULT NULL COMMENT '配图URL',
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -153,9 +154,10 @@ CREATE TABLE `company_profile` (
 -- 4.2 业务范围表
 CREATE TABLE `business_scope` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '业务ID',
-  `title` VARCHAR(255) NOT NULL COMMENT '业务标题',
+  `name` VARCHAR(255) NOT NULL COMMENT '业务名称',
   `description` TEXT DEFAULT NULL COMMENT '业务描述',
-  `icon_url` VARCHAR(500) DEFAULT NULL COMMENT '图标URL',
+  `features` TEXT DEFAULT NULL COMMENT '业务特点（JSON数组格式，如：["采购需求编制","招标文件制作"]）',
+  `image` VARCHAR(500) DEFAULT NULL COMMENT '业务图片URL',
   `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -164,37 +166,43 @@ CREATE TABLE `business_scope` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='业务范围表';
 
--- 4.3 企业荣誉表
-CREATE TABLE `company_honors` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '荣誉ID',
-  `title` VARCHAR(255) NOT NULL COMMENT '荣誉标题',
-  `description` TEXT DEFAULT NULL COMMENT '荣誉描述',
-  `image_url` VARCHAR(500) DEFAULT NULL COMMENT '荣誉图片URL',
-  `award_date` DATE DEFAULT NULL COMMENT '获奖日期',
+-- 4.3 企业资质表（原企业荣誉表，用于存储资质证书信息）
+CREATE TABLE `company_qualifications` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '资质ID',
+  `name` VARCHAR(255) NOT NULL COMMENT '资质名称',
+  `description` TEXT DEFAULT NULL COMMENT '资质描述',
+  `image` VARCHAR(500) DEFAULT NULL COMMENT '资质证书图片URL',
+  `certificate_no` VARCHAR(100) DEFAULT NULL COMMENT '证书编号',
+  `issue_date` DATE DEFAULT NULL COMMENT '颁发日期',
+  `expiry_date` DATE DEFAULT NULL COMMENT '有效期至',
   `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_award_date` (`award_date`),
+  INDEX `idx_issue_date` (`issue_date`),
   INDEX `idx_sort_order` (`sort_order`),
   INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='企业荣誉表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='企业资质表';
 
--- 4.4 重要业绩表
+-- 4.4 重要业绩表（企业荣誉展示）
 CREATE TABLE `major_achievements` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '业绩ID',
   `project_name` VARCHAR(255) NOT NULL COMMENT '项目名称',
   `project_type` VARCHAR(50) NOT NULL COMMENT '项目类型：工程、服务、货物',
-  `project_amount` DECIMAL(15,2) NOT NULL COMMENT '项目金额（万元）',
+  `project_amount` DECIMAL(15,2) DEFAULT NULL COMMENT '项目金额（万元）',
+  `client_name` VARCHAR(255) DEFAULT NULL COMMENT '客户名称',
+  `description` TEXT DEFAULT NULL COMMENT '项目描述',
+  `completion_date` DATE DEFAULT NULL COMMENT '完成日期',
   `image_url` VARCHAR(500) DEFAULT NULL COMMENT '项目图片URL',
   `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
   `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   INDEX `idx_project_type` (`project_type`),
+  INDEX `idx_completion_date` (`completion_date`),
   INDEX `idx_sort_order` (`sort_order`),
   INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='重要业绩表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='重要业绩表（企业荣誉展示）';
 
 -- ============================================
 -- 5. 统计模块

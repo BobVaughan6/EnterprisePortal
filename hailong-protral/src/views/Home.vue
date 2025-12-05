@@ -26,7 +26,7 @@
       </div>
     </div>
     <!-- 统计数据 - 改为浅色渐变 -->
-    <div class="py-20 bg-gradient-to-b from-white to-gray-50">
+    <!-- <div class="py-20 bg-gradient-to-b from-white to-gray-50">
       <div class="container-wide">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
           <div v-for="stat in companyInfo.stats" :key="stat.label">
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- 企业简介 - 改为中性渐变 -->
     <div class="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div class="container-wide">
