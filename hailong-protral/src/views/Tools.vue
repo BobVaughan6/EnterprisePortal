@@ -7,41 +7,17 @@
       <h1 class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
         实用工具
       </h1>
-      <p class="text-xl text-gray-200">专业工具助力高效工作</p>
+      <p class="text-xl text-gray-200">专业费用测算工具，快速准确计算</p>
     </div>
 
     <!-- 内容区域 -->
     <div class="py-16 bg-white">
       <div class="container-wide">
         <div class="animate-fade-in">
-          <!-- 工具分类导航 -->
-          <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-            <div class="flex flex-wrap gap-3">
-              <button
-                v-for="category in toolCategories"
-                :key="category.value"
-                @click="activeCategory = category.value"
-                :class="[
-                  'px-6 py-3 rounded-lg font-medium transition-all',
-                  activeCategory === category.value
-                    ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                <span class="flex items-center gap-2">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="category.icon" />
-                  </svg>
-                  {{ category.label }}
-                </span>
-              </button>
-            </div>
-          </div>
-
           <!-- 工具列表 -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             <div
-              v-for="tool in filteredTools"
+              v-for="tool in tools"
               :key="tool.id"
               class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary"
             >
@@ -97,17 +73,15 @@
               </div>
             </div>
           </div>
+          
+          <!-- 招标代理服务费计算工具 -->
+          <BiddingCalculator v-if="showBiddingCalculator" @close="showBiddingCalculator = false" class="mb-12" />
 
-          <!-- 空状态 -->
-          <div v-if="filteredTools.length === 0" class="text-center py-20">
-            <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-            <p class="text-gray-500">该分类暂无工具</p>
-          </div>
+          <!-- 造价费用计算工具 -->
+          <CostCalculator v-if="showCostCalculator" @close="showCostCalculator = false" class="mb-12" />
 
           <!-- 使用说明 -->
-          <div class="mt-12 bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5 rounded-xl p-8 border border-hailong-primary/20">
+          <div class="bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5 rounded-xl p-8 border border-hailong-primary/20">
             <h2 class="text-2xl font-bold text-hailong-dark mb-4 flex items-center gap-2">
               <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -119,14 +93,14 @@
                 <div class="flex-shrink-0 w-8 h-8 bg-hailong-primary text-white rounded-full flex items-center justify-center font-bold">1</div>
                 <div>
                   <h3 class="font-semibold mb-1">选择工具</h3>
-                  <p class="text-sm text-gray-600">根据您的需求选择合适的工具类别和具体工具</p>
+                  <p class="text-sm text-gray-600">根据您的需求选择合适的工具</p>
                 </div>
               </div>
               <div class="flex gap-3">
                 <div class="flex-shrink-0 w-8 h-8 bg-hailong-primary text-white rounded-full flex items-center justify-center font-bold">2</div>
                 <div>
                   <h3 class="font-semibold mb-1">点击使用</h3>
-                  <p class="text-sm text-gray-600">点击"立即使用"按钮进入工具页面</p>
+                  <p class="text-sm text-gray-600">点击"立即使用"按钮打开工具</p>
                 </div>
               </div>
               <div class="flex gap-3">
@@ -140,7 +114,7 @@
                 <div class="flex-shrink-0 w-8 h-8 bg-hailong-primary text-white rounded-full flex items-center justify-center font-bold">4</div>
                 <div>
                   <h3 class="font-semibold mb-1">获取结果</h3>
-                  <p class="text-sm text-gray-600">系统自动计算并展示结果，支持导出和打印</p>
+                  <p class="text-sm text-gray-600">系统自动计算并展示结果，支持复制</p>
                 </div>
               </div>
             </div>
@@ -154,146 +128,74 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import BiddingCalculator from '@/components/BiddingCalculator.vue'
+import CostCalculator from '@/components/CostCalculator.vue'
 
-const router = useRouter()
+// 页面加载时滚动到顶部
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
 
-// 工具分类
-const toolCategories = [
-  { 
-    label: '全部工具', 
-    value: 'all',
-    icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z'
-  },
-  { 
-    label: '造价计算', 
-    value: 'cost',
-    icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z'
-  },
-  { 
-    label: '文档模板', 
-    value: 'template',
-    icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-  },
-  { 
-    label: '数据分析', 
-    value: 'analysis',
-    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
-  },
-  { 
-    label: '其他工具', 
-    value: 'other',
-    icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'
-  }
-]
-
-// 当前选中的分类
-const activeCategory = ref('all')
-
-// 工具列表
+// 工具列表（只保留三个）
 const tools = [
   {
     id: 1,
-    name: '工程量清单计算器',
-    category: 'cost',
-    description: '快速计算工程量清单，支持多种计量单位和计算规则，自动生成报表',
+    name: '招标代理服务费计算工具',
+    description: '根据河南省招标代理服务收费指导意见，快速计算工程、货物、服务类项目的代理服务费用',
     icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z',
-    status: 'coming',
+    status: 'available',
     users: 1250
   },
   {
     id: 2,
-    name: '造价指标查询',
-    category: 'cost',
-    description: '提供各类工程造价指标查询，包括人工、材料、机械等价格信息',
-    icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
-    status: 'coming',
+    name: '造价费用计算工具',
+    description: '依据河南省建设工程造价咨询行业服务收费市场参考价格，提供专业的造价咨询费用计算',
+    icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    status: 'available',
     users: 980
   },
   {
     id: 3,
-    name: '招标文件模板',
-    category: 'template',
-    description: '提供标准化的招标文件模板，包括货物、服务、工程等各类项目',
-    icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-    status: 'coming',
-    users: 2100
-  },
-  {
-    id: 4,
-    name: '评标报告生成器',
-    category: 'template',
-    description: '自动生成规范的评标报告，支持多种评标方法和自定义模板',
-    icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-    status: 'coming',
-    users: 1560
-  },
-  {
-    id: 5,
-    name: '项目数据分析',
-    category: 'analysis',
-    description: '对项目数据进行多维度分析，生成可视化图表和分析报告',
-    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-    status: 'coming',
-    users: 850
-  },
-  {
-    id: 6,
-    name: '投标报价分析',
-    category: 'analysis',
-    description: '分析投标报价的合理性，识别异常报价，辅助评标决策',
-    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+    name: '司法鉴定费用计算工具',
+    description: '根据司法鉴定收费标准，计算各类司法鉴定项目的费用',
+    icon: 'M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3',
     status: 'coming',
     users: 720
-  },
-  {
-    id: 7,
-    name: '工期计算器',
-    category: 'other',
-    description: '计算工程工期，考虑节假日、工作日等因素，生成施工进度计划',
-    icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
-    status: 'coming',
-    users: 1100
-  },
-  {
-    id: 8,
-    name: '单位换算工具',
-    category: 'other',
-    description: '支持各类工程单位换算，包括长度、面积、体积、重量等',
-    icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
-    status: 'coming',
-    users: 1850
-  },
-  {
-    id: 9,
-    name: '税费计算器',
-    category: 'cost',
-    description: '计算工程项目相关税费，包括增值税、企业所得税等',
-    icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    status: 'coming',
-    users: 950
   }
 ]
 
-// 过滤后的工具列表
-const filteredTools = computed(() => {
-  if (activeCategory.value === 'all') {
-    return tools
-  }
-  return tools.filter(tool => tool.category === activeCategory.value)
-})
+// 显示计算器
+const showBiddingCalculator = ref(false)
+const showCostCalculator = ref(false)
 
 // 处理工具点击
 const handleToolClick = (tool) => {
-  // 这里可以跳转到具体的工具页面
-  console.log('使用工具:', tool.name)
-  // router.push(`/tools/${tool.id}`)
-  
-  // 暂时显示提示
-  alert(`${tool.name} 功能即将上线，敬请期待！`)
+  if (tool.id === 1) {
+    showBiddingCalculator.value = true
+    showCostCalculator.value = false
+    scrollToCalculator()
+  } else if (tool.id === 2) {
+    showCostCalculator.value = true
+    showBiddingCalculator.value = false
+    scrollToCalculator()
+  } else {
+    alert(`${tool.name} 功能即将上线，敬请期待！`)
+  }
+}
+
+// 滚动到计算器位置
+const scrollToCalculator = () => {
+  setTimeout(() => {
+    const calculator = document.querySelector('.bg-white.rounded-xl.shadow-2xl')
+    if (calculator) {
+      const headerHeight = 80 // 考虑固定头部的高度
+      const calculatorTop = calculator.getBoundingClientRect().top + window.pageYOffset - headerHeight
+      window.scrollTo({ top: calculatorTop, behavior: 'smooth' })
+    }
+  }, 100)
 }
 </script>
 
