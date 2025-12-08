@@ -365,7 +365,7 @@
               </svg>
             </div>
             <h3 class="text-xl font-bold mb-3">联系电话</h3>
-            <p class="text-white/90 text-base font-medium">0371-55894666</p>
+            <p class="text-white/90 text-base font-medium">{{ contactInfo.phone }}</p>
           </div>
 
           <!-- 邮箱地址 -->
@@ -379,7 +379,7 @@
               </svg>
             </div>
             <h3 class="text-xl font-bold mb-3">邮箱地址</h3>
-            <p class="text-white/90 text-base font-medium break-all">037155894666@henanhailong.com</p>
+            <p class="text-white/90 text-base font-medium break-all">{{ contactInfo.email }}</p>
           </div>
 
           <!-- 公司地址 -->
@@ -394,7 +394,7 @@
               </svg>
             </div>
             <h3 class="text-xl font-bold mb-3">公司地址</h3>
-            <p class="text-white/90 text-base font-medium leading-relaxed">郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层</p>
+            <p class="text-white/90 text-base font-medium leading-relaxed">{{ contactInfo.address.fullAddress }}</p>
           </div>
         </div>
       </div>
@@ -434,7 +434,7 @@
                 </div>
                 <div>
                   <h4 class="font-bold text-gray-900 mb-1">联系电话</h4>
-                  <p class="text-gray-600 text-sm">0371-55894666</p>
+                  <p class="text-gray-600 text-sm">{{ contactInfo.phone }}</p>
                 </div>
               </div>
 
@@ -449,7 +449,7 @@
                 </div>
                 <div>
                   <h4 class="font-bold text-gray-900 mb-1">邮箱地址</h4>
-                  <p class="text-gray-600 text-sm break-all">037155894666@henanhailong.com</p>
+                  <p class="text-gray-600 text-sm break-all">{{ contactInfo.email }}</p>
                 </div>
               </div>
 
@@ -465,7 +465,7 @@
                 </div>
                 <div>
                   <h4 class="font-bold text-gray-900 mb-1">公司地址</h4>
-                  <p class="text-gray-600 text-sm">郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层</p>
+                  <p class="text-gray-600 text-sm">{{ contactInfo.address.fullAddress }}</p>
                 </div>
               </div>
 
@@ -481,9 +481,9 @@
                 </svg>
               </div>
               <h4 class="font-bold text-gray-900 text-lg mb-2">工作时间</h4>
-              <p class="text-gray-700 font-medium mb-1">周一至周五</p>
-              <p class="text-hailong-primary text-xl font-bold mb-3">9:00-18:00</p>
-              <p class="text-gray-500 text-sm text-center">节假日休息</p>
+              <p class="text-gray-700 font-medium mb-1">{{ contactInfo.workingHours.weekdays.split(' ')[0] }}</p>
+              <p class="text-hailong-primary text-xl font-bold mb-3">{{ contactInfo.workingHours.weekdays.split(' ')[1] }}</p>
+              <p class="text-gray-500 text-sm text-center">节假日{{ contactInfo.workingHours.weekend }}</p>
             </div>
           </div>
         </div>
@@ -493,10 +493,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { companyInfo, companyProfile, businessScope, transactionData, majorAchievements, govProcurementAnnouncements, constructionAnnouncements } from './data.js'
+import { ref, computed } from 'vue'
+import { companyProfile, businessScope, transactionData, majorAchievements, govProcurementAnnouncements, constructionAnnouncements } from './data.js'
+import { getCompanyInfo, getContactInfo } from '@/utils/config'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+
+// 获取配置信息
+const companyInfo = computed(() => getCompanyInfo())
+const contactInfo = computed(() => getContactInfo())
 
 // 联系信息模态框
 const showContactModal = ref(false)

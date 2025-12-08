@@ -30,10 +30,10 @@
               </div>
               <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors">联系电话
               </h3>
-              <p class="text-gray-600 mb-4">工作日 9:00-18:00</p>
-              <a href="tel:0371-55894666"
+              <p class="text-gray-600 mb-4">{{ contactInfo.workingHours.description }}</p>
+              <a :href="`tel:${contactInfo.phone}`"
                 class="text-xl font-bold text-hailong-primary hover:text-hailong-secondary transition-colors">
-                0371-55894666
+                {{ contactInfo.phone }}
               </a>
             </div>
 
@@ -51,9 +51,9 @@
               <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors">邮箱地址
               </h3>
               <p class="text-gray-600 mb-4">欢迎来信咨询</p>
-              <a href="mailto:037155894666@henanhailong.com"
+              <a :href="`mailto:${contactInfo.email}`"
                 class="text-lg font-bold text-hailong-primary hover:text-hailong-secondary transition-colors break-all">
-                037155894666@henanhailong.com
+                {{ contactInfo.email }}
               </a>
             </div>
 
@@ -73,7 +73,7 @@
               </h3>
               <p class="text-gray-600 mb-4">欢迎莅临指导</p>
               <p class="text-lg font-medium text-gray-800 leading-relaxed">
-                郑州市郑东新区金水东路85号<br />雅宝·东方国际广场2号楼13层
+                {{ contactInfo.address.fullAddress }}
               </p>
             </div>
 
@@ -93,11 +93,11 @@
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-gray-600">工作日</span>
-                  <span class="text-lg font-bold text-hailong-primary">9:00-18:00</span>
+                  <span class="text-lg font-bold text-hailong-primary">{{ contactInfo.workingHours.weekdays.split(' ')[1] }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-gray-600">周末</span>
-                  <span class="text-sm text-gray-500">休息</span>
+                  <span class="text-sm text-gray-500">{{ contactInfo.workingHours.weekend }}</span>
                 </div>
               </div>
             </div>
@@ -119,7 +119,7 @@
               </div>
               <div class="grid grid-cols-1 gap-4">
                 <!-- 地铁 -->
-                <div class="p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl">
+                <div v-if="transportation.metro.enabled" class="p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,12 +130,14 @@
                     <h4 class="text-base font-bold text-gray-900">地铁出行</h4>
                   </div>
                   <ul class="space-y-1 text-sm text-gray-700 ml-10">
-                    <li>地铁1号线会展中心站D口</li>
-                    <li>步行约500米即可到达</li>
+                    <li v-for="line in transportation.metro.lines" :key="line.line">
+                      {{ line.line }}{{ line.station }}{{ line.exit }}
+                    </li>
+                    <li v-if="transportation.metro.lines[0]">{{ transportation.metro.lines[0].walkingDistance }}</li>
                   </ul>
                 </div>
                 <!-- 公交 -->
-                <div class="p-4 bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl">
+                <div v-if="transportation.bus.enabled" class="p-4 bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,12 +148,12 @@
                     <h4 class="text-base font-bold text-gray-900">公交出行</h4>
                   </div>
                   <ul class="space-y-1 text-sm text-gray-700 ml-10">
-                    <li>26路、43路、47路、115路</li>
-                    <li>金水东路站下车即到</li>
+                    <li>{{ transportation.bus.routes.join('、') }}</li>
+                    <li>{{ transportation.bus.description }}</li>
                   </ul>
                 </div>
                 <!-- 自驾 -->
-                <div class="p-4 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl">
+                <div v-if="transportation.driving.enabled" class="p-4 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,12 +165,12 @@
                     <h4 class="text-base font-bold text-gray-900">自驾出行</h4>
                   </div>
                   <ul class="space-y-1 text-sm text-gray-700 ml-10">
-                    <li>导航搜索"雅宝东方国际广场"</li>
-                    <li>大厦配有地下停车场</li>
+                    <li>导航搜索"{{ transportation.driving.navigation }}"</li>
+                    <li>{{ transportation.driving.parking }}</li>
                   </ul>
                 </div>
                 <!-- 周边地标 -->
-                <div class="p-4 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl">
+                <div v-if="transportation.landmarks.length > 0" class="p-4 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl">
                   <div class="flex items-center mb-3">
                     <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-2">
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,8 +182,7 @@
                     <h4 class="text-base font-bold text-gray-900">周边地标</h4>
                   </div>
                   <ul class="space-y-1 text-sm text-gray-700 ml-10">
-                    <li>郑州国际会展中心</li>
-                    <li>河南省体育中心</li>
+                    <li v-for="landmark in transportation.landmarks" :key="landmark">{{ landmark }}</li>
                   </ul>
                 </div>
               </div>
@@ -242,9 +243,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import { getContactInfo, getTransportation, getFAQs } from '@/utils/config'
+
+// 获取配置信息
+const contactInfo = computed(() => getContactInfo())
+const transportation = computed(() => getTransportation())
+const faqs = computed(() => getFAQs())
 
 // 确保页面加载时滚动到顶部
 onMounted(() => {
@@ -254,13 +261,14 @@ onMounted(() => {
 
 // 初始化地图
 const initMap = () => {
+  const mapConfig = contactInfo.value.map
   // 动态加载高德地图API
   const script = document.createElement('script')
-  script.src = 'https://webapi.amap.com/maps?v=2.0&key=21c2669531206e2b32dd6a3b1020c581'
+  script.src = `https://webapi.amap.com/maps?v=2.0&key=${mapConfig.apiKey}`
   script.onload = () => {
     const map = new AMap.Map('map-container', {
-      zoom: 16,
-      center: [113.773301, 34.768953],
+      zoom: mapConfig.zoom,
+      center: [mapConfig.longitude, mapConfig.latitude],
       viewMode: '2D',
       dragEnable: true, // 禁用拖拽
       keyboardEnable: false, // 禁用键盘
@@ -275,7 +283,7 @@ const initMap = () => {
 
     // 添加标记点
     const marker = new AMap.Marker({
-      position: [113.773301, 34.768953],
+      position: [mapConfig.longitude, mapConfig.latitude],
       // title: '海隆工程咨询有限公司',
       map: map,
       // label: {
@@ -308,21 +316,21 @@ const initMap = () => {
               padding-bottom: 8px;
               border-bottom: 2px solid #667eea;
             ">
-              🏢 海隆工程咨询
+              🏢 ${contactInfo.value.address.building.split('号')[0]}号
             </h3>
             <div style="margin: 8px 0; display: flex; align-items: center;">
               <span style="color: #667eea; font-size: 14px; margin-right: 6px;">📞</span>
-              <a href="tel:0371-55894666" style="
+              <a href="tel:${contactInfo.value.phone}" style="
                 font-size: 14px;
                 color: #667eea;
                 text-decoration: none;
                 font-weight: 600;
-              ">0371-55894666</a>
+              ">${contactInfo.value.phone}</a>
             </div>
             <div style="margin: 8px 0; display: flex; align-items: start;">
               <span style="color: #667eea; font-size: 14px; margin-right: 6px; margin-top: 2px;">📍</span>
               <div style="font-size: 12px; color: #4a5568; line-height: 1.4;">
-                金水东路85号雅宝国际2号楼13层
+                ${contactInfo.value.address.street}${contactInfo.value.address.building}
               </div>
             </div>
           </div>
@@ -342,26 +350,6 @@ const initMap = () => {
   }
   document.head.appendChild(script)
 }
-
-// 常见问题
-const faqs = [
-  {
-    question: '如何联系海隆咨询？',
-    answer: '您可以通过电话、邮箱或在线留言的方式联系我们，我们会在工作时间内尽快回复您。'
-  },
-  {
-    question: '海隆咨询的主要业务范围是什么？',
-    answer: '我们主要提供政府采购代理、工程招标代理、造价咨询、工程监理等专业服务。'
-  },
-  {
-    question: '如何获取项目报价？',
-    answer: '请通过电话或邮箱联系我们，提供项目基本信息，我们会根据具体情况为您提供专业报价。'
-  },
-  {
-    question: '海隆咨询的服务区域有哪些？',
-    answer: '我们主要服务于河南省及周边地区，具体服务范围可通过电话咨询了解详情。'
-  }
-]
 </script>
 
 <style scoped>

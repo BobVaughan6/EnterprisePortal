@@ -1,0 +1,299 @@
+{
+  "company": {
+    "fullName": "海隆工程咨询有限公司",
+    "shortName": "海隆咨询",
+    "englishName": "Hailong Engineering Consulting Co., Ltd.",
+    "slogan": "海纳百川，才望兼隆",
+    "description": "致力于成为工程建设的专业支撑者、行业发展的可信力量，以科学、规范、公正的咨询服务助力政府与企业项目高质量实施。",
+    "foundedYear": 2010,
+    "registeredCapital": "1000万元",
+    "employeeCount": "200+",
+    "logo": "/assets/logo.png",
+    "favicon": "/assets/hailong.ico"
+  },
+  "contact": {
+    "phone": "0371-55894666",
+    "email": "037155894666@henanhailong.com",
+    "fax": "",
+    "address": {
+      "province": "河南省",
+      "city": "郑州市",
+      "district": "郑东新区",
+      "street": "金水东路85号",
+      "building": "雅宝·东方国际广场2号楼13层",
+      "fullAddress": "郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层",
+      "postalCode": "450000"
+    },
+    "workingHours": {
+      "weekdays": "周一至周五 9:00-18:00",
+      "weekend": "休息",
+      "description": "工作日 9:00-18:00"
+    },
+    "map": {
+      "provider": "amap",
+      "apiKey": "21c2669531206e2b32dd6a3b1020c581",
+      "longitude": 113.773301,
+      "latitude": 34.768953,
+      "zoom": 16
+    }
+  },
+  "transportation": {
+    "metro": {
+      "enabled": true,
+      "lines": [
+        {
+          "line": "地铁1号线",
+          "station": "会展中心站",
+          "exit": "D口",
+          "walkingDistance": "约500米"
+        }
+      ]
+    },
+    "bus": {
+      "enabled": true,
+      "routes": ["26路", "43路", "47路", "115路"],
+      "station": "金水东路站",
+      "description": "金水东路站下车即到"
+    },
+    "driving": {
+      "enabled": true,
+      "navigation": "雅宝东方国际广场",
+      "parking": "大厦配有地下停车场"
+    },
+    "landmarks": [
+      "郑州国际会展中心",
+      "河南省体育中心"
+    ]
+  },
+  "businessScope": [
+    {
+      "id": "gov-procurement",
+      "name": "政府采购代理",
+      "icon": "📋",
+      "order": 1
+    },
+    {
+      "id": "construction-bidding",
+      "name": "工程招标代理",
+      "icon": "🏗️",
+      "order": 2
+    },
+    {
+      "id": "cost-consulting",
+      "name": "造价咨询",
+      "icon": "💰",
+      "order": 3
+    },
+    {
+      "id": "project-management",
+      "name": "项目管理",
+      "icon": "📊",
+      "order": 4
+    },
+    {
+      "id": "consulting-service",
+      "name": "咨询服务",
+      "icon": "💡",
+      "order": 5
+    },
+    {
+      "id": "training-service",
+      "name": "培训服务",
+      "icon": "📚",
+      "order": 6
+    }
+  ],
+  "navigation": {
+    "header": [
+      {
+        "name": "首页",
+        "path": "/",
+        "order": 1
+      },
+      {
+        "name": "关于海隆",
+        "path": "/about",
+        "order": 2
+      },
+      {
+        "name": "公告信息",
+        "path": "/announcements",
+        "order": 3
+      },
+      {
+        "name": "新闻中心",
+        "path": "/company-announcements",
+        "order": 4
+      },
+      {
+        "name": "政策法规",
+        "path": "/policies",
+        "order": 5
+      },
+      {
+        "name": "实用工具",
+        "path": "/tools",
+        "order": 6
+      },
+      {
+        "name": "联系我们",
+        "path": "/contact",
+        "order": 7
+      }
+    ],
+    "footer": {
+      "sections": [
+        {
+          "title": "业务范围",
+          "links": [
+            {
+              "name": "政府采购代理",
+              "path": "#"
+            },
+            {
+              "name": "工程招标代理",
+              "path": "#"
+            },
+            {
+              "name": "造价咨询",
+              "path": "#"
+            }
+          ]
+        },
+        {
+          "title": "快速链接",
+          "links": [
+            {
+              "name": "首页",
+              "path": "/"
+            },
+            {
+              "name": "关于海隆",
+              "path": "/about"
+            },
+            {
+              "name": "公告信息",
+              "path": "/announcements"
+            },
+            {
+              "name": "政策法规",
+              "path": "/policies"
+            }
+          ]
+        },
+        {
+          "title": "联系我们",
+          "type": "contact",
+          "items": [
+            {
+              "label": "电话",
+              "value": "0371-55894666"
+            },
+            {
+              "label": "邮箱",
+              "value": "037155894666@henanhailong.com"
+            },
+            {
+              "label": "地址",
+              "value": "郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层"
+            }
+          ]
+        }
+      ],
+      "copyright": "© 2025 海隆工程咨询有限公司 版权所有",
+      "icp": "",
+      "policeRecord": ""
+    }
+  },
+  "faqs": [
+    {
+      "id": 1,
+      "question": "如何联系海隆咨询？",
+      "answer": "您可以通过电话、邮箱或在线留言的方式联系我们，我们会在工作时间内尽快回复您。",
+      "category": "联系方式",
+      "order": 1
+    },
+    {
+      "id": 2,
+      "question": "海隆咨询的主要业务范围是什么？",
+      "answer": "我们主要提供政府采购代理、工程招标代理、造价咨询、工程监理等专业服务。",
+      "category": "业务咨询",
+      "order": 2
+    },
+    {
+      "id": 3,
+      "question": "如何获取项目报价？",
+      "answer": "请通过电话或邮箱联系我们，提供项目基本信息，我们会根据具体情况为您提供专业报价。",
+      "category": "业务咨询",
+      "order": 3
+    },
+    {
+      "id": 4,
+      "question": "海隆咨询的服务区域有哪些？",
+      "answer": "我们主要服务于河南省及周边地区，具体服务范围可通过电话咨询了解详情。",
+      "category": "业务咨询",
+      "order": 4
+    }
+  ],
+  "socialMedia": {
+    "wechat": {
+      "enabled": false,
+      "qrcode": "",
+      "account": ""
+    },
+    "weibo": {
+      "enabled": false,
+      "url": ""
+    },
+    "linkedin": {
+      "enabled": false,
+      "url": ""
+    }
+  },
+  "seo": {
+    "title": "海隆工程咨询有限公司 - 专业的工程咨询服务商",
+    "keywords": "海隆咨询,工程咨询,政府采购代理,工程招标代理,造价咨询,郑州工程咨询",
+    "description": "海隆工程咨询有限公司是河南省专业的工程咨询服务商，提供政府采购代理、工程招标代理、造价咨询等全方位服务。",
+    "author": "海隆工程咨询有限公司"
+  },
+  "theme": {
+    "primaryColor": "#667eea",
+    "secondaryColor": "#764ba2",
+    "accentColor": "#06b6d4",
+    "darkColor": "#1a202c",
+    "fontFamily": {
+      "base": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "tech": "'Orbitron', 'Microsoft YaHei', sans-serif"
+    }
+  },
+  "features": {
+    "enableSearch": false,
+    "enableComments": false,
+    "enableNewsletter": false,
+    "enableChatbot": false,
+    "enableAnalytics": false,
+    "analyticsId": ""
+  },
+  "api": {
+    "baseUrl": {
+      "development": "http://localhost:5000",
+      "production": "https://api.henanhailong.com"
+    },
+    "timeout": 30000,
+    "retryAttempts": 3
+  },
+  "upload": {
+    "maxFileSize": 10485760,
+    "allowedTypes": ["image/jpeg", "image/png", "image/gif", "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+    "imageMaxWidth": 1920,
+    "imageMaxHeight": 1080
+  },
+  "pagination": {
+    "defaultPageSize": 10,
+    "pageSizeOptions": [10, 20, 50, 100]
+  },
+  "cache": {
+    "enableCache": true,
+    "cacheTime": 300000
+  }
+}

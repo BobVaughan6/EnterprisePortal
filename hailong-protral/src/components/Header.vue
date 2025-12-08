@@ -101,24 +101,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import logoUrl from '@/assets/logo.png'
+import { getCompanyInfo, getNavigation } from '@/utils/config'
 
 const route = useRoute()
 const showMobileMenu = ref(false)
 const openMobileSubmenu = ref(null)
 
-// 导航链接配置
-const navLinks = [
-  { name: '首页', path: '/' },
-  { name: '关于海隆', path: '/about' },
-  { name: '公告信息', path: '/announcements' },
-  { name: '新闻中心', path: '/company-announcements' },
-  { name: '政策法规', path: '/policies' },
-  { name: '实用工具', path: '/tools' },
-  { name: '联系我们', path: '/contact' }
-]
+// 获取公司信息和导航配置
+const companyInfo = computed(() => getCompanyInfo())
+const navigation = computed(() => getNavigation())
+const navLinks = computed(() => navigation.value.header)
 
 const isActive = (path) => {
   return route.path === path || route.path.startsWith(path + '/')

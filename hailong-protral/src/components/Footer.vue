@@ -3,44 +3,43 @@
     <div class="container-wide">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
-          <h3 class="text-xl font-bold mb-4 text-hailong-cyan font-tech">海隆咨询</h3>
-          <p class="text-sm text-gray-400">海纳百川，才望兼隆</p>
+          <h3 class="text-xl font-bold mb-4 text-hailong-cyan font-tech">{{ companyInfo.shortName }}</h3>
+          <p class="text-sm text-gray-400">{{ companyInfo.slogan }}</p>
         </div>
-        <div>
-          <h4 class="font-semibold mb-4">业务范围</h4>
-          <ul class="space-y-2 text-sm text-gray-400">
-            <li><a href="#" class="hover:text-hailong-cyan transition-colors">政府采购代理</a></li>
-            <li><a href="#" class="hover:text-hailong-cyan transition-colors">工程招标代理</a></li>
-            <li><a href="#" class="hover:text-hailong-cyan transition-colors">造价咨询</a></li>
+        <div v-for="section in footerSections" :key="section.title">
+          <h4 class="font-semibold mb-4">{{ section.title }}</h4>
+          <ul v-if="section.type !== 'contact'" class="space-y-2 text-sm text-gray-400">
+            <li v-for="link in section.links" :key="link.name">
+              <router-link :to="link.path" class="hover:text-hailong-cyan transition-colors">
+                {{ link.name }}
+              </router-link>
+            </li>
           </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">快速链接</h4>
-          <ul class="space-y-2 text-sm text-gray-400">
-            <li><router-link to="/" class="hover:text-hailong-cyan transition-colors">首页</router-link></li>
-            <li><router-link to="/about" class="hover:text-hailong-cyan transition-colors">关于海隆</router-link></li>
-            <li><router-link to="/announcements" class="hover:text-hailong-cyan transition-colors">公告信息</router-link></li>
-            <li><router-link to="/policies" class="hover:text-hailong-cyan transition-colors">政策法规</router-link></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">联系我们</h4>
-          <ul class="space-y-2 text-sm text-gray-400">
-            <li>电话: 0371-55894666</li>
-            <li>邮箱: 037155894666@henanhailong.com</li>
-            <li>地址: 郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层</li>
+          <ul v-else class="space-y-2 text-sm text-gray-400">
+            <li v-for="item in section.items" :key="item.label">
+              {{ item.label }}: {{ item.value }}
+            </li>
           </ul>
         </div>
       </div>
       <div class="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-        <p>© 2025 海隆工程咨询有限公司 版权所有</p>
+        <p>{{ footerCopyright }}</p>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup>
-// 页脚组件
+import { computed } from 'vue'
+import { getCompanyInfo, getNavigation } from '@/utils/config'
+
+// 获取公司信息
+const companyInfo = computed(() => getCompanyInfo())
+
+// 获取页脚配置
+const navigation = computed(() => getNavigation())
+const footerSections = computed(() => navigation.value.footer.sections)
+const footerCopyright = computed(() => navigation.value.footer.copyright)
 </script>
 
 <style scoped>
