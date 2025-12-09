@@ -82,6 +82,21 @@
           <h3 class="text-lg font-bold text-hailong-dark mb-4">计算结果</h3>
           
           <div class="space-y-4">
+            <div v-if="result.standardFee > 0" class="space-y-2 text-sm mb-4">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600">服务类型：</span>
+                <span class="font-medium text-gray-800">{{ getServiceTypeLabel() }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600">项目金额：</span>
+                <span class="font-medium text-gray-800">{{ formData.amount }} 万元</span>
+              </div>
+              <div v-if="formData.discount < 100" class="flex justify-between items-center">
+                <span class="text-gray-600">优惠折扣：</span>
+                <span class="font-medium text-gray-800">{{ formData.discount }}%</span>
+              </div>
+            </div>
+
             <div class="flex justify-between items-center py-3 border-b border-gray-200">
               <span class="text-gray-700 font-medium">标准收费：</span>
               <span class="text-2xl font-bold text-hailong-primary">{{ formatCurrency(result.standardFee) }}</span>
@@ -117,6 +132,7 @@
       <div class="text-sm text-gray-600 leading-relaxed space-y-2">
         <p><span class="font-semibold text-gray-700">说明：</span></p>
         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li>本计算器提供的费用测算结果仅供参考估价，不能作为实际收费依据，实际费用应以双方签订的正式咨询服务合同为准。</li>
           <li>计算结果依据《河南省招标投标协会关于印发&lt;河南省招标代理服务收费指导意见&gt;的通知》（豫招协〔2023〕002号）文件提出的计算方法得出</li>
           <li>实际收费可根据项目具体情况协商确定</li>
         </ul>
@@ -234,6 +250,12 @@ const calculate = () => {
   result.standardFee = totalFee
   result.discountedFee = discountedFee
   result.report = report
+}
+
+// 获取服务类型标签
+const getServiceTypeLabel = () => {
+  const type = serviceTypes.find(t => t.value === formData.serviceType)
+  return type ? type.label : ''
 }
 
 // 格式化货币

@@ -3,11 +3,14 @@
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-3xl font-bold text-hailong-dark flex items-center gap-3">
         <svg class="w-8 h-8 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
         </svg>
-        造价费用计算工具
+        司法鉴定费用计算工具
       </h2>
-      <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600 transition-colors">
+      <button
+        @click="$emit('close')"
+        class="text-gray-400 hover:text-gray-600 transition-colors"
+      >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -17,18 +20,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- 输入区域 -->
       <div class="space-y-6">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-3">咨询项目类型</label>
-          <select 
-            v-model="selectedProject" 
-            @change="calculate"
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-hailong-primary focus:outline-none transition-colors text-lg"
-          >
-            <option value="">请选择项目类型</option>
-            <option v-for="project in projects" :key="project.id" :value="project.id">
-              {{ project.name }}
-            </option>
-          </select>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <p class="text-sm text-blue-800">
+            <span class="font-semibold">鉴定项目：</span>工程造价纠纷鉴定
+          </p>
         </div>
 
         <div>
@@ -46,42 +41,17 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-3">{{ feeBaseLabel }}（万元）</label>
+          <label class="block text-sm font-semibold text-gray-700 mb-3">鉴定标的额（万元）</label>
           <input 
             v-model.number="feeBase" 
             type="number" 
             step="0.01"
             min="0"
-            placeholder="请输入金额"
+            placeholder="请输入鉴定标的额"
             @input="calculate"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-hailong-primary focus:outline-none transition-colors text-lg"
           />
           <p class="text-xs text-gray-500 mt-2">请输入正数，支持小数</p>
-        </div>
-
-        <div v-if="showSteelOption">
-          <label class="flex items-center space-x-2 mb-3">
-            <input 
-              v-model="needSteelCalculation" 
-              type="checkbox"
-              @change="calculate"
-              class="w-5 h-5 text-hailong-primary border-gray-300 rounded focus:ring-hailong-primary"
-            />
-            <span class="text-sm font-semibold text-gray-700">需要钢筋工程精细计量</span>
-          </label>
-          
-          <div v-if="needSteelCalculation">
-            <input 
-              v-model.number="steelWeight" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="请输入钢筋重量（吨）"
-              @input="calculate"
-              class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-hailong-primary focus:outline-none transition-colors text-lg"
-            />
-            <p class="text-xs text-gray-500 mt-2">钢筋重量（吨），{{ steelRate }}元/吨</p>
-          </div>
         </div>
 
         <button
@@ -101,15 +71,15 @@
           <div class="space-y-4">
             <div v-if="result" class="space-y-2 text-sm mb-4">
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">项目类型：</span>
-                <span class="font-medium text-gray-800">{{ result.projectName }}</span>
+                <span class="text-gray-600">鉴定项目：</span>
+                <span class="font-medium text-gray-800">工程造价纠纷鉴定</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-gray-600">工程类别：</span>
                 <span class="font-medium text-gray-800">{{ result.engineeringName }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">收费基数：</span>
+                <span class="text-gray-600">鉴定标的额：</span>
                 <span class="font-medium text-gray-800">{{ result.feeBase.toFixed(2) }} 万元</span>
               </div>
             </div>
@@ -134,14 +104,14 @@
                 <span class="text-gray-600">专业调整系数：</span>
                 <span class="font-medium text-gray-800">{{ result.engineeringCoefficient }}</span>
               </div>
-              <div v-if="result.steelFee > 0" class="flex justify-between items-center">
-                <span class="text-gray-600">钢筋精细计量附加费：</span>
-                <span class="font-medium text-gray-800">{{ formatCurrency(result.steelFee) }}</span>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600">地区调整系数：</span>
+                <span class="font-medium text-gray-800">{{ result.regionCoefficient }}</span>
               </div>
             </div>
             
             <div class="flex justify-between items-center py-3 bg-green-50 rounded-lg px-3">
-              <span class="text-gray-700 font-medium">总费用：</span>
+              <span class="text-gray-700 font-medium">鉴定费用：</span>
               <span class="text-2xl font-bold text-green-600">{{ formatCurrency(result ? result.totalFee : 0) }}</span>
             </div>
           </div>
@@ -170,10 +140,9 @@
       <div class="text-sm text-gray-600 leading-relaxed space-y-2">
         <p><span class="font-semibold text-gray-700">说明：</span></p>
         <ul class="list-disc list-inside space-y-1 ml-4">
-          <li>本计算器提供的费用测算结果仅供参考估价，不能作为实际收费依据，实际费用应以双方签订的正式咨询服务合同为准。</li>
-          <li>工程造价咨询收费基准价采取差额定率分档累进方法计算</li>
+          <li>本计算器提供的费用测算结果仅供参考估价，不能作为实际收费依据，实际费用应以双方签订的正式鉴定服务合同为准。</li>
+          <li>工程造价纠纷鉴定收费采取差额定率分档累进方法计算</li>
           <li>不同专业工程有相应的调整系数</li>
-          <li>钢筋精细计量需额外计算附加费用（工程量清单编制12元/吨，结算审查18元/吨）</li>
         </ul>
       </div>
     </div>
@@ -185,22 +154,12 @@ import { ref, computed } from 'vue'
 
 defineEmits(['close'])
 
-const selectedProject = ref('')
 const selectedEngineering = ref('')
 const feeBase = ref(null)
-const needSteelCalculation = ref(false)
-const steelWeight = ref(null)
 const result = ref(null)
 
-const projects = [
-  { id: 1, name: '工程概算编制', rates: [3, 2.5, 2, 1.8, 1.6, 1.5], baseType: '建安工程费用' },
-  { id: 2, name: '工程量清单编制', rates: [5, 4, 3, 2.2, 1.8, 1.5], baseType: '建安工程费用', supportSteel: true },
-  { id: 3, name: '招标控制价编制', rates: [2.0, 1.8, 1.6, 1.4, 1.2, 1.0], baseType: '建安工程费用' },
-  { id: 4, name: '工程预算编制', rates: [4, 3.5, 3, 2.5, 2, 1.5], baseType: '建安工程费用' },
-  { id: 5, name: '工程结算审查', rates: [8, 7, 6, 5.0, 4.0, 3.0], baseType: '建安工程费用', supportSteel: true },
-  { id: 6, name: '全过程造价咨询', rates: [0, 0, 0, 12, 10, 8], baseType: '建安工程费用', minBase: 2000 },
-  { id: 7, name: '竣工决算编制', rates: [2, 1.5, 1.2, 1.0, 0.8, 0.6], baseType: '建安工程费用' }
-]
+// 工程造价纠纷鉴定费率
+const disputeRates = [12, 10, 8, 6, 5, 4]
 
 const engineeringTypes = [
   { id: 1, name: '房屋建筑工程', coefficient: 1.0 },
@@ -228,40 +187,12 @@ const brackets = [
   { min: 50000, max: Infinity, label: 'X＞50000万元' }
 ]
 
-const currentProject = computed(() => {
-  return projects.find(p => p.id === selectedProject.value)
-})
-
 const currentEngineering = computed(() => {
   return engineeringTypes.find(e => e.id === selectedEngineering.value)
 })
 
-const feeBaseLabel = computed(() => {
-  return currentProject.value ? currentProject.value.baseType : '收费基数'
-})
-
-const showSteelOption = computed(() => {
-  return currentProject.value && currentProject.value.supportSteel
-})
-
-const steelRate = computed(() => {
-  return currentProject.value && currentProject.value.id === 2 ? 12 : 18
-})
-
 const canCalculate = computed(() => {
-  if (!selectedProject.value || !selectedEngineering.value || !feeBase.value || feeBase.value <= 0) {
-    return false
-  }
-  
-  if (currentProject.value.minBase && feeBase.value < currentProject.value.minBase) {
-    return false
-  }
-  
-  if (needSteelCalculation.value && (!steelWeight.value || steelWeight.value <= 0)) {
-    return false
-  }
-  
-  return true
+  return selectedEngineering.value && feeBase.value && feeBase.value > 0
 })
 
 const calculate = () => {
@@ -270,7 +201,6 @@ const calculate = () => {
     return
   }
   
-  const project = currentProject.value
   const engineering = currentEngineering.value
   const breakdown = []
   let baseTotal = 0
@@ -279,9 +209,7 @@ const calculate = () => {
   
   for (let i = 0; i < brackets.length; i++) {
     const bracket = brackets[i]
-    const rate = project.rates[i]
-    
-    if (rate === 0) continue
+    const rate = disputeRates[i]
     
     let amountInBracket = 0
     
@@ -312,18 +240,11 @@ const calculate = () => {
     }
   }
   
-  const adjustedTotal = baseTotal * engineering.coefficient
+  const totalFee = baseTotal * engineering.coefficient
   
-  let steelFee = 0
-  if (needSteelCalculation.value && steelWeight.value > 0) {
-    steelFee = steelWeight.value * steelRate.value
-  }
-  
-  const totalFee = adjustedTotal + steelFee
-  
-  let report = `项目类型：${project.name}\n`
+  let report = `鉴定项目：工程造价纠纷鉴定\n`
   report += `工程类别：${engineering.name}\n`
-  report += `收费基数：${feeBase.value}万元\n`
+  report += `鉴定标的额：${feeBase.value}万元\n`
   report += `------------------------------\n`
   report += `分档计算明细：\n`
   
@@ -334,22 +255,15 @@ const calculate = () => {
   report += `------------------------------\n`
   report += `基准价小计：${baseTotal.toFixed(2)}元\n`
   report += `专业调整系数：${engineering.coefficient}\n`
-  
-  if (steelFee > 0) {
-    report += `钢筋精细计量附加费：${steelWeight.value}吨 × ${steelRate.value}元/吨 = ${steelFee.toFixed(2)}元\n`
-  }
-  
   report += `------------------------------\n`
-  report += `总费用：${totalFee.toFixed(2)}元`
+  report += `鉴定费用：${totalFee.toFixed(2)}元`
   
   result.value = {
-    projectName: project.name,
     engineeringName: engineering.name,
     feeBase: feeBase.value,
     breakdown: breakdown,
     baseTotal: baseTotal,
     engineeringCoefficient: engineering.coefficient,
-    steelFee: steelFee,
     totalFee: totalFee,
     report: report
   }

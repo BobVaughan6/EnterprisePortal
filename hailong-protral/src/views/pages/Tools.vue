@@ -80,6 +80,9 @@
           <!-- 造价费用计算工具 -->
           <CostCalculator v-if="showCostCalculator" @close="showCostCalculator = false" class="mb-12" />
 
+          <!-- 司法鉴定费用计算工具 -->
+          <JudicialAppraisalCalculator v-if="showJudicialCalculator" @close="showJudicialCalculator = false" class="mb-12" />
+
           <!-- 使用说明 -->
           <div class="bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5 rounded-xl p-8 border border-hailong-primary/20">
             <h2 class="text-2xl font-bold text-hailong-dark mb-4 flex items-center gap-2">
@@ -133,13 +136,14 @@ import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import BiddingCalculator from '@/components/BiddingCalculator.vue'
 import CostCalculator from '@/components/CostCalculator.vue'
+import JudicialAppraisalCalculator from '@/components/JudicialAppraisalCalculator.vue'
 
 // 页面加载时滚动到顶部
 onMounted(() => {
   window.scrollTo(0, 0)
 })
 
-// 工具列表（只保留三个）
+// 工具列表
 const tools = [
   {
     id: 1,
@@ -160,9 +164,9 @@ const tools = [
   {
     id: 3,
     name: '司法鉴定费用计算工具',
-    description: '根据司法鉴定收费标准，计算各类司法鉴定项目的费用',
+    description: '基于建设工程造价咨询收费基准价，采用差额定率分档累进方法，精确计算工程造价纠纷鉴定等各类咨询项目费用',
     icon: 'M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3',
-    status: 'coming',
+    status: 'available',
     users: 720
   }
 ]
@@ -170,20 +174,25 @@ const tools = [
 // 显示计算器
 const showBiddingCalculator = ref(false)
 const showCostCalculator = ref(false)
+const showJudicialCalculator = ref(false)
 
 // 处理工具点击
 const handleToolClick = (tool) => {
+  // 先关闭所有计算器
+  showBiddingCalculator.value = false
+  showCostCalculator.value = false
+  showJudicialCalculator.value = false
+  
+  // 打开对应的计算器
   if (tool.id === 1) {
     showBiddingCalculator.value = true
-    showCostCalculator.value = false
-    scrollToCalculator()
   } else if (tool.id === 2) {
     showCostCalculator.value = true
-    showBiddingCalculator.value = false
-    scrollToCalculator()
-  } else {
-    alert(`${tool.name} 功能即将上线，敬请期待！`)
+  } else if (tool.id === 3) {
+    showJudicialCalculator.value = true
   }
+  
+  scrollToCalculator()
 }
 
 // 滚动到计算器位置
@@ -192,7 +201,7 @@ const scrollToCalculator = () => {
     const calculator = document.querySelector('.bg-white.rounded-xl.shadow-2xl')
     if (calculator) {
       const headerHeight = 80 // 考虑固定头部的高度
-      const calculatorTop = calculator.getBoundingClientRect().top + window.pageYOffset - headerHeight
+      const calculatorTop = calculator.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20
       window.scrollTo({ top: calculatorTop, behavior: 'smooth' })
     }
   }, 100)
