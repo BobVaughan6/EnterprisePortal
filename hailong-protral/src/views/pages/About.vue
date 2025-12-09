@@ -62,11 +62,11 @@
           <h2 class="text-4xl font-bold text-hailong-dark mb-8 text-center font-tech">业务范围</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="business in businessScope" :key="business.id"
-              class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              @click="handleBusinessClick(business.id)"
+              class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
               <div class="h-48 overflow-hidden">
                 <img :src="business.image" :alt="business.name"
-                  @click="openImagePreview(business.image)"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer" />
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <div class="p-6">
                 <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors">
@@ -89,11 +89,11 @@
           <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">企业资质</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div v-for="qualification in qualifications" :key="qualification.id"
-              class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+              @click="handleQualificationClick(qualification.id)"
+              class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
               <div class="relative h-40 overflow-hidden bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10">
                 <img :src="qualification.image" :alt="qualification.name"
-                  @click="openImagePreview(qualification.image)"
-                  class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 cursor-pointer" />
+                  class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-4">
                   <div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center mb-2">
@@ -132,11 +132,11 @@
             
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div v-for="achievement in achievements" :key="achievement.id"
-                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+                @click="handleAchievementClick(achievement.id)"
+                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
                 <div v-if="achievement.imageUrl" class="h-48 overflow-hidden">
                   <img :src="achievement.imageUrl" :alt="achievement.projectName"
-                    @click="openImagePreview(achievement.imageUrl)"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer" />
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 </div>
                 <div class="p-6">
                   <div class="flex items-center justify-between mb-3">
@@ -194,9 +194,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { businessScope } from './data.js'
+import { useRouter } from 'vue-router'
+import { businessScope } from '@/config/data.js'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+
+const router = useRouter()
 
 // Tab配置
 const tabs = [
@@ -349,6 +352,21 @@ const closeImagePreview = () => {
   showImagePreview.value = false
   previewImageUrl.value = ''
   document.body.style.overflow = ''
+}
+
+// 业务范围点击处理
+const handleBusinessClick = (id) => {
+  router.push(`/detail/business-scope/${id}`)
+}
+
+// 重要业绩点击处理
+const handleAchievementClick = (id) => {
+  router.push(`/detail/achievement/${id}`)
+}
+
+// 企业资质点击处理
+const handleQualificationClick = (id) => {
+  router.push(`/detail/qualification/${id}`)
 }
 
 onMounted(() => {

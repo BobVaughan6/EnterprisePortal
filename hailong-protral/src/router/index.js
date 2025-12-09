@@ -4,42 +4,72 @@ const routes = [
   {
     path: '/',
     name: 'hailongHome',
-    component: () => import('@/views/Home.vue')
+    component: () => import('@/views/pages/Home.vue')
   },
   {
     path: '/detail/:id?',
     name: 'hailongDetail',
-    component: () => import('@/views/Detail.vue')
+    component: () => import('@/views/details/Detail.vue')
   },
   {
     path: '/about',
     name: 'About',
-    component: () => import('@/views/About.vue')
+    component: () => import('@/views/pages/About.vue')
   },
   {
     path: '/announcements',
     name: 'Announcements',
-    component: () => import('@/views/Announcements.vue')
+    component: () => import('@/views/announcements/Announcements.vue')
+  },
+  {
+    path: '/detail/announcement/:id',
+    name: 'AnnouncementDetail',
+    component: () => import('@/views/details/AnnouncementDetail.vue')
   },
   {
     path: '/company-announcements',
     name: 'CompanyAnnouncements',
-    component: () => import('@/views/CompanyAnnouncements.vue')
+    component: () => import('@/views/announcements/CompanyAnnouncements.vue')
+  },
+  {
+    path: '/detail/company-announcement/:id',
+    name: 'CompanyAnnouncementDetail',
+    component: () => import('@/views/details/CompanyAnnouncementDetail.vue')
+  },
+  {
+    path: '/detail/business-scope/:id',
+    name: 'BusinessScopeDetail',
+    component: () => import('@/views/details/BusinessScopeDetail.vue')
+  },
+  {
+    path: '/detail/achievement/:id',
+    name: 'AchievementDetail',
+    component: () => import('@/views/details/AchievementDetail.vue')
+  },
+  {
+    path: '/detail/qualification/:id',
+    name: 'QualificationDetail',
+    component: () => import('@/views/details/QualificationDetail.vue')
   },
   {
     path: '/policies',
     name: 'Policies',
-    component: () => import('@/views/Policies.vue')
+    component: () => import('@/views/info-publish/Policies.vue')
+  },
+  {
+    path: '/detail/policy/:id',
+    name: 'PolicyDetail',
+    component: () => import('@/views/details/PolicyDetail.vue')
   },
   {
     path: '/tools',
     name: 'Tools',
-    component: () => import('@/views/Tools.vue')
+    component: () => import('@/views/pages/Tools.vue')
   },
   {
     path: '/contact',
     name: 'Contact',
-    component: () => import('@/views/Contact.vue')
+    component: () => import('@/views/pages/Contact.vue')
   }
 ]
 

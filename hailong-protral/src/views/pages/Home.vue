@@ -90,6 +90,7 @@
             </div>
             <div class="space-y-4">
               <div v-for="announcement in govProcurementAnnouncements" :key="announcement.id"
+                @click="handleAnnouncementClick(announcement.id)"
                 class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-primary">
                 <div class="flex justify-between items-start mb-3">
                   <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ announcement.type }}</span>
@@ -112,6 +113,7 @@
             </div>
             <div class="space-y-4">
               <div v-for="announcement in constructionAnnouncements" :key="announcement.id"
+                @click="handleAnnouncementClick(announcement.id)"
                 class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-secondary">
                 <div class="flex justify-between items-start mb-3">
                   <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.type
@@ -140,7 +142,8 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div v-for="business in businessScope" :key="business.id"
-            class="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary">
+            @click="handleBusinessClick(business.id)"
+            class="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
             <div class="h-48 overflow-hidden">
               <img :src="business.image" :alt="business.name"
                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -168,7 +171,8 @@
         </div>
         <div class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            <div v-for="qualification in qualifications" :key="qualification"
+            <div v-for="(qualification, index) in qualifications" :key="index"
+              @click="handleQualificationClick(index + 1)"
               class="flex items-center p-4 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
               <div
                 class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-hailong-primary/20 transition-colors">
@@ -196,6 +200,7 @@
           <div class="flex gap-6 animate-scroll">
             <div v-for="achievement in [...majorAchievements, ...majorAchievements]"
               :key="achievement.id + Math.random()"
+              @click="handleAchievementClick(achievement.id)"
               class="flex-shrink-0 w-80 bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden hover:bg-white/20 transition-all cursor-pointer group">
               <div class="h-48 overflow-hidden">
                 <img :src="achievement.imageUrl" :alt="achievement.projectName"
@@ -494,10 +499,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { companyProfile, businessScope, transactionData, majorAchievements, govProcurementAnnouncements, constructionAnnouncements } from './data.js'
+import { useRouter } from 'vue-router'
+import { companyProfile, businessScope, transactionData, majorAchievements, govProcurementAnnouncements, constructionAnnouncements } from '@/config/data.js'
 import { getCompanyInfo, getContactInfo } from '@/utils/config'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+
+const router = useRouter()
 
 // 获取配置信息
 const companyInfo = computed(() => getCompanyInfo())
@@ -524,6 +532,26 @@ const formatAmount = (amount) => {
     return (amount / 10000).toFixed(1) + '亿'
   }
   return amount.toLocaleString() + '万'
+}
+
+// 业务范围点击处理
+const handleBusinessClick = (id) => {
+  router.push(`/detail/business-scope/${id}`)
+}
+
+// 重要业绩点击处理
+const handleAchievementClick = (id) => {
+  router.push(`/detail/achievement/${id}`)
+}
+
+// 公告信息点击处理
+const handleAnnouncementClick = (id) => {
+  router.push(`/detail/announcement/${id}`)
+}
+
+// 企业资质点击处理
+const handleQualificationClick = (id) => {
+  router.push(`/detail/qualification/${id}`)
 }
 </script>
 
