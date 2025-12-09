@@ -82,18 +82,21 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // 注册服务
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
-builder.Services.AddScoped<IGovProcurementRepository, GovProcurementRepository>();
-builder.Services.AddScoped<IGovProcurementService, GovProcurementService>();
-builder.Services.AddScoped<IConstructionProjectRepository, ConstructionProjectRepository>();
-builder.Services.AddScoped<IConstructionProjectService, ConstructionProjectService>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
-builder.Services.AddScoped<IInfoPublishService, InfoPublishService>();
 builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
 builder.Services.AddScoped<IConfigService, ConfigService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IGlobalSearchRepository, GlobalSearchRepository>();
 builder.Services.AddScoped<IGlobalSearchService, GlobalSearchService>();
+
+// 新增服务 - 统一附件、公告、信息发布管理
+builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<IInfoPublicationRepository, InfoPublicationRepository>();
+builder.Services.AddScoped<IInfoPublicationService, InfoPublicationService>();
+
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger

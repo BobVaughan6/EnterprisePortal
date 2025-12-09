@@ -8,11 +8,6 @@ namespace HailongConsulting.API.Repositories;
 public interface IUnitOfWork : IDisposable
 {
     IRepository<User> Users { get; }
-    IRepository<Project> Projects { get; }
-    IRepository<Client> Clients { get; }
-    IRepository<Category> Categories { get; }
-    
-    // 新增的仓储
     IAttachmentRepository Attachments { get; }
     IAnnouncementRepository Announcements { get; }
     IInfoPublicationRepository InfoPublications { get; }

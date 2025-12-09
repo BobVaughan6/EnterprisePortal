@@ -168,15 +168,18 @@ public DbSet<SystemLog> SystemLogs { get; set; }
    - ✅ IAttachmentService / AttachmentService
    - ✅ IAnnouncementService / AnnouncementService
    - ✅ IInfoPublicationService / InfoPublicationService
-7. ⏳ 创建/更新 Controller（待完成）
-   - ⏳ AttachmentController
-   - ⏳ AnnouncementController
-   - ⏳ InfoPublicationController
+7. ✅ 创建/更新 Controller
+   - ✅ AttachmentController
+   - ✅ AnnouncementController
+   - ✅ InfoPublicationController
 8. ✅ 更新 AutoMapper 配置
    - ✅ Attachment 映射
    - ✅ Announcement 映射（包含 JSON 序列化/反序列化）
    - ✅ InfoPublication 映射（包含 JSON 序列化/反序列化）
-9. ⏳ API文档更新（待完成）
+9. ✅ API文档更新
+   - ✅ ATTACHMENT_API_GUIDE.md
+   - ✅ ANNOUNCEMENT_API_GUIDE.md
+   - ✅ INFO_PUBLICATION_API_GUIDE.md
 
 ### 可选优化
 1. 实现附件上传服务
@@ -292,33 +295,72 @@ public DbSet<SystemLog> SystemLogs { get; set; }
 - CarouselBanners, FriendlyLinks
 - VisitStatistics
 
-### 待完成的工作
+### 已完成的所有工作（2025-12-09 更新）
 
-#### 1. Controller 层（高优先级）
-需要创建以下 Controller：
-- **AttachmentController**: 附件上传、下载、管理接口
-- **AnnouncementController**: 公告的 CRUD 和查询接口
-- **InfoPublicationController**: 信息发布的 CRUD 和查询接口
+#### 1. Controller 层 ✅
+已创建以下 Controller：
+- ✅ **AttachmentController**: 附件上传、下载、管理接口
+  - 单文件上传
+  - 批量文件上传
+  - 根据ID获取附件
+  - 根据关联类型获取附件列表
+  - 批量获取附件
+  - 删除附件（单个/批量）
+  - 下载附件
+  
+- ✅ **AnnouncementController**: 公告的 CRUD 和查询接口
+  - 创建公告
+  - 更新公告
+  - 获取公告详情（自动增加浏览次数）
+  - 分页查询公告列表
+  - 删除公告
+  - 政府采购公告专用接口
+  - 建设工程公告专用接口
+  
+- ✅ **InfoPublicationController**: 信息发布的 CRUD 和查询接口
+  - 创建信息发布
+  - 更新信息发布
+  - 获取信息详情（自动增加浏览次数）
+  - 分页查询信息列表
+  - 删除信息发布
+  - 公司公告专用接口
+  - 政策法规专用接口
+  - 政策信息专用接口
+  - 通知公告专用接口
 
-#### 2. API 文档（高优先级）
-需要创建详细的 API 文档：
-- 附件管理 API 文档
-- 统一公告 API 文档
-- 信息发布 API 文档
+#### 2. API 文档 ✅
+已创建详细的 API 文档：
+- ✅ **ATTACHMENT_API_GUIDE.md**: 附件管理 API 完整文档
+  - 包含所有接口说明
+  - 请求/响应示例
+  - 使用示例（JavaScript/C#）
+  - 错误码说明
+  
+- ✅ **ANNOUNCEMENT_API_GUIDE.md**: 统一公告 API 完整文档
+  - 业务类型和公告类型说明
+  - 所有接口详细说明
+  - 字段说明和使用示例
+  - 注意事项
+  
+- ✅ **INFO_PUBLICATION_API_GUIDE.md**: 信息发布 API 完整文档
+  - 信息类型说明
+  - 分类建议
+  - 所有接口详细说明
+  - 内容格式建议
 
-#### 3. 依赖注入配置（必须）
-在 Program.cs 中注册新的服务：
+#### 3. 依赖注入配置 ✅
+已在 Program.cs 中注册新的服务：
 ```csharp
-// Repository
+// 新增服务 - 统一附件、公告、信息发布管理
 builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
-builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
-builder.Services.AddScoped<IInfoPublicationRepository, InfoPublicationRepository>();
-
-// Service
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<IInfoPublicationRepository, InfoPublicationRepository>();
 builder.Services.AddScoped<IInfoPublicationService, InfoPublicationService>();
 ```
+
+**注意**: 已移除旧的服务注册（IGovProcurementService、IConstructionProjectService、IInfoPublishService），因为这些服务已被新的统一服务替代。
 
 ### 技术要点
 
@@ -400,15 +442,35 @@ public class PagedResult<T>
 - 建设工程和政府采购服务已合并到 `AnnouncementService`
 - 旧的信息发布服务已被 `InfoPublicationService` 替代
 
-**总计删除文件数：19个**
+#### Controller 层（已删除 - 3个文件）
+- ❌ ConstructionProjectController.cs
+- ❌ GovProcurementController.cs
+- ❌ InfoPublishController.cs
+
+**原因**：
+- 建设工程和政府采购控制器已合并到 `AnnouncementController`
+- 旧的信息发布控制器已被 `InfoPublicationController` 替代
+
+**总计删除文件数：22个**
 
 ### 下一步建议
 
-1. **立即完成依赖注入配置**，确保新服务可以被使用
-2. **创建 Controller 层**，提供 RESTful API 接口
-3. **编写 API 文档**，方便前端对接
-4. **进行集成测试**，验证整个流程
-5. **数据迁移**，将旧表数据迁移到新表（可选）
+1. ✅ **依赖注入配置** - 已完成
+2. ✅ **Controller 层** - 已完成
+3. ✅ **API 文档** - 已完成
+4. ⏳ **进行集成测试** - 建议进行
+   - 测试附件上传和下载功能
+   - 测试公告的 CRUD 操作
+   - 测试信息发布的 CRUD 操作
+   - 测试分页查询和筛选功能
+   - 测试浏览次数统计功能
+5. ⏳ **数据迁移**（可选）
+   - 将旧的政府采购和建设工程公告数据迁移到新的 announcements 表
+   - 将旧的信息发布数据迁移到新的 info_publications 表
+   - 将现有的图片URL转换为附件记录
+6. ⏳ **前端对接**
+   - 更新前端代码以使用新的 API 接口
+   - 测试前后端集成
 
 ### 注意事项
 

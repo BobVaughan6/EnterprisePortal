@@ -26,26 +26,26 @@ public class AuthService : IAuthService
         // 查找用户
         var user = await _unitOfWork.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
         
-        if (user == null || !user.IsActive)
+        if (user == null || user.Status == 0)
         {
             return null;
         }
 
         // 验证密码（使用MD5）
-        if (!PasswordHelper.VerifyPassword(request.Password, user.PasswordHash))
+        if (!PasswordHelper.VerifyPassword(request.Password, user.Password))
         {
             return null;
         }
 
         // 生成Token和RefreshToken
-        var token = _jwtHelper.GenerateToken(user.UserId, user.Username, user.Role);
+        var token = _jwtHelper.GenerateToken((int)user.Id, user.Username, user.Role);
         var refreshToken = _jwtHelper.GenerateRefreshToken();
         var expireHours = Convert.ToDouble(_configuration["Jwt:ExpireHours"]);
 
         // 保存RefreshToken
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7); // RefreshToken有效期7天
-        user.LastLogin = DateTime.Now;
+        user.LastLoginTime = DateTime.Now;
         user.UpdatedAt = DateTime.Now;
         
         _unitOfWork.Users.Update(user);
@@ -53,9 +53,9 @@ public class AuthService : IAuthService
 
         return new LoginResponseDto
         {
-            UserId = user.UserId,
+            UserId = (int)user.Id,
             Username = user.Username,
-            FullName = user.FullName,
+            FullName = user.RealName,
             Email = user.Email,
             Role = user.Role,
             Token = token,
@@ -68,7 +68,7 @@ public class AuthService : IAuthService
     {
         // 查找拥有该RefreshToken的用户
         var user = await _unitOfWork.Users.FirstOrDefaultAsync(
-            u => u.RefreshToken == refreshToken && u.IsActive);
+            u => u.RefreshToken == refreshToken && u.Status == 1);
 
         if (user == null || user.RefreshTokenExpiry == null || user.RefreshTokenExpiry < DateTime.UtcNow)
         {
@@ -76,7 +76,7 @@ public class AuthService : IAuthService
         }
 
         // 生成新的Token和RefreshToken
-        var newToken = _jwtHelper.GenerateToken(user.UserId, user.Username, user.Role);
+        var newToken = _jwtHelper.GenerateToken((int)user.Id, user.Username, user.Role);
         var newRefreshToken = _jwtHelper.GenerateRefreshToken();
         var expireHours = Convert.ToDouble(_configuration["Jwt:ExpireHours"]);
 
@@ -90,9 +90,9 @@ public class AuthService : IAuthService
 
         return new LoginResponseDto
         {
-            UserId = user.UserId,
+            UserId = (int)user.Id,
             Username = user.Username,
-            FullName = user.FullName,
+            FullName = user.RealName,
             Email = user.Email,
             Role = user.Role,
             Token = newToken,
@@ -105,20 +105,20 @@ public class AuthService : IAuthService
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
         
-        if (user == null || !user.IsActive)
+        if (user == null || user.Status == 0)
         {
             return null;
         }
 
         return new UserInfoDto
         {
-            UserId = user.UserId,
+            UserId = (int)user.Id,
             Username = user.Username,
-            FullName = user.FullName,
+            FullName = user.RealName,
             Email = user.Email,
             Phone = user.Phone,
             Role = user.Role,
-            LastLogin = user.LastLogin
+            LastLogin = user.LastLoginTime
         };
     }
 
@@ -126,19 +126,19 @@ public class AuthService : IAuthService
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
         
-        if (user == null || !user.IsActive)
+        if (user == null || user.Status == 0)
         {
             return false;
         }
 
         // 验证旧密码
-        if (!PasswordHelper.VerifyPassword(request.OldPassword, user.PasswordHash))
+        if (!PasswordHelper.VerifyPassword(request.OldPassword, user.Password))
         {
             return false;
         }
 
         // 更新密码（使用MD5）
-        user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
+        user.Password = PasswordHelper.HashPassword(request.NewPassword);
         user.UpdatedAt = DateTime.Now;
         
         // 出于安全考虑，修改密码后撤销RefreshToken

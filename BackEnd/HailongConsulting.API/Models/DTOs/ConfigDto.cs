@@ -7,7 +7,8 @@ public class CarouselBannerDto
 {
     public uint Id { get; set; }
     public string? Title { get; set; }
-    public string ImageUrl { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public uint ImageId { get; set; }
     public string? LinkUrl { get; set; }
     public int SortOrder { get; set; }
     public bool Status { get; set; }
@@ -21,7 +22,8 @@ public class CarouselBannerDto
 public class CreateCarouselBannerDto
 {
     public string? Title { get; set; }
-    public string ImageUrl { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public uint ImageId { get; set; }
     public string? LinkUrl { get; set; }
     public int SortOrder { get; set; } = 0;
     public bool Status { get; set; } = true;
@@ -33,7 +35,8 @@ public class CreateCarouselBannerDto
 public class UpdateCarouselBannerDto
 {
     public string? Title { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? Description { get; set; }
+    public uint? ImageId { get; set; }
     public string? LinkUrl { get; set; }
     public int? SortOrder { get; set; }
     public bool? Status { get; set; }
@@ -47,7 +50,9 @@ public class CompanyProfileDto
     public uint Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
+    public List<string>? Highlights { get; set; }
+    public List<uint>? ImageIds { get; set; }
+    public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -57,9 +62,11 @@ public class CompanyProfileDto
 /// </summary>
 public class UpdateCompanyProfileDto
 {
-    public string Title { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
+    public string? Title { get; set; }
+    public string? Content { get; set; }
+    public List<string>? Highlights { get; set; }
+    public List<uint>? ImageIds { get; set; }
+    public bool? Status { get; set; }
 }
 
 /// <summary>
@@ -74,8 +81,9 @@ public class MajorAchievementDto
     public string? ClientName { get; set; }
     public DateOnly? CompletionDate { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public List<uint>? ImageIds { get; set; }
     public int SortOrder { get; set; }
+    public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -91,8 +99,9 @@ public class CreateMajorAchievementDto
     public string? ClientName { get; set; }
     public DateOnly? CompletionDate { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public List<uint>? ImageIds { get; set; }
     public int SortOrder { get; set; } = 0;
+    public bool Status { get; set; } = true;
 }
 
 /// <summary>
@@ -106,8 +115,9 @@ public class UpdateMajorAchievementDto
     public string? ClientName { get; set; }
     public DateOnly? CompletionDate { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public List<uint>? ImageIds { get; set; }
     public int? SortOrder { get; set; }
+    public bool? Status { get; set; }
 }
 
 /// <summary>
@@ -116,9 +126,10 @@ public class UpdateMajorAchievementDto
 public class FriendlyLinkDto
 {
     public uint Id { get; set; }
-    public string LinkName { get; set; } = string.Empty;
-    public string LinkUrl { get; set; } = string.Empty;
-    public string? LogoUrl { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
+    public uint? LogoId { get; set; }
+    public string? Description { get; set; }
     public int SortOrder { get; set; }
     public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -130,9 +141,10 @@ public class FriendlyLinkDto
 /// </summary>
 public class CreateFriendlyLinkDto
 {
-    public string LinkName { get; set; } = string.Empty;
-    public string LinkUrl { get; set; } = string.Empty;
-    public string? LogoUrl { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
+    public uint? LogoId { get; set; }
+    public string? Description { get; set; }
     public int SortOrder { get; set; } = 0;
     public bool Status { get; set; } = true;
 }
@@ -142,9 +154,10 @@ public class CreateFriendlyLinkDto
 /// </summary>
 public class UpdateFriendlyLinkDto
 {
-    public string? LinkName { get; set; }
-    public string? LinkUrl { get; set; }
-    public string? LogoUrl { get; set; }
+    public string? Name { get; set; }
+    public string? Url { get; set; }
+    public uint? LogoId { get; set; }
+    public string? Description { get; set; }
     public int? SortOrder { get; set; }
     public bool? Status { get; set; }
 }

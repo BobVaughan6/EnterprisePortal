@@ -27,8 +27,8 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         // 搜索政府采购公告
         if (request.Category == "all" || request.Category == "gov_procurement")
         {
-            var govQuery = _context.Set<GovProcurementAnnouncement>()
-                .Where(x => !x.IsDeleted);
+            var govQuery = _context.Announcements
+                .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT");
 
             // 关键词搜索
             if (!string.IsNullOrWhiteSpace(request.Keyword))
@@ -77,22 +77,22 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
             results.AddRange(govResults.Select(x => new GlobalSearchItemDto
             {
-                Id = x.Id,
+                Id = (int)x.Id,
                 Title = HighlightKeyword(x.Title, request.Keyword),
                 Category = "gov_procurement",
                 Type = x.NoticeType,
                 Tenderer = x.Bidder,
                 Region = x.ProjectRegion,
                 PublishDate = x.PublishTime,
-                ViewCount = x.ViewCount
+                ViewCount = (int)x.ViewCount
             }));
         }
 
         // 搜索建设工程公告
         if (request.Category == "all" || request.Category == "construction")
         {
-            var constructionQuery = _context.Set<ConstructionProjectAnnouncement>()
-                .Where(x => !x.IsDeleted);
+            var constructionQuery = _context.Announcements
+                .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION");
 
             // 关键词搜索
             if (!string.IsNullOrWhiteSpace(request.Keyword))
@@ -141,14 +141,14 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
             results.AddRange(constructionResults.Select(x => new GlobalSearchItemDto
             {
-                Id = x.Id,
+                Id = (int)x.Id,
                 Title = HighlightKeyword(x.Title, request.Keyword),
                 Category = "construction",
                 Type = x.NoticeType,
                 Tenderer = x.Bidder,
                 Region = x.ProjectRegion,
                 PublishDate = x.PublishTime,
-                ViewCount = x.ViewCount
+                ViewCount = (int)x.ViewCount
             }));
         }
 

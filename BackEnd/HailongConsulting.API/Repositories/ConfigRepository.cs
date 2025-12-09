@@ -81,7 +81,8 @@ public class ConfigRepository : IConfigRepository
             // 如果存在，更新现有的
             existing.Title = profile.Title;
             existing.Content = profile.Content;
-            existing.ImageUrl = profile.ImageUrl;
+            existing.Highlights = profile.Highlights;
+            existing.ImageIds = profile.ImageIds;
             existing.UpdatedAt = DateTime.Now;
             _context.Set<CompanyProfile>().Update(existing);
         }

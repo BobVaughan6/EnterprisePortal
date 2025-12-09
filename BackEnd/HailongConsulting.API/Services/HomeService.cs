@@ -22,13 +22,13 @@ public class HomeService : IHomeService
     public async Task<HomeStatisticsDto> GetStatisticsOverviewAsync()
     {
         // 统计政府采购公告数量
-        var govCount = await _context.GovProcurementAnnouncements
-            .Where(x => !x.IsDeleted)
+        var govCount = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
             .CountAsync();
 
         // 统计建设工程公告数量
-        var constructionCount = await _context.ConstructionProjectAnnouncements
-            .Where(x => !x.IsDeleted)
+        var constructionCount = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION")
             .CountAsync();
 
         // 总项目数
@@ -55,8 +55,8 @@ public class HomeService : IHomeService
         }
 
         // 统计地区排行（政府采购）
-        var govRegionStats = await _context.GovProcurementAnnouncements
-            .Where(x => !x.IsDeleted)
+        var govRegionStats = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
             .GroupBy(x => x.ProjectRegion)
             .Select(g => new
             {
@@ -66,8 +66,8 @@ public class HomeService : IHomeService
             .ToListAsync();
 
         // 统计地区排行（建设工程）
-        var constructionRegionStats = await _context.ConstructionProjectAnnouncements
-            .Where(x => !x.IsDeleted)
+        var constructionRegionStats = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION")
             .GroupBy(x => x.ProjectRegion)
             .Select(g => new
             {
@@ -87,7 +87,7 @@ public class HomeService : IHomeService
                 Amount = 0 // 数据库中没有金额字段，返回0
             })
             .OrderByDescending(x => x.ProjectCount)
-            .Take(10)
+            .Take(5)
             .ToList();
 
         return new HomeStatisticsDto
@@ -105,13 +105,13 @@ public class HomeService : IHomeService
     public async Task<List<RecentAnnouncementDto>> GetRecentAnnouncementsAsync()
     {
         // 获取最新5条政府采购公告
-        var govAnnouncements = await _context.GovProcurementAnnouncements
-            .Where(x => !x.IsDeleted)
+        var govAnnouncements = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
             .OrderByDescending(x => x.PublishTime)
             .Take(5)
             .Select(x => new RecentAnnouncementDto
             {
-                Id = x.Id,
+                Id = (int)x.Id,
                 Title = x.Title,
                 NoticeType = x.NoticeType,
                 ProjectRegion = x.ProjectRegion,
@@ -121,13 +121,13 @@ public class HomeService : IHomeService
             .ToListAsync();
 
         // 获取最新5条建设工程公告
-        var constructionAnnouncements = await _context.ConstructionProjectAnnouncements
-            .Where(x => !x.IsDeleted)
+        var constructionAnnouncements = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION")
             .OrderByDescending(x => x.PublishTime)
             .Take(5)
             .Select(x => new RecentAnnouncementDto
             {
-                Id = x.Id,
+                Id = (int)x.Id,
                 Title = x.Title,
                 NoticeType = x.NoticeType,
                 ProjectRegion = x.ProjectRegion,
@@ -164,7 +164,7 @@ public class HomeService : IHomeService
                 ClientName = x.ClientName,
                 CompletionDate = x.CompletionDate,
                 Description = x.Description,
-                ImageUrl = x.ImageUrl
+                ImageUrl = null // 新实体使用ImageIds，这里暂时返回null
             })
             .ToListAsync();
 

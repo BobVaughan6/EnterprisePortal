@@ -13,11 +13,6 @@ public class UnitOfWork : IUnitOfWork
     private IDbContextTransaction? _transaction;
 
     private IRepository<User>? _users;
-    private IRepository<Project>? _projects;
-    private IRepository<Client>? _clients;
-    private IRepository<Category>? _categories;
-    
-    // 新增的仓储字段
     private IAttachmentRepository? _attachments;
     private IAnnouncementRepository? _announcements;
     private IInfoPublicationRepository? _infoPublications;
@@ -38,12 +33,7 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public IRepository<User> Users => _users ??= new Repository<User>(_context);
-    public IRepository<Project> Projects => _projects ??= new Repository<Project>(_context);
-    public IRepository<Client> Clients => _clients ??= new Repository<Client>(_context);
-    public IRepository<Category> Categories => _categories ??= new Repository<Category>(_context);
-    
-    // 新增的仓储属性
+    public IRepository<User> Users => _users ??= new Repository<User>(_context);    
     public IAttachmentRepository Attachments => _attachments ??= new AttachmentRepository(_context);
     public IAnnouncementRepository Announcements => _announcements ??= new AnnouncementRepository(_context);
     public IInfoPublicationRepository InfoPublications => _infoPublications ??= new InfoPublicationRepository(_context);

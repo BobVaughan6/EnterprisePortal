@@ -44,17 +44,6 @@ public class ApplicationDbContext : DbContext
     // 系统日志
     public DbSet<SystemLog> SystemLogs { get; set; }
 
-    // 旧的实体（保留以兼容现有代码，后续可以逐步迁移）
-    public DbSet<Project> Projects { get; set; }
-    public DbSet<Client> Clients { get; set; }
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<GovProcurementAnnouncement> GovProcurementAnnouncements { get; set; }
-    public DbSet<ConstructionProjectAnnouncement> ConstructionProjectAnnouncements { get; set; }
-    public DbSet<CompanyAnnouncement> CompanyAnnouncements { get; set; }
-    public DbSet<PolicyRegulation> PolicyRegulations { get; set; }
-    public DbSet<PolicyInformation> PolicyInformation { get; set; }
-    public DbSet<NoticeAnnouncement> NoticeAnnouncements { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -202,102 +191,6 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Module);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
-        });
-
-        // 旧实体配置（保留兼容性）
-        ConfigureOldEntities(modelBuilder);
-    }
-
-    private void ConfigureOldEntities(ModelBuilder modelBuilder)
-    {
-        // Project配置
-        modelBuilder.Entity<Project>(entity =>
-        {
-            entity.HasIndex(e => e.ProjectCode).IsUnique();
-            
-            entity.HasOne(p => p.Client)
-                .WithMany(c => c.Projects)
-                .HasForeignKey(p => p.ClientId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            entity.HasOne(p => p.Category)
-                .WithMany(c => c.Projects)
-                .HasForeignKey(p => p.CategoryId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            entity.HasOne(p => p.ProjectManager)
-                .WithMany()
-                .HasForeignKey(p => p.ProjectManagerId)
-                .OnDelete(DeleteBehavior.SetNull);
-        });
-
-        // Client配置
-        modelBuilder.Entity<Client>(entity =>
-        {
-            entity.HasIndex(e => e.ClientCode).IsUnique();
-        });
-
-        // Category配置
-        modelBuilder.Entity<Category>(entity =>
-        {
-            entity.HasIndex(e => e.CategoryCode).IsUnique();
-            
-            entity.HasOne(c => c.ParentCategory)
-                .WithMany(c => c.SubCategories)
-                .HasForeignKey(c => c.ParentId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        // GovProcurementAnnouncement配置
-        modelBuilder.Entity<GovProcurementAnnouncement>(entity =>
-        {
-            entity.HasIndex(e => e.NoticeType);
-            entity.HasIndex(e => e.ProjectRegion);
-            entity.HasIndex(e => e.PublishTime);
-            entity.HasIndex(e => e.IsTop);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // ConstructionProjectAnnouncement配置
-        modelBuilder.Entity<ConstructionProjectAnnouncement>(entity =>
-        {
-            entity.HasIndex(e => e.NoticeType);
-            entity.HasIndex(e => e.ProjectRegion);
-            entity.HasIndex(e => e.PublishTime);
-            entity.HasIndex(e => e.IsTop);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // CompanyAnnouncement配置
-        modelBuilder.Entity<CompanyAnnouncement>(entity =>
-        {
-            entity.HasIndex(e => e.PublishTime);
-            entity.HasIndex(e => e.IsTop);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // PolicyRegulation配置
-        modelBuilder.Entity<PolicyRegulation>(entity =>
-        {
-            entity.HasIndex(e => e.PublishTime);
-            entity.HasIndex(e => e.IsTop);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // PolicyInformation配置
-        modelBuilder.Entity<PolicyInformation>(entity =>
-        {
-            entity.HasIndex(e => e.PublishTime);
-            entity.HasIndex(e => e.IsTop);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // NoticeAnnouncement配置
-        modelBuilder.Entity<NoticeAnnouncement>(entity =>
-        {
-            entity.HasIndex(e => e.PublishTime);
-            entity.HasIndex(e => e.IsTop);
-            entity.HasIndex(e => e.IsDeleted);
         });
     }
 

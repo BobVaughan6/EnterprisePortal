@@ -47,7 +47,8 @@ public class ConfigService : IConfigService
 
         // 只更新非null的字段
         if (dto.Title != null) banner.Title = dto.Title;
-        if (dto.ImageUrl != null) banner.ImageUrl = dto.ImageUrl;
+        if (dto.Description != null) banner.Description = dto.Description;
+        if (dto.ImageId.HasValue) banner.ImageId = dto.ImageId.Value;
         if (dto.LinkUrl != null) banner.LinkUrl = dto.LinkUrl;
         if (dto.SortOrder.HasValue) banner.SortOrder = dto.SortOrder.Value;
         if (dto.Status.HasValue) banner.Status = (sbyte)(dto.Status.Value ? 1 : 0);
@@ -111,7 +112,7 @@ public class ConfigService : IConfigService
         if (dto.ClientName != null) achievement.ClientName = dto.ClientName;
         if (dto.CompletionDate.HasValue) achievement.CompletionDate = dto.CompletionDate;
         if (dto.Description != null) achievement.Description = dto.Description;
-        if (dto.ImageUrl != null) achievement.ImageUrl = dto.ImageUrl;
+        if (dto.ImageIds != null) achievement.ImageIds = System.Text.Json.JsonSerializer.Serialize(dto.ImageIds);
         if (dto.SortOrder.HasValue) achievement.SortOrder = dto.SortOrder.Value;
 
         return await _repository.UpdateAchievementAsync(achievement);
@@ -151,9 +152,10 @@ public class ConfigService : IConfigService
         if (link == null) return false;
 
         // 只更新非null的字段
-        if (dto.LinkName != null) link.LinkName = dto.LinkName;
-        if (dto.LinkUrl != null) link.LinkUrl = dto.LinkUrl;
-        if (dto.LogoUrl != null) link.LogoUrl = dto.LogoUrl;
+        if (dto.Name != null) link.Name = dto.Name;
+        if (dto.Url != null) link.Url = dto.Url;
+        if (dto.LogoId.HasValue) link.LogoId = dto.LogoId;
+        if (dto.Description != null) link.Description = dto.Description;
         if (dto.SortOrder.HasValue) link.SortOrder = dto.SortOrder.Value;
         if (dto.Status.HasValue) link.Status = (sbyte)(dto.Status.Value ? 1 : 0);
 

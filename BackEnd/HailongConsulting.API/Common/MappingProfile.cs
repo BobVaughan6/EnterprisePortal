@@ -11,16 +11,6 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        // Project映射
-        CreateMap<Project, ProjectDto>()
-            .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client != null ? src.Client.ClientName : null))
-            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : null))
-            .ForMember(dest => dest.ProjectManagerName, opt => opt.MapFrom(src => src.ProjectManager != null ? src.ProjectManager.FullName : null));
-
-        CreateMap<CreateProjectDto, Project>();
-        CreateMap<UpdateProjectDto, Project>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
         // User映射
         CreateMap<User, LoginResponseDto>();
 
@@ -28,22 +18,50 @@ public class MappingProfile : Profile
         // 轮播图
         CreateMap<CarouselBanner, CarouselBannerDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1));
+        
         CreateMap<CreateCarouselBannerDto, CarouselBanner>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
+        
+        CreateMap<UpdateCarouselBannerDto, CarouselBanner>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 企业简介
-        CreateMap<CompanyProfile, CompanyProfileDto>();
-        CreateMap<UpdateCompanyProfileDto, CompanyProfile>();
+        CreateMap<CompanyProfile, CompanyProfileDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1))
+            .ForMember(dest => dest.Highlights, opt => opt.MapFrom(src => DeserializeStringList(src.Highlights)))
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => DeserializeUintList(src.ImageIds)));
+        
+        CreateMap<UpdateCompanyProfileDto, CompanyProfile>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Highlights, opt => opt.MapFrom(src => SerializeStringList(src.Highlights)))
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeUintList(src.ImageIds)))
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 重要业绩
-        CreateMap<MajorAchievement, MajorAchievementDto>();
-        CreateMap<CreateMajorAchievementDto, MajorAchievement>();
+        CreateMap<MajorAchievement, MajorAchievementDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1))
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => DeserializeUintList(src.ImageIds)));
+        
+        CreateMap<CreateMajorAchievementDto, MajorAchievement>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)))
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeUintList(src.ImageIds)));
+        
+        CreateMap<UpdateMajorAchievementDto, MajorAchievement>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeUintList(src.ImageIds)))
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 友情链接
         CreateMap<FriendlyLink, FriendlyLinkDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1));
+        
         CreateMap<CreateFriendlyLinkDto, FriendlyLink>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
+        
+        CreateMap<UpdateFriendlyLinkDto, FriendlyLink>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 附件映射
         CreateMap<Attachment, AttachmentDto>();
@@ -97,5 +115,19 @@ public class MappingProfile : Profile
         if (string.IsNullOrEmpty(json))
             return null;
         return System.Text.Json.JsonSerializer.Deserialize<List<uint>>(json);
+    }
+
+    private static string? SerializeStringList(List<string>? list)
+    {
+        if (list == null || list.Count == 0)
+            return null;
+        return System.Text.Json.JsonSerializer.Serialize(list);
+    }
+
+    private static List<string>? DeserializeStringList(string? json)
+    {
+        if (string.IsNullOrEmpty(json))
+            return null;
+        return System.Text.Json.JsonSerializer.Deserialize<List<string>>(json);
     }
 }
