@@ -14,11 +14,16 @@ namespace HailongConsulting.API.Controllers;
 public class InfoPublicationController : ControllerBase
 {
     private readonly IInfoPublicationService _infoPublicationService;
+    private readonly IVisitStatisticService _visitStatisticService;
     private readonly ILogger<InfoPublicationController> _logger;
 
-    public InfoPublicationController(IInfoPublicationService infoPublicationService, ILogger<InfoPublicationController> logger)
+    public InfoPublicationController(
+        IInfoPublicationService infoPublicationService,
+        IVisitStatisticService visitStatisticService,
+        ILogger<InfoPublicationController> logger)
     {
         _infoPublicationService = infoPublicationService;
+        _visitStatisticService = visitStatisticService;
         _logger = logger;
     }
 
@@ -82,8 +87,8 @@ public class InfoPublicationController : ControllerBase
                 return NotFound(ApiResponse<InfoPublicationDto>.FailResult("信息发布不存在"));
             }
 
-            // 增加浏览次数
-            await _infoPublicationService.IncrementViewCountAsync(id);
+            // 增加浏览次数（同时更新业务表和统计表）
+            await _visitStatisticService.IncrementPublicationViewAsync(id, Request);
 
             return Ok(ApiResponse<InfoPublicationDto>.SuccessResult(publication, "获取信息发布成功"));
         }

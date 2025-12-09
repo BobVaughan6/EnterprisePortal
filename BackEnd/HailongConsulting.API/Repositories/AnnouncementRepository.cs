@@ -102,4 +102,14 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
             announcement.UpdatedAt = DateTime.UtcNow;
         }
     }
+
+    public async Task IncrementViewCountAsync(uint id)
+    {
+        var announcement = await _dbSet.FindAsync(id);
+        if (announcement != null)
+        {
+            announcement.ViewCount++;
+            announcement.UpdatedAt = DateTime.UtcNow;
+        }
+    }
 }

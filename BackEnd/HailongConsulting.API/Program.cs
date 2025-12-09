@@ -97,6 +97,10 @@ builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<IInfoPublicationRepository, InfoPublicationRepository>();
 builder.Services.AddScoped<IInfoPublicationService, InfoPublicationService>();
 
+// 访问统计服务
+builder.Services.AddScoped<IVisitStatisticRepository, VisitStatisticRepository>();
+builder.Services.AddScoped<IVisitStatisticService, VisitStatisticService>();
+
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger

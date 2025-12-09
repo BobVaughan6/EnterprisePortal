@@ -39,4 +39,9 @@ public interface IAnnouncementRepository : IRepository<Announcement>
     /// 软删除公告
     /// </summary>
     Task SoftDeleteAsync(uint id);
+    
+    /// <summary>
+    /// 增加浏览次数
+    /// </summary>
+    Task IncrementViewCountAsync(uint id);
 }

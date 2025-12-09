@@ -75,4 +75,14 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
             publication.UpdatedAt = DateTime.UtcNow;
         }
     }
+
+    public async Task IncrementViewCountAsync(uint id)
+    {
+        var publication = await _dbSet.FindAsync(id);
+        if (publication != null)
+        {
+            publication.ViewCount++;
+            publication.UpdatedAt = DateTime.UtcNow;
+        }
+    }
 }
