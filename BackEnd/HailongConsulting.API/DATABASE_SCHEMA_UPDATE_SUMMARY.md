@@ -159,11 +159,24 @@ public DbSet<SystemLog> SystemLogs { get; set; }
 2. ✅ 更新现有实体类
 3. ✅ 更新 ApplicationDbContext
 4. ✅ 创建新的DTO类
-5. ⏳ 创建/更新 Repository 接口和实现
-6. ⏳ 创建/更新 Service 接口和实现
-7. ⏳ 创建/更新 Controller
-8. ⏳ 更新 AutoMapper 配置
-9. ⏳ API文档更新
+5. ✅ 创建/更新 Repository 接口和实现
+   - ✅ IAttachmentRepository / AttachmentRepository
+   - ✅ IAnnouncementRepository / AnnouncementRepository
+   - ✅ IInfoPublicationRepository / InfoPublicationRepository
+   - ✅ 更新 IUnitOfWork / UnitOfWork
+6. ✅ 创建/更新 Service 接口和实现
+   - ✅ IAttachmentService / AttachmentService
+   - ✅ IAnnouncementService / AnnouncementService
+   - ✅ IInfoPublicationService / InfoPublicationService
+7. ⏳ 创建/更新 Controller（待完成）
+   - ⏳ AttachmentController
+   - ⏳ AnnouncementController
+   - ⏳ InfoPublicationController
+8. ✅ 更新 AutoMapper 配置
+   - ✅ Attachment 映射
+   - ✅ Announcement 映射（包含 JSON 序列化/反序列化）
+   - ✅ InfoPublication 映射（包含 JSON 序列化/反序列化）
+9. ⏳ API文档更新（待完成）
 
 ### 可选优化
 1. 实现附件上传服务
@@ -216,3 +229,192 @@ public DbSet<SystemLog> SystemLogs { get; set; }
 - 数据库版本：v2.0
 - 更新日期：2025-12-08
 - 更新人：System
+
+## 实施总结（2025-12-09）
+
+### 已完成的工作
+
+#### 1. Repository 层
+创建了三个新的专用 Repository：
+- **AttachmentRepository**: 提供附件的 CRUD 操作和专用查询方法
+  - 根据关联类型和ID查询附件
+  - 根据ID列表批量查询
+  - 软删除功能
+  
+- **AnnouncementRepository**: 提供统一公告的 CRUD 操作
+  - 按业务类型查询（政府采购/建设工程）
+  - 按公告类型查询（招标/更正/结果）
+  - 按区域查询（省市区三级）
+  - 分页查询支持关键词搜索
+  
+- **InfoPublicationRepository**: 提供信息发布的 CRUD 操作
+  - 按类型查询（公司公告/政策法规/政策信息/通知）
+  - 按分类查询
+  - 分页查询支持关键词搜索
+
+#### 2. Service 层
+创建了三个新的业务服务：
+- **AttachmentService**: 附件管理服务
+  - 上传附件
+  - 查询附件（按ID、关联类型、ID列表）
+  - 删除附件（单个/批量）
+  
+- **AnnouncementService**: 公告管理服务
+  - 创建/更新/删除公告
+  - 分页查询公告
+  - 增加浏览次数
+  
+- **InfoPublicationService**: 信息发布服务
+  - 创建/更新/删除信息
+  - 分页查询信息
+  - 增加浏览次数
+
+#### 3. AutoMapper 配置
+更新了 MappingProfile，添加了新实体的映射规则：
+- **Attachment** ↔ **AttachmentDto**
+- **Announcement** ↔ **AnnouncementDto** / **CreateAnnouncementDto** / **UpdateAnnouncementDto**
+- **InfoPublication** ↔ **InfoPublicationDto** / **CreateInfoPublicationDto** / **UpdateInfoPublicationDto**
+
+特殊处理：
+- JSON 数组字段的序列化/反序列化（AttachmentIds）
+- sbyte 与 bool/int 类型的转换（IsTop, Status）
+- 可空类型的条件映射
+
+#### 4. UnitOfWork 更新
+扩展了 IUnitOfWork 和 UnitOfWork，添加了新的 Repository 属性：
+- Attachments
+- Announcements
+- InfoPublications
+- AdminUsers, AdminRoles
+- BusinessScopes, CompanyQualifications
+- RegionDictionaries, SystemLogs
+- CompanyProfiles, MajorAchievements
+- CarouselBanners, FriendlyLinks
+- VisitStatistics
+
+### 待完成的工作
+
+#### 1. Controller 层（高优先级）
+需要创建以下 Controller：
+- **AttachmentController**: 附件上传、下载、管理接口
+- **AnnouncementController**: 公告的 CRUD 和查询接口
+- **InfoPublicationController**: 信息发布的 CRUD 和查询接口
+
+#### 2. API 文档（高优先级）
+需要创建详细的 API 文档：
+- 附件管理 API 文档
+- 统一公告 API 文档
+- 信息发布 API 文档
+
+#### 3. 依赖注入配置（必须）
+在 Program.cs 中注册新的服务：
+```csharp
+// Repository
+builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
+builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+builder.Services.AddScoped<IInfoPublicationRepository, InfoPublicationRepository>();
+
+// Service
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<IInfoPublicationService, InfoPublicationService>();
+```
+
+### 技术要点
+
+#### JSON 字段处理
+附件ID列表存储为 JSON 数组格式：
+```json
+[1, 2, 3, 4]
+```
+
+在 AutoMapper 中使用辅助方法进行序列化/反序列化：
+```csharp
+private static string? SerializeUintList(List<uint>? list)
+private static List<uint>? DeserializeUintList(string? json)
+```
+
+#### 软删除实现
+所有实体都支持软删除，通过 `is_deleted` 字段标记：
+- 0: 未删除
+- 1: 已删除
+
+查询时需要过滤已删除的记录：
+```csharp
+.Where(x => x.IsDeleted == 0)
+```
+
+#### 分页查询
+统一使用 PagedResult<T> 返回分页数据：
+```csharp
+public class PagedResult<T>
+{
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
+    public int TotalCount { get; set; }
+    public int TotalPages { get; }
+    public List<T> Items { get; set; }
+}
+```
+
+### 已清理的旧代码
+
+#### 实体层（已删除 - 6个文件）
+- ❌ ConstructionProjectAnnouncement.cs
+- ❌ GovProcurementAnnouncement.cs
+- ❌ CompanyAnnouncement.cs
+- ❌ PolicyRegulation.cs
+- ❌ PolicyInformation.cs
+- ❌ NoticeAnnouncement.cs
+
+**原因**：
+- 建设工程和政府采购公告 → 合并到 `Announcement` 实体
+- 公司公告、政策法规、政策信息、通知公告 → 合并到 `InfoPublication` 实体
+
+#### DTO 层（已删除 - 3个文件）
+- ❌ ConstructionProjectDto.cs
+- ❌ GovProcurementDto.cs
+- ❌ InfoPublishDto.cs
+
+**原因**：
+- 建设工程和政府采购 DTO → 使用 `AnnouncementDto` 替代
+- 旧信息发布 DTO → 使用 `InfoPublicationDto` 替代
+
+#### Repository 层（已删除 - 4个文件）
+- ❌ IConstructionProjectRepository.cs
+- ❌ ConstructionProjectRepository.cs
+- ❌ IGovProcurementRepository.cs
+- ❌ GovProcurementRepository.cs
+
+**原因**：建设工程和政府采购公告已合并到统一的 `Announcement` 表，使用 `AnnouncementRepository` 替代。
+
+#### Service 层（已删除 - 6个文件）
+- ❌ IConstructionProjectService.cs
+- ❌ ConstructionProjectService.cs
+- ❌ IGovProcurementService.cs
+- ❌ GovProcurementService.cs
+- ❌ IInfoPublishService.cs
+- ❌ InfoPublishService.cs
+
+**原因**：
+- 建设工程和政府采购服务已合并到 `AnnouncementService`
+- 旧的信息发布服务已被 `InfoPublicationService` 替代
+
+**总计删除文件数：19个**
+
+### 下一步建议
+
+1. **立即完成依赖注入配置**，确保新服务可以被使用
+2. **创建 Controller 层**，提供 RESTful API 接口
+3. **编写 API 文档**，方便前端对接
+4. **进行集成测试**，验证整个流程
+5. **数据迁移**，将旧表数据迁移到新表（可选）
+
+### 注意事项
+
+1. 所有 ID 字段使用 `uint` 类型
+2. 状态字段使用 `sbyte` 类型（0/1）
+3. 时间字段使用 UTC 时间
+4. JSON 字段需要正确序列化/反序列化
+5. 查询时注意过滤软删除的记录
+6. 旧的 Controller 需要更新以使用新的 Service
