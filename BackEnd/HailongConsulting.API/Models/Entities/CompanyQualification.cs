@@ -4,49 +4,59 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HailongConsulting.API.Models.Entities;
 
 /// <summary>
-/// 轮播图实体
+/// 企业资质实体（企业荣誉、企业资质）
 /// </summary>
-[Table("carousel_banners")]
-public class CarouselBanner
+[Table("company_qualifications")]
+public class CompanyQualification
 {
     /// <summary>
-    /// 轮播图ID
+    /// 资质ID
     /// </summary>
     [Key]
     [Column("id")]
     public uint Id { get; set; }
 
     /// <summary>
-    /// 轮播图标题
+    /// 资质名称
     /// </summary>
-    [Column("title")]
+    [Column("name")]
     [Required]
     [MaxLength(255)]
-    public string Title { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// 轮播图描述
+    /// 资质描述
     /// </summary>
     [Column("description")]
-    [MaxLength(500)]
     public string? Description { get; set; }
 
     /// <summary>
-    /// 轮播图图片ID（关联attachments表）
+    /// 资质证书图片ID（关联attachments表）
     /// </summary>
     [Column("image_id")]
-    [Required]
-    public uint ImageId { get; set; }
+    public uint? ImageId { get; set; }
 
     /// <summary>
-    /// 跳转链接
+    /// 证书编号
     /// </summary>
-    [Column("link_url")]
-    [MaxLength(500)]
-    public string? LinkUrl { get; set; }
+    [Column("certificate_no")]
+    [MaxLength(100)]
+    public string? CertificateNo { get; set; }
 
     /// <summary>
-    /// 排序顺序（数字越小越靠前）
+    /// 颁发日期
+    /// </summary>
+    [Column("issue_date")]
+    public DateOnly? IssueDate { get; set; }
+
+    /// <summary>
+    /// 有效期至
+    /// </summary>
+    [Column("expiry_date")]
+    public DateOnly? ExpiryDate { get; set; }
+
+    /// <summary>
+    /// 排序顺序
     /// </summary>
     [Column("sort_order")]
     public int SortOrder { get; set; } = 0;

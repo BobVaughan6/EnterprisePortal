@@ -4,58 +4,79 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HailongConsulting.API.Models.Entities;
 
 /// <summary>
-/// 轮播图实体
+/// 管理员账号实体
 /// </summary>
-[Table("carousel_banners")]
-public class CarouselBanner
+[Table("admin_users")]
+public class AdminUser
 {
     /// <summary>
-    /// 轮播图ID
+    /// 管理员ID
     /// </summary>
     [Key]
     [Column("id")]
     public uint Id { get; set; }
 
     /// <summary>
-    /// 轮播图标题
+    /// 用户名
     /// </summary>
-    [Column("title")]
+    [Column("username")]
+    [Required]
+    [MaxLength(50)]
+    public string Username { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 密码（加密存储）
+    /// </summary>
+    [Column("password")]
     [Required]
     [MaxLength(255)]
-    public string Title { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 
     /// <summary>
-    /// 轮播图描述
+    /// 真实姓名
     /// </summary>
-    [Column("description")]
-    [MaxLength(500)]
-    public string? Description { get; set; }
+    [Column("real_name")]
+    [MaxLength(50)]
+    public string? RealName { get; set; }
 
     /// <summary>
-    /// 轮播图图片ID（关联attachments表）
+    /// 邮箱
     /// </summary>
-    [Column("image_id")]
-    [Required]
-    public uint ImageId { get; set; }
+    [Column("email")]
+    [MaxLength(100)]
+    public string? Email { get; set; }
 
     /// <summary>
-    /// 跳转链接
+    /// 手机号
     /// </summary>
-    [Column("link_url")]
-    [MaxLength(500)]
-    public string? LinkUrl { get; set; }
+    [Column("phone")]
+    [MaxLength(20)]
+    public string? Phone { get; set; }
 
     /// <summary>
-    /// 排序顺序（数字越小越靠前）
+    /// 角色ID
     /// </summary>
-    [Column("sort_order")]
-    public int SortOrder { get; set; } = 0;
+    [Column("role_id")]
+    public uint? RoleId { get; set; }
 
     /// <summary>
     /// 状态：0-禁用，1-启用
     /// </summary>
     [Column("status")]
     public sbyte Status { get; set; } = 1;
+
+    /// <summary>
+    /// 最后登录时间
+    /// </summary>
+    [Column("last_login_time")]
+    public DateTime? LastLoginTime { get; set; }
+
+    /// <summary>
+    /// 最后登录IP
+    /// </summary>
+    [Column("last_login_ip")]
+    [MaxLength(50)]
+    public string? LastLoginIp { get; set; }
 
     /// <summary>
     /// 软删除：0-未删除，1-已删除

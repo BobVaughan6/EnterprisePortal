@@ -4,58 +4,52 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HailongConsulting.API.Models.Entities;
 
 /// <summary>
-/// 轮播图实体
+/// 项目区域字典实体（省市区三级结构）
 /// </summary>
-[Table("carousel_banners")]
-public class CarouselBanner
+[Table("region_dictionary")]
+public class RegionDictionary
 {
     /// <summary>
-    /// 轮播图ID
+    /// 区域ID
     /// </summary>
     [Key]
     [Column("id")]
     public uint Id { get; set; }
 
     /// <summary>
-    /// 轮播图标题
+    /// 区域代码（如：410000、410100、410101）
     /// </summary>
-    [Column("title")]
+    [Column("region_code")]
     [Required]
-    [MaxLength(255)]
-    public string Title { get; set; } = string.Empty;
+    [MaxLength(50)]
+    public string RegionCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// 轮播图描述
+    /// 区域名称
     /// </summary>
-    [Column("description")]
-    [MaxLength(500)]
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// 轮播图图片ID（关联attachments表）
-    /// </summary>
-    [Column("image_id")]
+    [Column("region_name")]
     [Required]
-    public uint ImageId { get; set; }
+    [MaxLength(50)]
+    public string RegionName { get; set; } = string.Empty;
 
     /// <summary>
-    /// 跳转链接
+    /// 区域级别：1-省份，2-城市，3-区县
     /// </summary>
-    [Column("link_url")]
-    [MaxLength(500)]
-    public string? LinkUrl { get; set; }
+    [Column("region_level")]
+    public sbyte RegionLevel { get; set; }
 
     /// <summary>
-    /// 排序顺序（数字越小越靠前）
+    /// 父级区域代码
+    /// </summary>
+    [Column("parent_code")]
+    [MaxLength(50)]
+    public string? ParentCode { get; set; }
+
+    /// <summary>
+    /// 排序顺序
     /// </summary>
     [Column("sort_order")]
     public int SortOrder { get; set; } = 0;
-
-    /// <summary>
-    /// 状态：0-禁用，1-启用
-    /// </summary>
-    [Column("status")]
-    public sbyte Status { get; set; } = 1;
 
     /// <summary>
     /// 软删除：0-未删除，1-已删除

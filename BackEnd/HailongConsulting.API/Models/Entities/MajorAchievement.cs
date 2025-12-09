@@ -26,11 +26,12 @@ public class MajorAchievement
     public string ProjectName { get; set; } = string.Empty;
 
     /// <summary>
-    /// 项目类型
+    /// 项目类型：工程、服务、货物
     /// </summary>
     [Column("project_type")]
+    [Required]
     [MaxLength(50)]
-    public string? ProjectType { get; set; }
+    public string ProjectType { get; set; } = string.Empty;
 
     /// <summary>
     /// 项目金额（万元）
@@ -47,29 +48,35 @@ public class MajorAchievement
     public string? ClientName { get; set; }
 
     /// <summary>
-    /// 完成日期
-    /// </summary>
-    [Column("completion_date")]
-    public DateOnly? CompletionDate { get; set; }
-
-    /// <summary>
     /// 项目描述
     /// </summary>
     [Column("description")]
     public string? Description { get; set; }
 
     /// <summary>
-    /// 项目图片URL
+    /// 完成日期
     /// </summary>
-    [Column("image_url")]
+    [Column("completion_date")]
+    public DateOnly? CompletionDate { get; set; }
+
+    /// <summary>
+    /// 项目图片ID列表（JSON数组格式，如：[1,2,3]）
+    /// </summary>
+    [Column("image_ids")]
     [MaxLength(500)]
-    public string? ImageUrl { get; set; }
+    public string? ImageIds { get; set; }
 
     /// <summary>
     /// 排序顺序
     /// </summary>
     [Column("sort_order")]
     public int SortOrder { get; set; } = 0;
+
+    /// <summary>
+    /// 状态：0-禁用，1-启用
+    /// </summary>
+    [Column("status")]
+    public sbyte Status { get; set; } = 1;
 
     /// <summary>
     /// 软删除：0-未删除，1-已删除

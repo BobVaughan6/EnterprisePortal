@@ -4,49 +4,52 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HailongConsulting.API.Models.Entities;
 
 /// <summary>
-/// 轮播图实体
+/// 业务范围实体
 /// </summary>
-[Table("carousel_banners")]
-public class CarouselBanner
+[Table("business_scope")]
+public class BusinessScope
 {
     /// <summary>
-    /// 轮播图ID
+    /// 业务ID
     /// </summary>
     [Key]
     [Column("id")]
     public uint Id { get; set; }
 
     /// <summary>
-    /// 轮播图标题
+    /// 业务名称
     /// </summary>
-    [Column("title")]
+    [Column("name")]
     [Required]
     [MaxLength(255)]
-    public string Title { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// 轮播图描述
+    /// 业务描述
     /// </summary>
     [Column("description")]
-    [MaxLength(500)]
     public string? Description { get; set; }
 
     /// <summary>
-    /// 轮播图图片ID（关联attachments表）
+    /// 详细内容（富文本）
+    /// </summary>
+    [Column("content")]
+    public string? Content { get; set; }
+
+    /// <summary>
+    /// 业务特点（JSON数组格式，如：["采购需求编制","招标文件制作"]）
+    /// </summary>
+    [Column("features")]
+    public string? Features { get; set; }
+
+    /// <summary>
+    /// 业务图片ID（关联attachments表）
     /// </summary>
     [Column("image_id")]
-    [Required]
-    public uint ImageId { get; set; }
+    public uint? ImageId { get; set; }
 
     /// <summary>
-    /// 跳转链接
-    /// </summary>
-    [Column("link_url")]
-    [MaxLength(500)]
-    public string? LinkUrl { get; set; }
-
-    /// <summary>
-    /// 排序顺序（数字越小越靠前）
+    /// 排序顺序
     /// </summary>
     [Column("sort_order")]
     public int SortOrder { get; set; } = 0;

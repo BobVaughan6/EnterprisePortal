@@ -32,11 +32,23 @@ public class CompanyProfile
     public string Content { get; set; } = string.Empty;
 
     /// <summary>
-    /// 配图URL
+    /// 企业特色标签（JSON数组格式，如：["专业资质齐全","经验丰富团队"]）
     /// </summary>
-    [Column("image_url")]
+    [Column("highlights")]
+    public string? Highlights { get; set; }
+
+    /// <summary>
+    /// 配图ID列表（JSON数组格式，如：[1,2,3]）
+    /// </summary>
+    [Column("image_ids")]
     [MaxLength(500)]
-    public string? ImageUrl { get; set; }
+    public string? ImageIds { get; set; }
+
+    /// <summary>
+    /// 状态：0-禁用，1-启用
+    /// </summary>
+    [Column("status")]
+    public sbyte Status { get; set; } = 1;
 
     /// <summary>
     /// 软删除：0-未删除，1-已删除

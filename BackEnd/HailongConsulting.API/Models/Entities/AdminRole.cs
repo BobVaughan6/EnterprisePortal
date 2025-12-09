@@ -4,52 +4,46 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HailongConsulting.API.Models.Entities;
 
 /// <summary>
-/// 轮播图实体
+/// 角色权限实体
 /// </summary>
-[Table("carousel_banners")]
-public class CarouselBanner
+[Table("admin_roles")]
+public class AdminRole
 {
     /// <summary>
-    /// 轮播图ID
+    /// 角色ID
     /// </summary>
     [Key]
     [Column("id")]
     public uint Id { get; set; }
 
     /// <summary>
-    /// 轮播图标题
+    /// 角色名称
     /// </summary>
-    [Column("title")]
+    [Column("role_name")]
     [Required]
-    [MaxLength(255)]
-    public string Title { get; set; } = string.Empty;
+    [MaxLength(50)]
+    public string RoleName { get; set; } = string.Empty;
 
     /// <summary>
-    /// 轮播图描述
+    /// 角色代码
+    /// </summary>
+    [Column("role_code")]
+    [Required]
+    [MaxLength(50)]
+    public string RoleCode { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 角色描述
     /// </summary>
     [Column("description")]
-    [MaxLength(500)]
+    [MaxLength(255)]
     public string? Description { get; set; }
 
     /// <summary>
-    /// 轮播图图片ID（关联attachments表）
+    /// 权限列表（JSON格式）
     /// </summary>
-    [Column("image_id")]
-    [Required]
-    public uint ImageId { get; set; }
-
-    /// <summary>
-    /// 跳转链接
-    /// </summary>
-    [Column("link_url")]
-    [MaxLength(500)]
-    public string? LinkUrl { get; set; }
-
-    /// <summary>
-    /// 排序顺序（数字越小越靠前）
-    /// </summary>
-    [Column("sort_order")]
-    public int SortOrder { get; set; } = 0;
+    [Column("permissions")]
+    public string? Permissions { get; set; }
 
     /// <summary>
     /// 状态：0-禁用，1-启用

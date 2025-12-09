@@ -13,7 +13,38 @@ public class ApplicationDbContext : DbContext
     {
     }
 
+    // 用户权限管理模块
     public DbSet<User> Users { get; set; }
+    public DbSet<AdminUser> AdminUsers { get; set; }
+    public DbSet<AdminRole> AdminRoles { get; set; }
+
+    // 附件管理模块
+    public DbSet<Attachment> Attachments { get; set; }
+
+    // 公告信息模块（统一公告表）
+    public DbSet<Announcement> Announcements { get; set; }
+
+    // 信息发布模块（统一信息发布表）
+    public DbSet<InfoPublication> InfoPublications { get; set; }
+
+    // 系统配置模块
+    public DbSet<CompanyProfile> CompanyProfiles { get; set; }
+    public DbSet<BusinessScope> BusinessScopes { get; set; }
+    public DbSet<CompanyQualification> CompanyQualifications { get; set; }
+    public DbSet<MajorAchievement> MajorAchievements { get; set; }
+    public DbSet<CarouselBanner> CarouselBanners { get; set; }
+    public DbSet<FriendlyLink> FriendlyLinks { get; set; }
+
+    // 统计模块
+    public DbSet<VisitStatistic> VisitStatistics { get; set; }
+
+    // 区域字典
+    public DbSet<RegionDictionary> RegionDictionaries { get; set; }
+
+    // 系统日志
+    public DbSet<SystemLog> SystemLogs { get; set; }
+
+    // 旧的实体（保留以兼容现有代码，后续可以逐步迁移）
     public DbSet<Project> Projects { get; set; }
     public DbSet<Client> Clients { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -23,13 +54,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<PolicyRegulation> PolicyRegulations { get; set; }
     public DbSet<PolicyInformation> PolicyInformation { get; set; }
     public DbSet<NoticeAnnouncement> NoticeAnnouncements { get; set; }
-    
-    // 系统配置相关
-    public DbSet<CarouselBanner> CarouselBanners { get; set; }
-    public DbSet<CompanyProfile> CompanyProfiles { get; set; }
-    public DbSet<MajorAchievement> MajorAchievements { get; set; }
-    public DbSet<FriendlyLink> FriendlyLinks { get; set; }
-    public DbSet<VisitStatistic> VisitStatistics { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,9 +63,153 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasIndex(e => e.Username).IsUnique();
-            entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.Email);
+            entity.HasIndex(e => e.RefreshToken);
+            entity.HasIndex(e => e.Role);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
         });
 
+        // AdminUser配置
+        modelBuilder.Entity<AdminUser>(entity =>
+        {
+            entity.HasIndex(e => e.Username).IsUnique();
+            entity.HasIndex(e => e.RoleId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // AdminRole配置
+        modelBuilder.Entity<AdminRole>(entity =>
+        {
+            entity.HasIndex(e => e.RoleCode).IsUnique();
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // Attachment配置
+        modelBuilder.Entity<Attachment>(entity =>
+        {
+            entity.HasIndex(e => new { e.RelatedType, e.RelatedId });
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.UploadUserId);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // Announcement配置（统一公告表）
+        modelBuilder.Entity<Announcement>(entity =>
+        {
+            entity.HasIndex(e => e.BusinessType);
+            entity.HasIndex(e => e.NoticeType);
+            entity.HasIndex(e => e.Province);
+            entity.HasIndex(e => e.City);
+            entity.HasIndex(e => e.District);
+            entity.HasIndex(e => e.ProjectRegion);
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.Deadline);
+            entity.HasIndex(e => e.BudgetAmount);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // InfoPublication配置（统一信息发布表）
+        modelBuilder.Entity<InfoPublication>(entity =>
+        {
+            entity.HasIndex(e => e.Type);
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.Author);
+            entity.HasIndex(e => e.PublishTime);
+            entity.HasIndex(e => e.IsTop);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // CompanyProfile配置
+        modelBuilder.Entity<CompanyProfile>(entity =>
+        {
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // BusinessScope配置
+        modelBuilder.Entity<BusinessScope>(entity =>
+        {
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // CompanyQualification配置
+        modelBuilder.Entity<CompanyQualification>(entity =>
+        {
+            entity.HasIndex(e => e.IssueDate);
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // MajorAchievement配置
+        modelBuilder.Entity<MajorAchievement>(entity =>
+        {
+            entity.HasIndex(e => e.ProjectType);
+            entity.HasIndex(e => e.CompletionDate);
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // CarouselBanner配置
+        modelBuilder.Entity<CarouselBanner>(entity =>
+        {
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // FriendlyLink配置
+        modelBuilder.Entity<FriendlyLink>(entity =>
+        {
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // VisitStatistic配置
+        modelBuilder.Entity<VisitStatistic>(entity =>
+        {
+            entity.HasIndex(e => e.VisitDate);
+            entity.HasIndex(e => e.PageUrl);
+            entity.HasIndex(e => e.VisitorIp);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // RegionDictionary配置
+        modelBuilder.Entity<RegionDictionary>(entity =>
+        {
+            entity.HasIndex(e => e.RegionCode).IsUnique();
+            entity.HasIndex(e => e.RegionLevel);
+            entity.HasIndex(e => e.ParentCode);
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // SystemLog配置
+        modelBuilder.Entity<SystemLog>(entity =>
+        {
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Action);
+            entity.HasIndex(e => e.Module);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        // 旧实体配置（保留兼容性）
+        ConfigureOldEntities(modelBuilder);
+    }
+
+    private void ConfigureOldEntities(ModelBuilder modelBuilder)
+    {
         // Project配置
         modelBuilder.Entity<Project>(entity =>
         {
@@ -129,45 +297,6 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasIndex(e => e.PublishTime);
             entity.HasIndex(e => e.IsTop);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // CarouselBanner配置
-        modelBuilder.Entity<CarouselBanner>(entity =>
-        {
-            entity.HasIndex(e => e.SortOrder);
-            entity.HasIndex(e => e.Status);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // CompanyProfile配置
-        modelBuilder.Entity<CompanyProfile>(entity =>
-        {
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // MajorAchievement配置
-        modelBuilder.Entity<MajorAchievement>(entity =>
-        {
-            entity.HasIndex(e => e.CompletionDate);
-            entity.HasIndex(e => e.SortOrder);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // FriendlyLink配置
-        modelBuilder.Entity<FriendlyLink>(entity =>
-        {
-            entity.HasIndex(e => e.SortOrder);
-            entity.HasIndex(e => e.Status);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // VisitStatistic配置
-        modelBuilder.Entity<VisitStatistic>(entity =>
-        {
-            entity.HasIndex(e => e.VisitDate);
-            entity.HasIndex(e => e.PageUrl);
-            entity.HasIndex(e => e.VisitorIp);
             entity.HasIndex(e => e.IsDeleted);
         });
     }

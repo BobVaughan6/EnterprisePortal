@@ -19,25 +19,31 @@ public class FriendlyLink
     /// <summary>
     /// 链接名称
     /// </summary>
-    [Column("link_name")]
+    [Column("name")]
     [Required]
-    [MaxLength(100)]
-    public string LinkName { get; set; } = string.Empty;
+    [MaxLength(255)]
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// 链接URL
+    /// 链接地址
     /// </summary>
-    [Column("link_url")]
+    [Column("url")]
     [Required]
     [MaxLength(500)]
-    public string LinkUrl { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
 
     /// <summary>
-    /// Logo URL
+    /// Logo图片ID（关联attachments表）
     /// </summary>
-    [Column("logo_url")]
+    [Column("logo_id")]
+    public uint? LogoId { get; set; }
+
+    /// <summary>
+    /// 链接描述
+    /// </summary>
+    [Column("description")]
     [MaxLength(500)]
-    public string? LogoUrl { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// 排序顺序
