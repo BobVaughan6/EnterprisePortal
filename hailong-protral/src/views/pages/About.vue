@@ -118,53 +118,20 @@
           <div class="max-w-6xl mx-auto">
             <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">企业荣誉</h2>
             
-            <div v-if="loadingAchievements" class="text-center py-12">
-              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
-              <p class="mt-4 text-gray-600">加载中...</p>
-            </div>
-            
-            <div v-else-if="achievementsError" class="text-center py-12">
-              <p class="text-red-600">{{ achievementsError }}</p>
-              <button @click="fetchAchievements" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
-                重新加载
-              </button>
-            </div>
-            
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div v-for="achievement in achievements" :key="achievement.id"
-                @click="handleAchievementClick(achievement.id)"
-                class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
-                <div v-if="achievement.imageUrl" class="h-48 overflow-hidden">
-                  <img :src="achievement.imageUrl" :alt="achievement.projectName"
+                @click="openImagePreview(achievement.imageUrl)"
+                class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
+                <div class="h-48 overflow-hidden bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5">
+                  <img :src="achievement.imageUrl" :alt="achievement.name"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 </div>
-                <div class="p-6">
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="px-3 py-1 bg-hailong-primary/10 text-hailong-primary rounded-full text-xs font-semibold">
-                      {{ achievement.projectType || '重要业绩' }}
-                    </span>
-                    <span class="text-sm text-gray-500">{{ formatDate(achievement.completionDate) }}</span>
-                  </div>
-                  <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-hailong-primary transition-colors line-clamp-2">
-                    {{ achievement.projectName }}
+                <div class="p-4">
+                  <h3 class="text-sm font-bold text-gray-900 text-center group-hover:text-hailong-primary transition-colors line-clamp-2">
+                    {{ achievement.name }}
                   </h3>
-                  <p v-if="achievement.description" class="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {{ achievement.description }}
-                  </p>
-                  <div class="flex items-center justify-between">
-                    <span v-if="achievement.clientName" class="text-sm text-gray-500">
-                      {{ achievement.clientName }}
-                    </span>
-                    <span v-if="achievement.projectAmount" class="text-lg font-bold text-hailong-secondary">
-                      {{ formatAmount(achievement.projectAmount) }}
-                    </span>
-                  </div>
                 </div>
               </div>
-            </div>
-
-            <div v-if="!loadingAchievements && !achievementsError && achievements.length === 0" class="text-center py-12">
-              <p class="text-gray-500">暂无企业荣誉数据</p>
             </div>
           </div>
         </div>
@@ -195,7 +162,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { businessScope } from '@/config/data.js'
+import { businessScope, companyProfile as staticCompanyProfile } from '@/config/data.js'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
@@ -211,12 +178,12 @@ const tabs = [
 
 const activeTab = ref('intro')
 
-// 企业简介数据
+// 企业简介数据（使用静态数据）
 const companyProfile = ref({
-  id: 0,
-  title: '',
-  content: '',
-  imageUrl: ''
+  id: 1,
+  title: staticCompanyProfile.title,
+  content: staticCompanyProfile.content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>'),
+  imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=600&fit=crop'
 })
 const loading = ref(false)
 const error = ref('')
@@ -273,56 +240,65 @@ const qualifications = [
   }
 ]
 
-// 企业荣誉数据（重要业绩）
-const achievements = ref([])
+// 企业荣誉数据（证书列表）
+const achievements = ref([
+  {
+    id: 1,
+    name: '河南省建设工程招标代理诚实守信单位',
+    imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop'
+  },
+  {
+    id: 2,
+    name: '企业信用评价AAA级信用企业',
+    imageUrl: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=300&fit=crop'
+  },
+  {
+    id: 3,
+    name: '全国重合同守信用优秀企业',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop'
+  },
+  {
+    id: 4,
+    name: '质量·服务·诚信AAA企业',
+    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=300&fit=crop'
+  },
+  {
+    id: 5,
+    name: 'ISO9001质量管理体系认证',
+    imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop'
+  },
+  {
+    id: 6,
+    name: 'ISO14001环境管理体系认证',
+    imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'
+  },
+  {
+    id: 7,
+    name: 'ISO45001职业健康安全管理体系认证',
+    imageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400&h=300&fit=crop'
+  },
+  {
+    id: 8,
+    name: '河南省工程咨询协会会员单位',
+    imageUrl: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop'
+  }
+])
 const loadingAchievements = ref(false)
 const achievementsError = ref('')
 
 // API基础URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 
-// 获取企业简介
+// 获取企业简介（已使用静态数据，保留函数以便将来切换）
 const fetchCompanyProfile = async () => {
-  loading.value = true
-  error.value = ''
-  
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/config/company-intro`)
-    const result = await response.json()
-    
-    if (result.success && result.data) {
-      companyProfile.value = result.data
-    } else {
-      error.value = result.message || '获取企业简介失败'
-    }
-  } catch (err) {
-    console.error('获取企业简介失败:', err)
-    error.value = '网络错误，请稍后重试'
-  } finally {
-    loading.value = false
-  }
+  // 使用静态数据，无需API调用
+  console.log('使用静态企业简介数据')
 }
 
-// 获取企业荣誉（重要业绩）
+// 获取企业荣誉（已使用静态数据，保留函数以便将来切换）
 const fetchAchievements = async () => {
-  loadingAchievements.value = true
-  achievementsError.value = ''
-  
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/config/achievements`)
-    const result = await response.json()
-    
-    if (result.success && result.data) {
-      achievements.value = result.data
-    } else {
-      achievementsError.value = result.message || '获取企业荣誉失败'
-    }
-  } catch (err) {
-    console.error('获取企业荣誉失败:', err)
-    achievementsError.value = '网络错误，请稍后重试'
-  } finally {
-    loadingAchievements.value = false
-  }
+  // 使用静态数据，无需API调用
+  console.log('使用静态企业荣誉数据')
 }
 
 // 格式化日期
