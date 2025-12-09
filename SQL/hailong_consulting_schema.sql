@@ -151,7 +151,7 @@ CREATE TABLE `announcements` (
 -- 3. 信息发布模块
 -- ============================================
 
--- 3.1 统一信息发布表（合并公司公告、政策法规、政策信息、通知公告）
+-- 3.1 统一信息发布表（公司公告、政策法规、政策信息、通知公告）
 CREATE TABLE `info_publications` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '信息ID',
   `type` VARCHAR(50) NOT NULL COMMENT '信息类型：COMPANY_NEWS-公司公告, POLICY_REGULATION-政策法规, POLICY_INFO-政策信息, NOTICE-通知公告',
@@ -217,7 +217,7 @@ CREATE TABLE `business_scope` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='业务范围表';
 
--- 4.3 企业资质表（企业荣誉、企业资质）
+-- 4.3 企业资质表
 CREATE TABLE `company_qualifications` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '资质ID',
   `name` VARCHAR(255) NOT NULL COMMENT '资质名称',
@@ -259,7 +259,29 @@ CREATE TABLE `major_achievements` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='重要业绩表（企业荣誉展示）';
 
--- 4.5 轮播图表
+-- 4.5 企业荣誉表
+CREATE TABLE `company_honors` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '荣誉ID',
+  `name` VARCHAR(255) NOT NULL COMMENT '荣誉名称',
+  `description` TEXT DEFAULT NULL COMMENT '荣誉描述',
+  `image_id` INT UNSIGNED DEFAULT NULL COMMENT '荣誉证书图片ID（关联attachments表）',
+  `award_organization` VARCHAR(255) DEFAULT NULL COMMENT '颁发机构',
+  `award_date` DATE DEFAULT NULL COMMENT '获奖日期',
+  `certificate_no` VARCHAR(100) DEFAULT NULL COMMENT '证书编号',
+  `honor_level` VARCHAR(50) DEFAULT NULL COMMENT '荣誉级别：国家级、省级、市级、行业级等',
+  `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
+  `status` TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
+  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX `idx_award_date` (`award_date`),
+  INDEX `idx_honor_level` (`honor_level`),
+  INDEX `idx_sort_order` (`sort_order`),
+  INDEX `idx_status` (`status`),
+  INDEX `idx_is_deleted` (`is_deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='企业荣誉表（荣誉证书展示）';
+
+-- 4.6 轮播图表
 CREATE TABLE `carousel_banners` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '轮播图ID',
   `title` VARCHAR(255) NOT NULL COMMENT '轮播图标题',
@@ -276,7 +298,7 @@ CREATE TABLE `carousel_banners` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='轮播图表';
 
--- 4.6 友情链接表
+-- 4.7 友情链接表
 CREATE TABLE `friendly_links` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '链接ID',
   `name` VARCHAR(255) NOT NULL COMMENT '链接名称',

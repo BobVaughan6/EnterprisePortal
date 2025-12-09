@@ -125,6 +125,53 @@ public class ConfigService : IConfigService
 
     #endregion
 
+    #region 企业荣誉
+
+    public async Task<IEnumerable<CompanyHonorDto>> GetAllHonorsAsync()
+    {
+        var honors = await _repository.GetAllHonorsAsync();
+        return _mapper.Map<IEnumerable<CompanyHonorDto>>(honors);
+    }
+
+    public async Task<CompanyHonorDto?> GetHonorByIdAsync(uint id)
+    {
+        var honor = await _repository.GetHonorByIdAsync(id);
+        return honor == null ? null : _mapper.Map<CompanyHonorDto>(honor);
+    }
+
+    public async Task<CompanyHonorDto> CreateHonorAsync(CreateCompanyHonorDto dto)
+    {
+        var honor = _mapper.Map<CompanyHonor>(dto);
+        var created = await _repository.AddHonorAsync(honor);
+        return _mapper.Map<CompanyHonorDto>(created);
+    }
+
+    public async Task<bool> UpdateHonorAsync(uint id, UpdateCompanyHonorDto dto)
+    {
+        var honor = await _repository.GetHonorByIdAsync(id);
+        if (honor == null) return false;
+
+        // 只更新非null的字段
+        if (dto.Name != null) honor.Name = dto.Name;
+        if (dto.Description != null) honor.Description = dto.Description;
+        if (dto.ImageId.HasValue) honor.ImageId = dto.ImageId;
+        if (dto.AwardOrganization != null) honor.AwardOrganization = dto.AwardOrganization;
+        if (dto.AwardDate.HasValue) honor.AwardDate = dto.AwardDate;
+        if (dto.CertificateNo != null) honor.CertificateNo = dto.CertificateNo;
+        if (dto.HonorLevel != null) honor.HonorLevel = dto.HonorLevel;
+        if (dto.SortOrder.HasValue) honor.SortOrder = dto.SortOrder.Value;
+        if (dto.Status.HasValue) honor.Status = (sbyte)(dto.Status.Value ? 1 : 0);
+
+        return await _repository.UpdateHonorAsync(honor);
+    }
+
+    public async Task<bool> DeleteHonorAsync(uint id)
+    {
+        return await _repository.DeleteHonorAsync(id);
+    }
+
+    #endregion
+
     #region 友情链接
 
     public async Task<IEnumerable<FriendlyLinkDto>> GetAllLinksAsync()

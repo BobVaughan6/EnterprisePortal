@@ -25,6 +25,13 @@ public interface IConfigRepository
     Task<bool> UpdateAchievementAsync(MajorAchievement achievement);
     Task<bool> DeleteAchievementAsync(uint id);
 
+    // 企业荣誉
+    Task<IEnumerable<CompanyHonor>> GetAllHonorsAsync();
+    Task<CompanyHonor?> GetHonorByIdAsync(uint id);
+    Task<CompanyHonor> AddHonorAsync(CompanyHonor honor);
+    Task<bool> UpdateHonorAsync(CompanyHonor honor);
+    Task<bool> DeleteHonorAsync(uint id);
+
     // 友情链接
     Task<IEnumerable<FriendlyLink>> GetAllLinksAsync();
     Task<FriendlyLink?> GetLinkByIdAsync(uint id);

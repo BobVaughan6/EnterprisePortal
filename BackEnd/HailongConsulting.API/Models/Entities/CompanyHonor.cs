@@ -1,0 +1,95 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HailongConsulting.API.Models.Entities;
+
+/// <summary>
+/// 企业荣誉实体
+/// </summary>
+[Table("company_honors")]
+public class CompanyHonor
+{
+    /// <summary>
+    /// 荣誉ID
+    /// </summary>
+    [Key]
+    [Column("id")]
+    public uint Id { get; set; }
+
+    /// <summary>
+    /// 荣誉名称
+    /// </summary>
+    [Column("name")]
+    [Required]
+    [MaxLength(255)]
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 荣誉描述
+    /// </summary>
+    [Column("description")]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// 荣誉证书图片ID（关联attachments表）
+    /// </summary>
+    [Column("image_id")]
+    public uint? ImageId { get; set; }
+
+    /// <summary>
+    /// 颁发机构
+    /// </summary>
+    [Column("award_organization")]
+    [MaxLength(255)]
+    public string? AwardOrganization { get; set; }
+
+    /// <summary>
+    /// 获奖日期
+    /// </summary>
+    [Column("award_date")]
+    public DateOnly? AwardDate { get; set; }
+
+    /// <summary>
+    /// 证书编号
+    /// </summary>
+    [Column("certificate_no")]
+    [MaxLength(100)]
+    public string? CertificateNo { get; set; }
+
+    /// <summary>
+    /// 荣誉级别：国家级、省级、市级、行业级等
+    /// </summary>
+    [Column("honor_level")]
+    [MaxLength(50)]
+    public string? HonorLevel { get; set; }
+
+    /// <summary>
+    /// 排序顺序
+    /// </summary>
+    [Column("sort_order")]
+    public int SortOrder { get; set; } = 0;
+
+    /// <summary>
+    /// 状态：0-禁用，1-启用
+    /// </summary>
+    [Column("status")]
+    public sbyte Status { get; set; } = 1;
+
+    /// <summary>
+    /// 软删除：0-未删除，1-已删除
+    /// </summary>
+    [Column("is_deleted")]
+    public sbyte IsDeleted { get; set; } = 0;
+
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// 更新时间
+    /// </summary>
+    [Column("updated_at")]
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+}

@@ -32,6 +32,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<BusinessScope> BusinessScopes { get; set; }
     public DbSet<CompanyQualification> CompanyQualifications { get; set; }
     public DbSet<MajorAchievement> MajorAchievements { get; set; }
+    public DbSet<CompanyHonor> CompanyHonors { get; set; }
     public DbSet<CarouselBanner> CarouselBanners { get; set; }
     public DbSet<FriendlyLink> FriendlyLinks { get; set; }
 
@@ -143,6 +144,16 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasIndex(e => e.ProjectType);
             entity.HasIndex(e => e.CompletionDate);
+            entity.HasIndex(e => e.SortOrder);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
+        });
+
+        // CompanyHonor配置
+        modelBuilder.Entity<CompanyHonor>(entity =>
+        {
+            entity.HasIndex(e => e.AwardDate);
+            entity.HasIndex(e => e.HonorLevel);
             entity.HasIndex(e => e.SortOrder);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.IsDeleted);

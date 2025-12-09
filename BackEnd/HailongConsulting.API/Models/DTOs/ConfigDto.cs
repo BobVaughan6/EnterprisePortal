@@ -182,3 +182,54 @@ public class RecordVisitDto
     public string? PageTitle { get; set; }
     public string? Referer { get; set; }
 }
+
+/// <summary>
+/// 企业荣誉DTO
+/// </summary>
+public class CompanyHonorDto
+{
+    public uint Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public uint? ImageId { get; set; }
+    public string? AwardOrganization { get; set; }
+    public DateOnly? AwardDate { get; set; }
+    public string? CertificateNo { get; set; }
+    public string? HonorLevel { get; set; }
+    public int SortOrder { get; set; }
+    public bool Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// 创建企业荣誉DTO
+/// </summary>
+public class CreateCompanyHonorDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public uint? ImageId { get; set; }
+    public string? AwardOrganization { get; set; }
+    public DateOnly? AwardDate { get; set; }
+    public string? CertificateNo { get; set; }
+    public string? HonorLevel { get; set; }
+    public int SortOrder { get; set; } = 0;
+    public bool Status { get; set; } = true;
+}
+
+/// <summary>
+/// 更新企业荣誉DTO
+/// </summary>
+public class UpdateCompanyHonorDto
+{
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public uint? ImageId { get; set; }
+    public string? AwardOrganization { get; set; }
+    public DateOnly? AwardDate { get; set; }
+    public string? CertificateNo { get; set; }
+    public string? HonorLevel { get; set; }
+    public int? SortOrder { get; set; }
+    public bool? Status { get; set; }
+}

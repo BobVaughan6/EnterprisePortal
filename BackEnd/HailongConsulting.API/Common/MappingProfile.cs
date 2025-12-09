@@ -52,6 +52,17 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeUintList(src.ImageIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+        // 企业荣誉
+        CreateMap<CompanyHonor, CompanyHonorDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1));
+        
+        CreateMap<CreateCompanyHonorDto, CompanyHonor>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
+        
+        CreateMap<UpdateCompanyHonorDto, CompanyHonor>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
         // 友情链接
         CreateMap<FriendlyLink, FriendlyLinkDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1));

@@ -285,6 +285,115 @@ public class ConfigController : ControllerBase
 
     #endregion
 
+    #region 企业荣誉管理
+
+    /// <summary>
+    /// 获取所有企业荣誉
+    /// </summary>
+    [HttpGet("honors")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CompanyHonorDto>>>> GetHonors()
+    {
+        try
+        {
+            var honors = await _configService.GetAllHonorsAsync();
+            return Ok(ApiResponse<IEnumerable<CompanyHonorDto>>.SuccessResult(honors, "获取企业荣誉列表成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取企业荣誉列表失败");
+            return StatusCode(500, ApiResponse<IEnumerable<CompanyHonorDto>>.FailResult("获取企业荣誉列表失败"));
+        }
+    }
+
+    /// <summary>
+    /// 根据ID获取企业荣誉
+    /// </summary>
+    [HttpGet("honors/{id}")]
+    public async Task<ActionResult<ApiResponse<CompanyHonorDto>>> GetHonor(uint id)
+    {
+        try
+        {
+            var honor = await _configService.GetHonorByIdAsync(id);
+            if (honor == null)
+            {
+                return NotFound(ApiResponse<CompanyHonorDto>.FailResult("企业荣誉不存在"));
+            }
+            return Ok(ApiResponse<CompanyHonorDto>.SuccessResult(honor, "获取企业荣誉成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取企业荣誉失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<CompanyHonorDto>.FailResult("获取企业荣誉失败"));
+        }
+    }
+
+    /// <summary>
+    /// 创建企业荣誉
+    /// </summary>
+    [HttpPost("honors")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<CompanyHonorDto>>> CreateHonor([FromBody] CreateCompanyHonorDto dto)
+    {
+        try
+        {
+            var honor = await _configService.CreateHonorAsync(dto);
+            return Ok(ApiResponse<CompanyHonorDto>.SuccessResult(honor, "创建企业荣誉成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "创建企业荣誉失败");
+            return StatusCode(500, ApiResponse<CompanyHonorDto>.FailResult("创建企业荣誉失败"));
+        }
+    }
+
+    /// <summary>
+    /// 更新企业荣誉
+    /// </summary>
+    [HttpPut("honors/{id}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<bool>>> UpdateHonor(uint id, [FromBody] UpdateCompanyHonorDto dto)
+    {
+        try
+        {
+            var result = await _configService.UpdateHonorAsync(id, dto);
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailResult("企业荣誉不存在"));
+            }
+            return Ok(ApiResponse<bool>.SuccessResult(true, "更新企业荣誉成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "更新企业荣誉失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<bool>.FailResult("更新企业荣誉失败"));
+        }
+    }
+
+    /// <summary>
+    /// 删除企业荣誉
+    /// </summary>
+    [HttpDelete("honors/{id}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteHonor(uint id)
+    {
+        try
+        {
+            var result = await _configService.DeleteHonorAsync(id);
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailResult("企业荣誉不存在"));
+            }
+            return Ok(ApiResponse<bool>.SuccessResult(true, "删除企业荣誉成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "删除企业荣誉失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<bool>.FailResult("删除企业荣誉失败"));
+        }
+    }
+
+    #endregion
+
     #region 友情链接管理
 
     /// <summary>

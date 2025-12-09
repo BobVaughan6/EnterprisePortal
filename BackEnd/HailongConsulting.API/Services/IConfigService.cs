@@ -25,6 +25,13 @@ public interface IConfigService
     Task<bool> UpdateAchievementAsync(uint id, UpdateMajorAchievementDto dto);
     Task<bool> DeleteAchievementAsync(uint id);
 
+    // 企业荣誉
+    Task<IEnumerable<CompanyHonorDto>> GetAllHonorsAsync();
+    Task<CompanyHonorDto?> GetHonorByIdAsync(uint id);
+    Task<CompanyHonorDto> CreateHonorAsync(CreateCompanyHonorDto dto);
+    Task<bool> UpdateHonorAsync(uint id, UpdateCompanyHonorDto dto);
+    Task<bool> DeleteHonorAsync(uint id);
+
     // 友情链接
     Task<IEnumerable<FriendlyLinkDto>> GetAllLinksAsync();
     Task<FriendlyLinkDto?> GetLinkByIdAsync(uint id);

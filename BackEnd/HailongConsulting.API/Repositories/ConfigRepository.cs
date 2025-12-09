@@ -133,6 +133,47 @@ public class ConfigRepository : IConfigRepository
 
     #endregion
 
+    #region 企业荣誉
+
+    public async Task<IEnumerable<CompanyHonor>> GetAllHonorsAsync()
+    {
+        return await _context.Set<CompanyHonor>()
+            .Where(h => h.IsDeleted == 0)
+            .OrderBy(h => h.SortOrder)
+            .ThenByDescending(h => h.AwardDate)
+            .ToListAsync();
+    }
+
+    public async Task<CompanyHonor?> GetHonorByIdAsync(uint id)
+    {
+        return await _context.Set<CompanyHonor>()
+            .FirstOrDefaultAsync(h => h.Id == id && h.IsDeleted == 0);
+    }
+
+    public async Task<CompanyHonor> AddHonorAsync(CompanyHonor honor)
+    {
+        await _context.Set<CompanyHonor>().AddAsync(honor);
+        await _context.SaveChangesAsync();
+        return honor;
+    }
+
+    public async Task<bool> UpdateHonorAsync(CompanyHonor honor)
+    {
+        _context.Set<CompanyHonor>().Update(honor);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteHonorAsync(uint id)
+    {
+        var honor = await GetHonorByIdAsync(id);
+        if (honor == null) return false;
+
+        honor.IsDeleted = 1;
+        return await UpdateHonorAsync(honor);
+    }
+
+    #endregion
+
     #region 友情链接
 
     public async Task<IEnumerable<FriendlyLink>> GetAllLinksAsync()
