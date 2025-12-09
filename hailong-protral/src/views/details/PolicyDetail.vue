@@ -65,28 +65,12 @@
                 </span>
               </div>
 
-              <div v-if="policy.source" class="flex items-center gap-2 text-sm text-gray-600">
-                <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                <span class="font-medium">来源：</span>
-                <span>{{ policy.source }}</span>
-              </div>
-
               <div class="flex items-center gap-2 text-sm text-gray-600">
                 <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span class="font-medium">发布时间：</span>
                 <span>{{ policy.publishDate }}</span>
-              </div>
-
-              <div v-if="policy.effectiveDate" class="flex items-center gap-2 text-sm text-gray-600">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="font-medium">生效时间：</span>
-                <span>{{ policy.effectiveDate }}</span>
               </div>
 
               <div class="flex items-center gap-2 text-sm text-gray-600">
@@ -96,14 +80,6 @@
                 </svg>
                 <span class="font-medium">浏览：</span>
                 <span>{{ policy.views || 0 }} 次</span>
-              </div>
-
-              <div v-if="policy.downloads" class="flex items-center gap-2 text-sm text-gray-600">
-                <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                <span class="font-medium">下载：</span>
-                <span>{{ policy.downloads }} 次</span>
               </div>
             </div>
 
@@ -132,40 +108,6 @@
               法规正文
             </h2>
             <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed" v-html="policy.content"></div>
-          </div>
-
-          <!-- 文件下载 -->
-          <div v-if="policy.fileUrl" class="bg-gradient-to-r from-hailong-primary/5 to-hailong-secondary/5 rounded-xl p-8 mb-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              文件下载
-            </h2>
-            <a
-              :href="policy.fileUrl"
-              target="_blank"
-              class="flex items-center justify-between p-6 bg-white rounded-lg hover:shadow-lg transition-all group"
-            >
-              <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
-                  <svg class="w-7 h-7 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="text-lg font-bold text-gray-900 group-hover:text-hailong-primary transition-colors">
-                    {{ policy.title }}.pdf
-                  </div>
-                  <div class="text-sm text-gray-500 mt-1">
-                    点击下载完整文件
-                  </div>
-                </div>
-              </div>
-              <svg class="w-6 h-6 text-gray-400 group-hover:text-hailong-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-            </a>
           </div>
 
           <!-- 标签 -->

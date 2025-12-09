@@ -95,76 +95,6 @@
             <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed" v-html="business.detailContent"></div>
           </div>
 
-          <!-- 服务流程 -->
-          <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-3">
-              <div class="w-10 h-10 bg-hailong-cyan/10 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-hailong-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              服务流程
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div
-                v-for="(step, index) in serviceSteps"
-                :key="index"
-                class="relative"
-              >
-                <div class="flex flex-col items-center text-center">
-                  <div class="w-16 h-16 bg-gradient-to-br from-hailong-primary to-hailong-secondary rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg">
-                    {{ index + 1 }}
-                  </div>
-                  <h3 class="text-lg font-bold text-gray-900 mb-2">{{ step.title }}</h3>
-                  <p class="text-sm text-gray-600">{{ step.description }}</p>
-                </div>
-                <!-- 连接线 -->
-                <div v-if="index < serviceSteps.length - 1" class="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-hailong-primary to-hailong-secondary -translate-x-1/2"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 成功案例 -->
-          <div v-if="cases.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-3">
-              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
-              成功案例
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div
-                v-for="caseItem in cases"
-                :key="caseItem.id"
-                class="p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100 hover:shadow-lg transition-all"
-              >
-                <h3 class="text-lg font-bold text-gray-900 mb-3">{{ caseItem.name }}</h3>
-                <div class="space-y-2 text-sm text-gray-600">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span>客户：{{ caseItem.client }}</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>金额：{{ caseItem.amount }}</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>时间：{{ caseItem.date }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- 联系咨询 -->
           <div class="bg-gradient-to-r from-hailong-primary/10 via-hailong-secondary/10 to-hailong-cyan/10 rounded-xl p-8 mb-8">
             <div class="text-center">
@@ -225,33 +155,26 @@ const route = useRoute()
 const business = ref(null)
 const loading = ref(true)
 
-// 服务流程
-const serviceSteps = ref([
-  { title: '需求沟通', description: '了解客户需求，制定初步方案' },
-  { title: '方案设计', description: '制定详细服务方案和计划' },
-  { title: '项目实施', description: '按计划执行，确保质量' },
-  { title: '验收交付', description: '完成验收，提供后续服务' }
-])
-
-// 成功案例
-const cases = ref([])
-
 // 加载业务详情
 const loadBusinessDetail = async () => {
   loading.value = true
   try {
     const id = route.params.id
     
+    // TODO: 替换为实际的API调用
+    // const response = await fetch(`/api/config/business-scope/${id}`)
+    // business.value = await response.json()
+    
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 500))
     
-    // 模拟数据
+    // 模拟数据 - 对应数据库字段
     business.value = {
       id: id,
-      name: '工程造价咨询',
-      description: '为建设项目提供全过程造价管理服务',
-      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=600&fit=crop',
-      features: [
+      name: '工程造价咨询', // name
+      description: '为建设项目提供全过程造价管理服务', // description
+      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=600&fit=crop', // 从image_id获取
+      features: [ // features (JSON数组)
         '拥有专业的造价工程师团队，具备丰富的项目经验',
         '采用先进的造价管理软件，提高工作效率和准确性',
         '提供全过程造价咨询服务，从项目立项到竣工结算',
@@ -283,40 +206,8 @@ const loadBusinessDetail = async () => {
         
         <h3>服务承诺</h3>
         <p>我们承诺为客户提供专业、高效、优质的造价咨询服务，严格遵守职业道德和行业规范，维护客户合法权益，为客户创造价值。</p>
-      `
+      ` // content (富文本)
     }
-
-    // 加载成功案例
-    cases.value = [
-      {
-        id: 1,
-        name: '某市医院建设项目造价咨询',
-        client: '某市卫生局',
-        amount: '¥2.5亿',
-        date: '2024年'
-      },
-      {
-        id: 2,
-        name: '某高速公路工程造价审核',
-        client: '某省交通厅',
-        amount: '¥15亿',
-        date: '2024年'
-      },
-      {
-        id: 3,
-        name: '某学校改扩建工程预算编制',
-        client: '某市教育局',
-        amount: '¥8500万',
-        date: '2024年'
-      },
-      {
-        id: 4,
-        name: '某住宅小区工程结算审核',
-        client: '某房地产公司',
-        amount: '¥3.2亿',
-        date: '2023年'
-      }
-    ]
   } catch (error) {
     console.error('加载业务详情失败:', error)
     business.value = null
