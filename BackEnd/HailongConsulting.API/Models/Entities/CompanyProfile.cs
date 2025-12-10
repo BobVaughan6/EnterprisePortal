@@ -14,7 +14,7 @@ public class CompanyProfile
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 简介标题

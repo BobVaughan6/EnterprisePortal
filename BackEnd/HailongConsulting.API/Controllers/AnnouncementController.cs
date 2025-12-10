@@ -54,7 +54,7 @@ public class AnnouncementController : ControllerBase
     /// <param name="dto">公告更新DTO</param>
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<AnnouncementDto>>> UpdateAnnouncement(uint id, [FromBody] UpdateAnnouncementDto dto)
+    public async Task<ActionResult<ApiResponse<AnnouncementDto>>> UpdateAnnouncement(int id, [FromBody] UpdateAnnouncementDto dto)
     {
         try
         {
@@ -77,7 +77,7 @@ public class AnnouncementController : ControllerBase
     /// </summary>
     /// <param name="id">公告ID</param>
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<AnnouncementDto>>> GetAnnouncement(uint id)
+    public async Task<ActionResult<ApiResponse<AnnouncementDto>>> GetAnnouncement(int id)
     {
         try
         {
@@ -124,7 +124,7 @@ public class AnnouncementController : ControllerBase
     /// <param name="id">公告ID</param>
     [HttpDelete("{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteAnnouncement(uint id)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteAnnouncement(int id)
     {
         try
         {

@@ -20,7 +20,7 @@ public class SystemLog
     /// 操作用户ID
     /// </summary>
     [Column("user_id")]
-    public uint? UserId { get; set; }
+    public int? UserId { get; set; }
 
     /// <summary>
     /// 操作用户名

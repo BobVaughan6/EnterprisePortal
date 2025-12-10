@@ -99,7 +99,7 @@ import {
   LegendComponent,
   GridComponent
 } from 'echarts/components'
-import { getStatisticsOverview } from '@/api/home'
+import { statisticsApi } from '@/api'
 import { getPieChartOption, getBarChartOption } from '@/utils/chartOptions'
 import { ElMessage } from 'element-plus'
 
@@ -158,7 +158,7 @@ const getProjectTypeCount = (type) => {
  */
 const loadStatistics = async () => {
   try {
-    const response = await getStatisticsOverview()
+    const response = await statisticsApi.getOverview()
     if (response.success) {
       statistics.value = response.data
     } else {

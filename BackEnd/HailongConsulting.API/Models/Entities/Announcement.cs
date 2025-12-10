@@ -15,7 +15,7 @@ public class Announcement
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 公告标题
@@ -127,7 +127,7 @@ public class Announcement
     /// 浏览次数
     /// </summary>
     [Column("view_count")]
-    public uint ViewCount { get; set; } = 0;
+    public int ViewCount { get; set; } = 0;
 
     /// <summary>
     /// 附件ID列表（JSON数组格式，如：[1,2,3]）

@@ -61,16 +61,16 @@ public interface IVisitStatisticService
     Task RecordVisitAsync(string pageUrl, string? pageTitle, string? visitorIp, string? userAgent, string? referer);
     
     // 增加公告浏览次数（同时更新业务表和统计表）
-    Task IncrementAnnouncementViewAsync(uint announcementId, HttpRequest request);
+    Task IncrementAnnouncementViewAsync(int announcementId, HttpRequest request);
     
     // 增加信息发布浏览次数（同时更新业务表和统计表）
-    Task IncrementPublicationViewAsync(uint publicationId, HttpRequest request);
+    Task IncrementPublicationViewAsync(int publicationId, HttpRequest request);
     
     // 获取指定日期范围的访问统计
     Task<IEnumerable<VisitStatistic>> GetVisitStatisticsAsync(DateOnly startDate, DateOnly endDate);
     
     // 获取热门页面统计
-    Task<IEnumerable<(string PageUrl, string? PageTitle, uint TotalViews)>> GetTopPagesAsync(int topCount = 10, int days = 30);
+    Task<IEnumerable<(string PageUrl, string? PageTitle, int TotalViews)>> GetTopPagesAsync(int topCount = 10, int days = 30);
 }
 ```
 
@@ -79,7 +79,7 @@ public interface IVisitStatisticService
 #### AnnouncementController
 ```csharp
 [HttpGet("{id}")]
-public async Task<ActionResult<ApiResponse<AnnouncementDto>>> GetAnnouncement(uint id)
+public async Task<ActionResult<ApiResponse<AnnouncementDto>>> GetAnnouncement(int id)
 {
     var announcement = await _announcementService.GetByIdAsync(id);
     if (announcement == null)
@@ -97,7 +97,7 @@ public async Task<ActionResult<ApiResponse<AnnouncementDto>>> GetAnnouncement(ui
 #### InfoPublicationController
 ```csharp
 [HttpGet("{id}")]
-public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> GetInfoPublication(uint id)
+public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> GetInfoPublication(int id)
 {
     var publication = await _infoPublicationService.GetByIdAsync(id);
     if (publication == null)

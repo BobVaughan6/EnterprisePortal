@@ -8,7 +8,7 @@ public class InfoPublicationDto
     /// <summary>
     /// 信息ID
     /// </summary>
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 信息类型：COMPANY_NEWS-公司公告, POLICY_REGULATION-政策法规, POLICY_INFO-政策信息, NOTICE-通知公告
@@ -38,7 +38,7 @@ public class InfoPublicationDto
     /// <summary>
     /// 封面图片ID
     /// </summary>
-    public uint? CoverImageId { get; set; }
+    public int? CoverImageId { get; set; }
 
     /// <summary>
     /// 封面图片信息
@@ -63,12 +63,12 @@ public class InfoPublicationDto
     /// <summary>
     /// 浏览次数
     /// </summary>
-    public uint ViewCount { get; set; }
+    public int ViewCount { get; set; }
 
     /// <summary>
     /// 附件ID列表
     /// </summary>
-    public List<uint>? AttachmentIds { get; set; }
+    public List<int>? AttachmentIds { get; set; }
 
     /// <summary>
     /// 附件列表
@@ -106,11 +106,11 @@ public class CreateInfoPublicationDto
     public string Title { get; set; } = string.Empty;
     public string? Summary { get; set; }
     public string Content { get; set; } = string.Empty;
-    public uint? CoverImageId { get; set; }
+    public int? CoverImageId { get; set; }
     public string? Author { get; set; }
     public string? Publisher { get; set; }
     public DateTime? PublishTime { get; set; }
-    public List<uint>? AttachmentIds { get; set; }
+    public List<int>? AttachmentIds { get; set; }
     public bool IsTop { get; set; }
     public int Status { get; set; } = 1;
 }
@@ -124,11 +124,11 @@ public class UpdateInfoPublicationDto
     public string? Title { get; set; }
     public string? Summary { get; set; }
     public string? Content { get; set; }
-    public uint? CoverImageId { get; set; }
+    public int? CoverImageId { get; set; }
     public string? Author { get; set; }
     public string? Publisher { get; set; }
     public DateTime? PublishTime { get; set; }
-    public List<uint>? AttachmentIds { get; set; }
+    public List<int>? AttachmentIds { get; set; }
     public bool? IsTop { get; set; }
     public int? Status { get; set; }
 }

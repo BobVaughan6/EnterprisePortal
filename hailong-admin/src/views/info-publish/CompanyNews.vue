@@ -62,19 +62,77 @@
     >
       <el-form :model="formData" label-width="100px">
         <el-form-item label="标题" required>
-          <el-input v-model="formData.title" placeholder="请输入标题" />
-        </el-form-item>
-        <el-form-item label="发布时间">
-          <el-date-picker 
-            v-model="formData.publishTime" 
-            type="datetime" 
-            placeholder="选择日期时间"
-            value-format="YYYY-MM-DD HH:mm:ss"
+          <el-input
+            v-model="formData.title"
+            placeholder="请输入标题（最多500个字符）"
+            maxlength="500"
+            show-word-limit
           />
         </el-form-item>
-        <el-form-item label="是否置顶">
-          <el-switch v-model="formData.isTop" />
+        
+        <el-form-item label="摘要">
+          <el-input
+            v-model="formData.summary"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入摘要（最多500个字符）"
+            maxlength="500"
+            show-word-limit
+          />
         </el-form-item>
+        
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="作者">
+              <el-input
+                v-model="formData.author"
+                placeholder="请输入作者"
+                maxlength="100"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="发布人">
+              <el-input
+                v-model="formData.publisher"
+                placeholder="请输入发布人"
+                maxlength="100"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="发布时间" required>
+              <el-date-picker
+                v-model="formData.publishTime"
+                type="datetime"
+                placeholder="选择发布时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+                style="width: 100%;"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="是否置顶">
+              <el-switch
+                v-model="formData.isTop"
+                :active-value="1"
+                :inactive-value="0"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态">
+              <el-radio-group v-model="formData.status">
+                <el-radio :label="1">启用</el-radio>
+                <el-radio :label="0">禁用</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
         <el-form-item label="内容" required>
           <RichEditor v-model="formData.content" />
         </el-form-item>
@@ -91,13 +149,25 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { infoPublishApi } from '@/api'
+import { infoPublicationApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 
 const route = useRoute()
 
-// 当前分类
-const category = computed(() => route.meta.category || 'company_news')
+// 信息类型映射
+const typeMap = {
+  'company-news': 'COMPANY_NEWS',
+  'policies': 'POLICY_REGULATION',
+  'policy-info': 'POLICY_INFO',
+  'notices': 'NOTICE'
+}
+
+// 当前信息类型
+const infoType = computed(() => {
+  const pathParts = route.path.split('/')
+  const lastPart = pathParts[pathParts.length - 1]
+  return typeMap[lastPart] || 'COMPANY_NEWS'
+})
 
 // 页面标题
 const pageTitle = computed(() => route.meta.title || '信息发布')
@@ -125,11 +195,19 @@ const submitting = ref(false)
 
 // 表单数据
 const formData = reactive({
+  id: null,
+  type: '',
   category: '',
   title: '',
+  summary: '',
   content: '',
+  author: '',
+  publisher: '',
   publishTime: null,
-  isTop: false
+  coverImageId: null,
+  attachmentIds: [],
+  isTop: 0,
+  status: 1
 })
 
 /**
@@ -139,20 +217,23 @@ const loadData = async () => {
   loading.value = true
   try {
     const params = {
-      category: category.value,
-      keyword: searchForm.keyword,
-      pageIndex: pagination.pageIndex,
+      type: infoType.value,
+      keyword: searchForm.keyword || undefined,
+      page: pagination.pageIndex,
       pageSize: pagination.pageSize
     }
     
-    const res = await infoPublishApi.getPagedList(params)
+    const res = await infoPublicationApi.getInfoPublicationList(params)
     
     if (res.success && res.data) {
       tableData.value = res.data.items || []
       pagination.total = res.data.totalCount || 0
+    } else {
+      ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
     console.error('加载数据失败:', error)
+    ElMessage.error('加载数据失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -180,11 +261,19 @@ const handleReset = () => {
 const handleAdd = () => {
   isEdit.value = false
   Object.assign(formData, {
-    category: category.value,
+    id: null,
+    type: infoType.value,
+    category: '',
     title: '',
+    summary: '',
     content: '',
-    publishTime: null,
-    isTop: false
+    author: '',
+    publisher: '',
+    publishTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    coverImageId: null,
+    attachmentIds: [],
+    isTop: 0,
+    status: 1
   })
   dialogVisible.value = true
 }
@@ -195,13 +284,30 @@ const handleAdd = () => {
 const handleEdit = async (row) => {
   isEdit.value = true
   try {
-    const res = await infoPublishApi.getById(row.id, category.value)
+    const res = await infoPublicationApi.getInfoPublicationDetail(row.id)
     if (res.success && res.data) {
-      Object.assign(formData, res.data)
+      Object.assign(formData, {
+        id: res.data.id,
+        type: res.data.type,
+        category: res.data.category || '',
+        title: res.data.title,
+        summary: res.data.summary || '',
+        content: res.data.content,
+        author: res.data.author || '',
+        publisher: res.data.publisher || '',
+        publishTime: res.data.publishTime,
+        coverImageId: res.data.coverImageId,
+        attachmentIds: res.data.attachmentIds || [],
+        isTop: res.data.isTop,
+        status: res.data.status
+      })
       dialogVisible.value = true
+    } else {
+      ElMessage.error(res.message || '获取详情失败')
     }
   } catch (error) {
-    ElMessage.error('获取详情失败')
+    console.error('获取详情失败:', error)
+    ElMessage.error('获取详情失败，请稍后重试')
   }
 }
 
@@ -210,20 +316,31 @@ const handleEdit = async (row) => {
  */
 const handleDelete = async (row) => {
   try {
-    await ElMessageBox.confirm('确定要删除该信息吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    await ElMessageBox.confirm(
+      `确定要删除信息"${row.title}"吗？删除后将无法恢复。`,
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
     
-    const res = await infoPublishApi.delete(row.id, category.value)
+    const res = await infoPublicationApi.deleteInfoPublication(row.id)
     if (res.success) {
-      ElMessage.success('删除成功')
+      ElMessage.success(res.message || '删除成功')
+      // 如果当前页只有一条数据且不是第一页，则返回上一页
+      if (tableData.value.length === 1 && pagination.pageIndex > 1) {
+        pagination.pageIndex--
+      }
       loadData()
+    } else {
+      ElMessage.error(res.message || '删除失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败，请稍后重试')
     }
   }
 }
@@ -232,31 +349,45 @@ const handleDelete = async (row) => {
  * 提交表单
  */
 const handleSubmit = async () => {
+  if (!formData.title || !formData.content) {
+    ElMessage.warning('请填写标题和内容')
+    return
+  }
+  
   submitting.value = true
   try {
-    const formDataObj = new FormData()
-    formDataObj.append('category', formData.category)
-    formDataObj.append('title', formData.title)
-    formDataObj.append('content', formData.content)
-    formDataObj.append('isTop', formData.isTop)
-    if (formData.publishTime) {
-      formDataObj.append('publishTime', formData.publishTime)
+    const submitData = {
+      type: formData.type,
+      category: formData.category || null,
+      title: formData.title,
+      summary: formData.summary || null,
+      content: formData.content,
+      author: formData.author || null,
+      publisher: formData.publisher || null,
+      publishTime: formData.publishTime,
+      coverImageId: formData.coverImageId,
+      attachmentIds: formData.attachmentIds,
+      isTop: formData.isTop ? 1 : 0,
+      status: formData.status
     }
     
     let res
     if (isEdit.value) {
-      res = await infoPublishApi.update(formData.id, category.value, formDataObj)
+      res = await infoPublicationApi.updateInfoPublication(formData.id, submitData)
     } else {
-      res = await infoPublishApi.create(formDataObj)
+      res = await infoPublicationApi.createInfoPublication(submitData)
     }
     
     if (res.success) {
-      ElMessage.success(isEdit.value ? '更新成功' : '发布成功')
+      ElMessage.success(res.message || (isEdit.value ? '更新成功' : '发布成功'))
       dialogVisible.value = false
       loadData()
+    } else {
+      ElMessage.error(res.message || (isEdit.value ? '更新失败' : '发布失败'))
     }
   } catch (error) {
-    ElMessage.error(isEdit.value ? '更新失败' : '发布失败')
+    console.error('提交失败:', error)
+    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '发布失败，请稍后重试')
   } finally {
     submitting.value = false
   }

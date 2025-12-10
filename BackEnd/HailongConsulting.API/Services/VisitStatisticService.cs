@@ -43,7 +43,7 @@ public class VisitStatisticService : IVisitStatisticService
         }
     }
 
-    public async Task IncrementAnnouncementViewAsync(uint announcementId, HttpRequest request)
+    public async Task IncrementAnnouncementViewAsync(int announcementId, HttpRequest request)
     {
         try
         {
@@ -52,7 +52,7 @@ public class VisitStatisticService : IVisitStatisticService
 
             // 2. 记录详细的访问统计
             var pageUrl = $"/api/announcements/{announcementId}";
-            var announcement = await _announcementRepository.GetByIdAsync((int)announcementId);
+            var announcement = await _announcementRepository.GetByIdAsync(announcementId);
             var pageTitle = announcement?.Title;
             var visitorIp = GetClientIpAddress(request);
             var userAgent = request.Headers["User-Agent"].ToString();
@@ -70,7 +70,7 @@ public class VisitStatisticService : IVisitStatisticService
         }
     }
 
-    public async Task IncrementPublicationViewAsync(uint publicationId, HttpRequest request)
+    public async Task IncrementPublicationViewAsync(int publicationId, HttpRequest request)
     {
         try
         {
@@ -79,7 +79,7 @@ public class VisitStatisticService : IVisitStatisticService
 
             // 2. 记录详细的访问统计
             var pageUrl = $"/api/info-publications/{publicationId}";
-            var publication = await _infoPublicationRepository.GetByIdAsync((int)publicationId);
+            var publication = await _infoPublicationRepository.GetByIdAsync(publicationId);
             var pageTitle = publication?.Title;
             var visitorIp = GetClientIpAddress(request);
             var userAgent = request.Headers["User-Agent"].ToString();
@@ -110,7 +110,7 @@ public class VisitStatisticService : IVisitStatisticService
         }
     }
 
-    public async Task<IEnumerable<(string PageUrl, string? PageTitle, uint TotalViews)>> GetTopPagesAsync(int topCount = 10, int days = 30)
+    public async Task<IEnumerable<(string PageUrl, string? PageTitle, int TotalViews)>> GetTopPagesAsync(int topCount = 10, int days = 30)
     {
         try
         {

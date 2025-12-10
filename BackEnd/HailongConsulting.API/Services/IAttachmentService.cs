@@ -15,25 +15,25 @@ public interface IAttachmentService
     /// <summary>
     /// 根据ID获取附件
     /// </summary>
-    Task<AttachmentDto?> GetByIdAsync(uint id);
+    Task<AttachmentDto?> GetByIdAsync(int id);
     
     /// <summary>
     /// 根据关联类型和ID获取附件列表
     /// </summary>
-    Task<IEnumerable<AttachmentDto>> GetByRelatedAsync(string relatedType, uint relatedId);
+    Task<IEnumerable<AttachmentDto>> GetByRelatedAsync(string relatedType, int relatedId);
     
     /// <summary>
     /// 根据ID列表获取附件
     /// </summary>
-    Task<IEnumerable<AttachmentDto>> GetByIdsAsync(IEnumerable<uint> ids);
+    Task<IEnumerable<AttachmentDto>> GetByIdsAsync(IEnumerable<int> ids);
     
     /// <summary>
     /// 删除附件
     /// </summary>
-    Task<bool> DeleteAsync(uint id);
+    Task<bool> DeleteAsync(int id);
     
     /// <summary>
     /// 批量删除附件
     /// </summary>
-    Task<bool> DeleteRangeAsync(IEnumerable<uint> ids);
+    Task<bool> DeleteRangeAsync(IEnumerable<int> ids);
 }

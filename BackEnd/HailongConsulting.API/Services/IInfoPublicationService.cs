@@ -16,12 +16,12 @@ public interface IInfoPublicationService
     /// <summary>
     /// 更新信息发布
     /// </summary>
-    Task<InfoPublicationDto?> UpdateAsync(uint id, UpdateInfoPublicationDto updateDto);
+    Task<InfoPublicationDto?> UpdateAsync(int id, UpdateInfoPublicationDto updateDto);
     
     /// <summary>
     /// 根据ID获取信息发布
     /// </summary>
-    Task<InfoPublicationDto?> GetByIdAsync(uint id);
+    Task<InfoPublicationDto?> GetByIdAsync(int id);
     
     /// <summary>
     /// 分页查询信息发布
@@ -31,10 +31,10 @@ public interface IInfoPublicationService
     /// <summary>
     /// 删除信息发布
     /// </summary>
-    Task<bool> DeleteAsync(uint id);
+    Task<bool> DeleteAsync(int id);
     
     /// <summary>
     /// 增加浏览次数
     /// </summary>
-    Task IncrementViewCountAsync(uint id);
+    Task IncrementViewCountAsync(int id);
 }

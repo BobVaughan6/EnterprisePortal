@@ -10,20 +10,20 @@ public interface IAttachmentRepository : IRepository<Attachment>
     /// <summary>
     /// 根据关联类型和关联ID获取附件列表
     /// </summary>
-    Task<IEnumerable<Attachment>> GetByRelatedAsync(string relatedType, uint relatedId);
+    Task<IEnumerable<Attachment>> GetByRelatedAsync(string relatedType, int relatedId);
     
     /// <summary>
     /// 根据ID列表获取附件
     /// </summary>
-    Task<IEnumerable<Attachment>> GetByIdsAsync(IEnumerable<uint> ids);
+    Task<IEnumerable<Attachment>> GetByIdsAsync(IEnumerable<int> ids);
     
     /// <summary>
     /// 软删除附件
     /// </summary>
-    Task SoftDeleteAsync(uint id);
+    Task SoftDeleteAsync(int id);
     
     /// <summary>
     /// 批量软删除附件
     /// </summary>
-    Task SoftDeleteRangeAsync(IEnumerable<uint> ids);
+    Task SoftDeleteRangeAsync(IEnumerable<int> ids);
 }

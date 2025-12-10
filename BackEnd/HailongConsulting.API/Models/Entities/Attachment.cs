@@ -14,7 +14,7 @@ public class Attachment
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 文件名称
@@ -78,13 +78,13 @@ public class Attachment
     /// 关联记录ID
     /// </summary>
     [Column("related_id")]
-    public uint? RelatedId { get; set; }
+    public int? RelatedId { get; set; }
 
     /// <summary>
     /// 上传用户ID
     /// </summary>
     [Column("upload_user_id")]
-    public uint? UploadUserId { get; set; }
+    public int? UploadUserId { get; set; }
 
     /// <summary>
     /// 软删除：0-未删除，1-已删除

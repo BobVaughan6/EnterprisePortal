@@ -14,7 +14,7 @@ public class CarouselBanner
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 轮播图标题
@@ -36,7 +36,7 @@ public class CarouselBanner
     /// </summary>
     [Column("image_id")]
     [Required]
-    public uint ImageId { get; set; }
+    public int ImageId { get; set; }
 
     /// <summary>
     /// 跳转链接

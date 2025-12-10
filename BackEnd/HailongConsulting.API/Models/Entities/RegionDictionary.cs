@@ -14,7 +14,7 @@ public class RegionDictionary
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 区域代码（如：410000、410100、410101）

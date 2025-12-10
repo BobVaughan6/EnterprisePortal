@@ -8,7 +8,7 @@ public class AttachmentDto
     /// <summary>
     /// 附件ID
     /// </summary>
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 文件名称
@@ -53,12 +53,12 @@ public class AttachmentDto
     /// <summary>
     /// 关联记录ID
     /// </summary>
-    public uint? RelatedId { get; set; }
+    public int? RelatedId { get; set; }
 
     /// <summary>
     /// 上传用户ID
     /// </summary>
-    public uint? UploadUserId { get; set; }
+    public int? UploadUserId { get; set; }
 
     /// <summary>
     /// 创建时间
@@ -73,5 +73,5 @@ public class UploadAttachmentDto
 {
     public string? Category { get; set; }
     public string? RelatedType { get; set; }
-    public uint? RelatedId { get; set; }
+    public int? RelatedId { get; set; }
 }

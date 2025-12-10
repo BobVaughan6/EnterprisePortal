@@ -21,12 +21,6 @@ const routes = [
         meta: { title: '数据看板', icon: 'DataAnalysis' }
       },
       {
-        path: '/home',
-        name: 'Home',
-        component: () => import('@/views/Home.vue'),
-        meta: { title: '首页', icon: 'Odometer' }
-      },
-      {
         path: '/gov-procurement',
         name: 'GovProcurement',
         component: () => import('@/views/announcements/GovProcurement.vue'),
@@ -48,27 +42,27 @@ const routes = [
             path: '/info-publish/company-news',
             name: 'CompanyNews',
             component: () => import('@/views/info-publish/CompanyNews.vue'),
-            meta: { title: '公司公告', category: 'company_news' }
+            meta: { title: '公司公告' }
           },
           {
-            path: '/info-publish/policies',
-            name: 'Policies',
-            component: () => import('@/views/info-publish/Policies.vue'),
-            meta: { title: '政策法规', category: 'policies' }
+            path: '/info-publish/policy-regulation',
+            name: 'PolicyRegulation',
+            component: () => import('@/views/info-publish/PolicyRegulation.vue'),
+            meta: { title: '政策法规' }
           },
           {
-            path: '/info-publish/policy-info',
-            name: 'PolicyInfo',
-            component: () => import('@/views/info-publish/PolicyInfo.vue'),
-            meta: { title: '政策信息', category: 'policy_info' }
-          },
-          {
-            path: '/info-publish/notices',
-            name: 'Notices',
-            component: () => import('@/views/info-publish/Notices.vue'),
-            meta: { title: '通知公告', category: 'notices' }
+            path: '/info-publish/notice',
+            name: 'Notice',
+            component: () => import('@/views/info-publish/Notice.vue'),
+            meta: { title: '通知公告' }
           }
         ]
+      },
+      {
+        path: '/attachments',
+        name: 'Attachments',
+        component: () => import('@/views/attachments/AttachmentList.vue'),
+        meta: { title: '附件管理', icon: 'FolderOpened' }
       },
       {
         path: '/config',
@@ -89,10 +83,28 @@ const routes = [
             meta: { title: '企业信息' }
           },
           {
+            path: '/config/business-scope',
+            name: 'BusinessScope',
+            component: () => import('@/views/config/BusinessScope.vue'),
+            meta: { title: '业务范围' }
+          },
+          {
+            path: '/config/qualifications',
+            name: 'Qualifications',
+            component: () => import('@/views/config/Qualifications.vue'),
+            meta: { title: '资质管理' }
+          },
+          {
+            path: '/config/honors',
+            name: 'Honors',
+            component: () => import('@/views/config/Honors.vue'),
+            meta: { title: '荣誉管理' }
+          },
+          {
             path: '/config/achievements',
             name: 'Achievements',
             component: () => import('@/views/config/Achievements.vue'),
-            meta: { title: '业绩展示' }
+            meta: { title: '重大业绩' }
           },
           {
             path: '/config/friendly-links',
@@ -105,9 +117,27 @@ const routes = [
       {
         path: '/system',
         name: 'System',
-        redirect: '/system/change-password',
+        redirect: '/system/users',
         meta: { title: '系统管理', icon: 'Tools' },
         children: [
+          {
+            path: '/system/users',
+            name: 'Users',
+            component: () => import('@/views/system/Users.vue'),
+            meta: { title: '用户管理' }
+          },
+          {
+            path: '/system/logs',
+            name: 'SystemLogs',
+            component: () => import('@/views/system/SystemLogs.vue'),
+            meta: { title: '系统日志' }
+          },
+          {
+            path: '/system/regions',
+            name: 'Regions',
+            component: () => import('@/views/system/Regions.vue'),
+            meta: { title: '地区字典' }
+          },
           {
             path: '/system/change-password',
             name: 'ChangePassword',
@@ -117,6 +147,11 @@ const routes = [
         ]
       }
     ]
+  },
+  // 兼容旧路由 - 重定向到 dashboard
+  {
+    path: '/home',
+    redirect: '/dashboard'
   }
 ]
 
@@ -137,8 +172,8 @@ router.beforeEach((to, from, next) => {
   // 如果访问登录页，直接放行
   if (to.path === '/login') {
     if (token) {
-      // 已登录则跳转到首页
-      next('/home')
+      // 已登录则跳转到数据看板
+      next('/dashboard')
     } else {
       next()
     }

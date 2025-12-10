@@ -93,7 +93,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         return (items, totalCount);
     }
 
-    public async Task SoftDeleteAsync(uint id)
+    public async Task SoftDeleteAsync(int id)
     {
         var announcement = await _dbSet.FindAsync(id);
         if (announcement != null)
@@ -103,7 +103,7 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         }
     }
 
-    public async Task IncrementViewCountAsync(uint id)
+    public async Task IncrementViewCountAsync(int id)
     {
         var announcement = await _dbSet.FindAsync(id);
         if (announcement != null)

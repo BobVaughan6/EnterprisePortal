@@ -25,10 +25,10 @@ public interface IVisitStatisticRepository : IRepository<VisitStatistic>
     /// <summary>
     /// 获取热门页面统计
     /// </summary>
-    Task<IEnumerable<(string PageUrl, string? PageTitle, uint TotalViews)>> GetTopPagesAsync(int topCount, int days);
+    Task<IEnumerable<(string PageUrl, string? PageTitle, int TotalViews)>> GetTopPagesAsync(int topCount, int days);
 
     /// <summary>
     /// 获取指定页面的总访问次数
     /// </summary>
-    Task<uint> GetPageTotalViewsAsync(string pageUrl);
+    Task<int> GetPageTotalViewsAsync(string pageUrl);
 }

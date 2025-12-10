@@ -124,17 +124,17 @@
         
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="公告类型" prop="type">
-              <el-select v-model="formData.type" placeholder="请选择公告类型" style="width: 100%;">
-                <el-option label="招标公告" value="招标公告" />
-                <el-option label="中标公告" value="中标公告" />
-                <el-option label="变更公告" value="变更公告" />
+            <el-form-item label="公告类型" prop="noticeType">
+              <el-select v-model="formData.noticeType" placeholder="请选择公告类型" style="width: 100%;">
+                <el-option label="招标公告" value="bidding" />
+                <el-option label="中标公告" value="result" />
+                <el-option label="变更公告" value="correction" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="项目区域" prop="region">
-              <el-select v-model="formData.region" placeholder="请选择项目区域" style="width: 100%;">
+            <el-form-item label="项目区域" prop="projectRegion">
+              <el-select v-model="formData.projectRegion" placeholder="请选择项目区域" style="width: 100%;">
                 <el-option label="郑州" value="郑州" />
                 <el-option label="洛阳" value="洛阳" />
                 <el-option label="开封" value="开封" />
@@ -160,30 +160,55 @@
         
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="招标人" prop="tenderer">
-              <el-input 
-                v-model="formData.tenderer" 
-                placeholder="请输入招标人名称（最多255个字符）" 
+            <el-form-item label="招标人" prop="bidder">
+              <el-input
+                v-model="formData.bidder"
+                placeholder="请输入招标人名称（最多255个字符）"
                 maxlength="255"
               />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="中标人" prop="winner">
-              <el-input 
-                v-model="formData.winner" 
-                placeholder="请输入中标人名称（最多255个字符）" 
+              <el-input
+                v-model="formData.winner"
+                placeholder="请输入中标人名称（最多255个字符）"
                 maxlength="255"
               />
             </el-form-item>
           </el-col>
         </el-row>
         
-        <el-form-item label="发布日期" prop="publishDate">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="预算金额" prop="budgetAmount">
+              <el-input-number
+                v-model="formData.budgetAmount"
+                :min="0"
+                :precision="2"
+                placeholder="请输入预算金额"
+                style="width: 100%;"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="截止时间" prop="deadline">
+              <el-date-picker
+                v-model="formData.deadline"
+                type="datetime"
+                placeholder="选择截止时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+                style="width: 100%;"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <el-form-item label="发布时间" prop="publishTime">
           <el-date-picker
-            v-model="formData.publishDate"
+            v-model="formData.publishTime"
             type="datetime"
-            placeholder="选择发布日期"
+            placeholder="选择发布时间"
             value-format="YYYY-MM-DD HH:mm:ss"
             style="width: 100%;"
           />
@@ -205,7 +230,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { constructionApi } from '@/api'
+import { announcementApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 
 // 日期范围
@@ -241,38 +266,38 @@ const formRef = ref(null)
 const formData = reactive({
   id: null,
   title: '',
-  type: '',
+  businessType: 'CONSTRUCTION', // 固定为建设工程
+  noticeType: '',
   content: '',
-  tenderer: '',
-  winner: '',
-  region: '',
-  publishDate: ''
+  bidder: '', // 招标人
+  winner: '', // 中标人
+  province: '',
+  city: '',
+  district: '',
+  projectRegion: '',
+  publishTime: '',
+  budgetAmount: null,
+  deadline: '',
+  attachmentIds: []
 })
 
 // 表单验证规则
 const formRules = {
   title: [
     { required: true, message: '请输入公告标题', trigger: 'blur' },
-    { max: 255, message: '标题长度不能超过255个字符', trigger: 'blur' }
+    { max: 500, message: '标题长度不能超过500个字符', trigger: 'blur' }
   ],
-  type: [
+  noticeType: [
     { required: true, message: '请选择公告类型', trigger: 'change' }
   ],
   content: [
     { required: true, message: '请输入公告内容', trigger: 'blur' }
   ],
-  region: [
-    { required: true, message: '请选择项目区域', trigger: 'change' },
-    { max: 50, message: '区域长度不能超过50个字符', trigger: 'blur' }
+  projectRegion: [
+    { required: true, message: '请选择项目区域', trigger: 'change' }
   ],
-  publishDate: [
+  publishTime: [
     { required: true, message: '请选择发布日期', trigger: 'change' }
-  ],
-  tenderer: [
-    { max: 255, message: '招标人名称长度不能超过255个字符', trigger: 'blur' }
-  ],
-  winner: [
-    { max: 255, message: '中标人名称长度不能超过255个字符', trigger: 'blur' }
   ]
 }
 
@@ -302,15 +327,16 @@ const loadData = async () => {
     
     const params = {
       keyword: searchForm.keyword || undefined,
-      type: searchForm.type || undefined,
-      region: searchForm.region || undefined,
+      businessType: 'CONSTRUCTION', // 固定为建设工程
+      noticeType: searchForm.type || undefined,
+      projectRegion: searchForm.region || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined,
-      pageIndex: pagination.pageIndex,
+      page: pagination.pageIndex,
       pageSize: pagination.pageSize
     }
     
-    const res = await constructionApi.getAnnouncements(params)
+    const res = await announcementApi.getAnnouncementList(params)
     
     if (res.success && res.data) {
       tableData.value = res.data.items || []
@@ -353,12 +379,19 @@ const handleAdd = () => {
   Object.assign(formData, {
     id: null,
     title: '',
-    type: '',
+    businessType: 'CONSTRUCTION',
+    noticeType: '',
     content: '',
-    tenderer: '',
+    bidder: '',
     winner: '',
-    region: '',
-    publishDate: new Date().toISOString().slice(0, 19).replace('T', ' ')
+    province: '',
+    city: '',
+    district: '',
+    projectRegion: '',
+    publishTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    budgetAmount: null,
+    deadline: '',
+    attachmentIds: []
   })
   dialogVisible.value = true
 }
@@ -369,18 +402,24 @@ const handleAdd = () => {
 const handleEdit = async (row) => {
   isEdit.value = true
   try {
-    const res = await constructionApi.getAnnouncement(row.id)
+    const res = await announcementApi.getAnnouncementDetail(row.id)
     if (res.success && res.data) {
-      // 映射后端DTO字段到前端表单
       Object.assign(formData, {
         id: res.data.id,
         title: res.data.title,
-        type: res.data.noticeType,
+        businessType: res.data.businessType,
+        noticeType: res.data.noticeType,
         content: res.data.content,
-        tenderer: res.data.bidder || '', // 数据库字段bidder对应招标人
-        winner: res.data.winner || '', // 数据库字段winner对应中标人
-        region: res.data.projectRegion,
-        publishDate: res.data.publishTime
+        bidder: res.data.bidder || '',
+        winner: res.data.winner || '',
+        province: res.data.province || '',
+        city: res.data.city || '',
+        district: res.data.district || '',
+        projectRegion: res.data.projectRegion || '',
+        publishTime: res.data.publishTime,
+        budgetAmount: res.data.budgetAmount,
+        deadline: res.data.deadline || '',
+        attachmentIds: res.data.attachmentIds || []
       })
       dialogVisible.value = true
     } else {
@@ -407,7 +446,7 @@ const handleDelete = async (row) => {
       }
     )
     
-    const res = await constructionApi.deleteAnnouncement(row.id)
+    const res = await announcementApi.deleteAnnouncement(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
       // 如果当前页只有一条数据且不是第一页，则返回上一页
@@ -441,22 +480,30 @@ const handleSubmit = async () => {
   
   submitting.value = true
   try {
-    // 映射前端表单字段到后端DTO
     const submitData = {
       title: formData.title,
-      type: formData.type,
+      businessType: formData.businessType,
+      noticeType: formData.noticeType,
       content: formData.content,
-      tenderer: formData.tenderer || null,
+      bidder: formData.bidder || null,
       winner: formData.winner || null,
-      region: formData.region,
-      publishDate: formData.publishDate
+      province: formData.province || null,
+      city: formData.city || null,
+      district: formData.district || null,
+      projectRegion: formData.projectRegion,
+      publishTime: formData.publishTime,
+      budgetAmount: formData.budgetAmount,
+      deadline: formData.deadline || null,
+      attachmentIds: formData.attachmentIds,
+      status: 1,
+      isTop: 0
     }
     
     let res
     if (isEdit.value) {
-      res = await constructionApi.updateAnnouncement(formData.id, submitData)
+      res = await announcementApi.updateAnnouncement(formData.id, submitData)
     } else {
-      res = await constructionApi.createAnnouncement(submitData)
+      res = await announcementApi.createAnnouncement(submitData)
     }
     
     if (res.success) {

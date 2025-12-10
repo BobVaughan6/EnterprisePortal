@@ -14,7 +14,7 @@ public class CompanyHonor
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 荣誉名称
@@ -34,7 +34,7 @@ public class CompanyHonor
     /// 荣誉证书图片ID（关联attachments表）
     /// </summary>
     [Column("image_id")]
-    public uint? ImageId { get; set; }
+    public int? ImageId { get; set; }
 
     /// <summary>
     /// 颁发机构

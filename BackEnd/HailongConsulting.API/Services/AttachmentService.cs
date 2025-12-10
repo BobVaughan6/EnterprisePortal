@@ -44,25 +44,25 @@ public class AttachmentService : IAttachmentService
         }
     }
 
-    public async Task<AttachmentDto?> GetByIdAsync(uint id)
+    public async Task<AttachmentDto?> GetByIdAsync(int id)
     {
         var attachment = await _unitOfWork.Attachments.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == 0);
         return attachment == null ? null : _mapper.Map<AttachmentDto>(attachment);
     }
 
-    public async Task<IEnumerable<AttachmentDto>> GetByRelatedAsync(string relatedType, uint relatedId)
+    public async Task<IEnumerable<AttachmentDto>> GetByRelatedAsync(string relatedType, int relatedId)
     {
         var attachments = await _unitOfWork.Attachments.GetByRelatedAsync(relatedType, relatedId);
         return _mapper.Map<IEnumerable<AttachmentDto>>(attachments);
     }
 
-    public async Task<IEnumerable<AttachmentDto>> GetByIdsAsync(IEnumerable<uint> ids)
+    public async Task<IEnumerable<AttachmentDto>> GetByIdsAsync(IEnumerable<int> ids)
     {
         var attachments = await _unitOfWork.Attachments.GetByIdsAsync(ids);
         return _mapper.Map<IEnumerable<AttachmentDto>>(attachments);
     }
 
-    public async Task<bool> DeleteAsync(uint id)
+    public async Task<bool> DeleteAsync(int id)
     {
         try
         {
@@ -77,7 +77,7 @@ public class AttachmentService : IAttachmentService
         }
     }
 
-    public async Task<bool> DeleteRangeAsync(IEnumerable<uint> ids)
+    public async Task<bool> DeleteRangeAsync(IEnumerable<int> ids)
     {
         try
         {

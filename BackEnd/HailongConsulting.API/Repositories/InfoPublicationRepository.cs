@@ -66,7 +66,7 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
         return (items, totalCount);
     }
 
-    public async Task SoftDeleteAsync(uint id)
+    public async Task SoftDeleteAsync(int id)
     {
         var publication = await _dbSet.FindAsync(id);
         if (publication != null)
@@ -76,7 +76,7 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
         }
     }
 
-    public async Task IncrementViewCountAsync(uint id)
+    public async Task IncrementViewCountAsync(int id)
     {
         var publication = await _dbSet.FindAsync(id);
         if (publication != null)

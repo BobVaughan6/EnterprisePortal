@@ -46,7 +46,7 @@ public class ConfigController : ControllerBase
     /// 根据ID获取轮播图
     /// </summary>
     [HttpGet("banners/{id}")]
-    public async Task<ActionResult<ApiResponse<CarouselBannerDto>>> GetBanner(uint id)
+    public async Task<ActionResult<ApiResponse<CarouselBannerDto>>> GetBanner(int id)
     {
         try
         {
@@ -88,7 +88,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpPut("banners/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> UpdateBanner(uint id, [FromBody] UpdateCarouselBannerDto dto)
+    public async Task<ActionResult<ApiResponse<bool>>> UpdateBanner(int id, [FromBody] UpdateCarouselBannerDto dto)
     {
         try
         {
@@ -111,7 +111,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpDelete("banners/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteBanner(uint id)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteBanner(int id)
     {
         try
         {
@@ -200,7 +200,7 @@ public class ConfigController : ControllerBase
     /// 根据ID获取重要业绩
     /// </summary>
     [HttpGet("achievements/{id}")]
-    public async Task<ActionResult<ApiResponse<MajorAchievementDto>>> GetAchievement(uint id)
+    public async Task<ActionResult<ApiResponse<MajorAchievementDto>>> GetAchievement(int id)
     {
         try
         {
@@ -242,7 +242,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpPut("achievements/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> UpdateAchievement(uint id, [FromBody] UpdateMajorAchievementDto dto)
+    public async Task<ActionResult<ApiResponse<bool>>> UpdateAchievement(int id, [FromBody] UpdateMajorAchievementDto dto)
     {
         try
         {
@@ -265,7 +265,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpDelete("achievements/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteAchievement(uint id)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteAchievement(int id)
     {
         try
         {
@@ -309,7 +309,7 @@ public class ConfigController : ControllerBase
     /// 根据ID获取企业荣誉
     /// </summary>
     [HttpGet("honors/{id}")]
-    public async Task<ActionResult<ApiResponse<CompanyHonorDto>>> GetHonor(uint id)
+    public async Task<ActionResult<ApiResponse<CompanyHonorDto>>> GetHonor(int id)
     {
         try
         {
@@ -351,7 +351,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpPut("honors/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> UpdateHonor(uint id, [FromBody] UpdateCompanyHonorDto dto)
+    public async Task<ActionResult<ApiResponse<bool>>> UpdateHonor(int id, [FromBody] UpdateCompanyHonorDto dto)
     {
         try
         {
@@ -374,7 +374,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpDelete("honors/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteHonor(uint id)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteHonor(int id)
     {
         try
         {
@@ -418,7 +418,7 @@ public class ConfigController : ControllerBase
     /// 根据ID获取友情链接
     /// </summary>
     [HttpGet("links/{id}")]
-    public async Task<ActionResult<ApiResponse<FriendlyLinkDto>>> GetLink(uint id)
+    public async Task<ActionResult<ApiResponse<FriendlyLinkDto>>> GetLink(int id)
     {
         try
         {
@@ -460,7 +460,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpPut("links/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> UpdateLink(uint id, [FromBody] UpdateFriendlyLinkDto dto)
+    public async Task<ActionResult<ApiResponse<bool>>> UpdateLink(int id, [FromBody] UpdateFriendlyLinkDto dto)
     {
         try
         {
@@ -483,7 +483,7 @@ public class ConfigController : ControllerBase
     /// </summary>
     [HttpDelete("links/{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteLink(uint id)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteLink(int id)
     {
         try
         {

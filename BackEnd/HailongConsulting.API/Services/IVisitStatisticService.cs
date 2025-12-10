@@ -22,14 +22,14 @@ public interface IVisitStatisticService
     /// </summary>
     /// <param name="announcementId">公告ID</param>
     /// <param name="request">HTTP请求对象</param>
-    Task IncrementAnnouncementViewAsync(uint announcementId, HttpRequest request);
+    Task IncrementAnnouncementViewAsync(int announcementId, HttpRequest request);
 
     /// <summary>
     /// 增加信息发布浏览次数（同时更新业务表和统计表）
     /// </summary>
     /// <param name="publicationId">信息发布ID</param>
     /// <param name="request">HTTP请求对象</param>
-    Task IncrementPublicationViewAsync(uint publicationId, HttpRequest request);
+    Task IncrementPublicationViewAsync(int publicationId, HttpRequest request);
 
     /// <summary>
     /// 获取指定日期范围的访问统计
@@ -39,5 +39,5 @@ public interface IVisitStatisticService
     /// <summary>
     /// 获取热门页面统计
     /// </summary>
-    Task<IEnumerable<(string PageUrl, string? PageTitle, uint TotalViews)>> GetTopPagesAsync(int topCount = 10, int days = 30);
+    Task<IEnumerable<(string PageUrl, string? PageTitle, int TotalViews)>> GetTopPagesAsync(int topCount = 10, int days = 30);
 }

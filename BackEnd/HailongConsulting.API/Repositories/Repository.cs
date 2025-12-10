@@ -19,7 +19,7 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet = context.Set<T>();
     }
 
-    public virtual async Task<T?> GetByIdAsync(int id)
+    public virtual async Task<T?> GetByIdAsync(object id)
     {
         return await _dbSet.FindAsync(id);
     }

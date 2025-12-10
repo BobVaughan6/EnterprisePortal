@@ -20,7 +20,7 @@
 file: IFormFile (必填) - 要上传的文件
 category: string (可选) - 分类：image/document/video/other，默认 other
 relatedType: string (可选) - 关联类型，如：announcement, info_publication
-relatedId: uint (可选) - 关联记录ID
+relatedId: int (可选) - 关联记录ID
 ```
 
 **响应示例**:
@@ -58,7 +58,7 @@ relatedId: uint (可选) - 关联记录ID
 files: List<IFormFile> (必填) - 要上传的文件列表
 category: string (可选) - 分类
 relatedType: string (可选) - 关联类型
-relatedId: uint (可选) - 关联记录ID
+relatedId: int (可选) - 关联记录ID
 ```
 
 **响应示例**:
@@ -126,7 +126,7 @@ relatedId: uint (可选) - 关联记录ID
 
 **查询参数**:
 - `relatedType`: string (必填) - 关联类型
-- `relatedId`: uint (必填) - 关联记录ID
+- `relatedId`: int (必填) - 关联记录ID
 
 **请求示例**:
 ```

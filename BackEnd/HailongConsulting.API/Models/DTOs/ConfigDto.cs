@@ -5,10 +5,10 @@ namespace HailongConsulting.API.Models.DTOs;
 /// </summary>
 public class CarouselBannerDto
 {
-    public uint Id { get; set; }
+    public int Id { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }
-    public uint ImageId { get; set; }
+    public int ImageId { get; set; }
     public string? LinkUrl { get; set; }
     public int SortOrder { get; set; }
     public bool Status { get; set; }
@@ -23,7 +23,7 @@ public class CreateCarouselBannerDto
 {
     public string? Title { get; set; }
     public string? Description { get; set; }
-    public uint ImageId { get; set; }
+    public int ImageId { get; set; }
     public string? LinkUrl { get; set; }
     public int SortOrder { get; set; } = 0;
     public bool Status { get; set; } = true;
@@ -36,7 +36,7 @@ public class UpdateCarouselBannerDto
 {
     public string? Title { get; set; }
     public string? Description { get; set; }
-    public uint? ImageId { get; set; }
+    public int? ImageId { get; set; }
     public string? LinkUrl { get; set; }
     public int? SortOrder { get; set; }
     public bool? Status { get; set; }
@@ -47,11 +47,11 @@ public class UpdateCarouselBannerDto
 /// </summary>
 public class CompanyProfileDto
 {
-    public uint Id { get; set; }
+    public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public List<string>? Highlights { get; set; }
-    public List<uint>? ImageIds { get; set; }
+    public List<int>? ImageIds { get; set; }
     public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
@@ -65,7 +65,7 @@ public class UpdateCompanyProfileDto
     public string? Title { get; set; }
     public string? Content { get; set; }
     public List<string>? Highlights { get; set; }
-    public List<uint>? ImageIds { get; set; }
+    public List<int>? ImageIds { get; set; }
     public bool? Status { get; set; }
 }
 
@@ -74,14 +74,14 @@ public class UpdateCompanyProfileDto
 /// </summary>
 public class MajorAchievementDto
 {
-    public uint Id { get; set; }
+    public int Id { get; set; }
     public string ProjectName { get; set; } = string.Empty;
     public string? ProjectType { get; set; }
     public decimal? ProjectAmount { get; set; }
     public string? ClientName { get; set; }
     public DateOnly? CompletionDate { get; set; }
     public string? Description { get; set; }
-    public List<uint>? ImageIds { get; set; }
+    public List<int>? ImageIds { get; set; }
     public int SortOrder { get; set; }
     public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -99,7 +99,7 @@ public class CreateMajorAchievementDto
     public string? ClientName { get; set; }
     public DateOnly? CompletionDate { get; set; }
     public string? Description { get; set; }
-    public List<uint>? ImageIds { get; set; }
+    public List<int>? ImageIds { get; set; }
     public int SortOrder { get; set; } = 0;
     public bool Status { get; set; } = true;
 }
@@ -115,7 +115,7 @@ public class UpdateMajorAchievementDto
     public string? ClientName { get; set; }
     public DateOnly? CompletionDate { get; set; }
     public string? Description { get; set; }
-    public List<uint>? ImageIds { get; set; }
+    public List<int>? ImageIds { get; set; }
     public int? SortOrder { get; set; }
     public bool? Status { get; set; }
 }
@@ -125,10 +125,10 @@ public class UpdateMajorAchievementDto
 /// </summary>
 public class FriendlyLinkDto
 {
-    public uint Id { get; set; }
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Url { get; set; } = string.Empty;
-    public uint? LogoId { get; set; }
+    public int? LogoId { get; set; }
     public string? Description { get; set; }
     public int SortOrder { get; set; }
     public bool Status { get; set; }
@@ -143,7 +143,7 @@ public class CreateFriendlyLinkDto
 {
     public string Name { get; set; } = string.Empty;
     public string Url { get; set; } = string.Empty;
-    public uint? LogoId { get; set; }
+    public int? LogoId { get; set; }
     public string? Description { get; set; }
     public int SortOrder { get; set; } = 0;
     public bool Status { get; set; } = true;
@@ -156,7 +156,7 @@ public class UpdateFriendlyLinkDto
 {
     public string? Name { get; set; }
     public string? Url { get; set; }
-    public uint? LogoId { get; set; }
+    public int? LogoId { get; set; }
     public string? Description { get; set; }
     public int? SortOrder { get; set; }
     public bool? Status { get; set; }
@@ -167,10 +167,10 @@ public class UpdateFriendlyLinkDto
 /// </summary>
 public class VisitStatisticDto
 {
-    public uint TotalVisits { get; set; }
-    public uint TodayVisits { get; set; }
-    public uint YesterdayVisits { get; set; }
-    public uint ThisMonthVisits { get; set; }
+    public int TotalVisits { get; set; }
+    public int TodayVisits { get; set; }
+    public int YesterdayVisits { get; set; }
+    public int ThisMonthVisits { get; set; }
 }
 
 /// <summary>
@@ -188,10 +188,10 @@ public class RecordVisitDto
 /// </summary>
 public class CompanyHonorDto
 {
-    public uint Id { get; set; }
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public uint? ImageId { get; set; }
+    public int? ImageId { get; set; }
     public string? AwardOrganization { get; set; }
     public DateOnly? AwardDate { get; set; }
     public string? CertificateNo { get; set; }
@@ -209,7 +209,7 @@ public class CreateCompanyHonorDto
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public uint? ImageId { get; set; }
+    public int? ImageId { get; set; }
     public string? AwardOrganization { get; set; }
     public DateOnly? AwardDate { get; set; }
     public string? CertificateNo { get; set; }
@@ -225,7 +225,7 @@ public class UpdateCompanyHonorDto
 {
     public string? Name { get; set; }
     public string? Description { get; set; }
-    public uint? ImageId { get; set; }
+    public int? ImageId { get; set; }
     public string? AwardOrganization { get; set; }
     public DateOnly? AwardDate { get; set; }
     public string? CertificateNo { get; set; }

@@ -14,7 +14,7 @@ public class InfoPublication
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 信息类型：COMPANY_NEWS-公司公告, POLICY_REGULATION-政策法规, POLICY_INFO-政策信息, NOTICE-通知公告
@@ -57,7 +57,7 @@ public class InfoPublication
     /// 封面图片ID（关联attachments表）
     /// </summary>
     [Column("cover_image_id")]
-    public uint? CoverImageId { get; set; }
+    public int? CoverImageId { get; set; }
 
     /// <summary>
     /// 作者
@@ -83,7 +83,7 @@ public class InfoPublication
     /// 浏览次数
     /// </summary>
     [Column("view_count")]
-    public uint ViewCount { get; set; } = 0;
+    public int ViewCount { get; set; } = 0;
 
     /// <summary>
     /// 附件ID列表（JSON数组格式，如：[1,2,3]）

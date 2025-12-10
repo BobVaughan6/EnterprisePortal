@@ -39,9 +39,11 @@
             {{ formatDateTime(row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right" align="center">
+        <el-table-column label="操作" width="250" fixed="right" align="center">
           <template #default="{ row }">
             <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="success" size="small" link @click="handleSort(row, 'up')" :disabled="row.sortOrder === 1">上移</el-button>
+            <el-button type="success" size="small" link @click="handleSort(row, 'down')">下移</el-button>
             <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -100,11 +102,10 @@
         </el-form-item>
         
         <el-form-item label="状态" prop="status">
-          <el-switch
-            v-model="formData.status"
-            active-text="启用"
-            inactive-text="禁用"
-          />
+          <el-radio-group v-model="formData.status">
+            <el-radio :label="1">启用</el-radio>
+            <el-radio :label="0">禁用</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -119,7 +120,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { configApi } from '@/api'
+import { systemConfigApi } from '@/api'
 import { formatDateTime } from '@/utils/date'
 import FileUpload from '@/components/FileUpload.vue'
 
@@ -131,12 +132,13 @@ const submitting = ref(false)
 const formRef = ref(null)
 
 const formData = reactive({
+  id: null,
   name: '',
   url: '',
   logoId: null,
   description: '',
-  sortOrder: 0,
-  status: true
+  sortOrder: 1,
+  status: 1
 })
 
 const formRules = {
@@ -157,13 +159,15 @@ const formRules = {
 const loadData = async () => {
   loading.value = true
   try {
-    const res = await configApi.getFriendlyLinks()
+    const res = await systemConfigApi.friendlyLinks.getList()
     if (res.success && res.data) {
-      tableData.value = res.data
+      tableData.value = res.data.sort((a, b) => a.sortOrder - b.sortOrder)
+    } else {
+      ElMessage.error(res.message || '加载数据失败')
     }
   } catch (error) {
     console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败')
+    ElMessage.error('加载数据失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -172,48 +176,79 @@ const loadData = async () => {
 const handleAdd = () => {
   isEdit.value = false
   Object.assign(formData, {
+    id: null,
     name: '',
     url: '',
     logoId: null,
     description: '',
-    sortOrder: 0,
-    status: true
+    sortOrder: tableData.value.length + 1,
+    status: 1
   })
   dialogVisible.value = true
 }
 
-const handleEdit = (row) => {
+const handleEdit = async (row) => {
   isEdit.value = true
-  Object.assign(formData, {
-    id: row.id,
-    name: row.name,
-    url: row.url,
-    logoId: row.logoId,
-    description: row.description || '',
-    sortOrder: row.sortOrder,
-    status: row.status
-  })
-  dialogVisible.value = true
+  try {
+    const res = await systemConfigApi.friendlyLinks.getDetail(row.id)
+    if (res.success && res.data) {
+      Object.assign(formData, {
+        id: res.data.id,
+        name: res.data.name,
+        url: res.data.url,
+        logoId: res.data.logoId,
+        description: res.data.description || '',
+        sortOrder: res.data.sortOrder,
+        status: res.data.status
+      })
+      dialogVisible.value = true
+    } else {
+      ElMessage.error(res.message || '获取详情失败')
+    }
+  } catch (error) {
+    console.error('获取详情失败:', error)
+    ElMessage.error('获取详情失败，请稍后重试')
+  }
+}
+
+const handleSort = async (row, direction) => {
+  try {
+    const res = await systemConfigApi.friendlyLinks.updateSort(row.id, direction)
+    if (res.success) {
+      ElMessage.success('排序成功')
+      loadData()
+    } else {
+      ElMessage.error(res.message || '排序失败')
+    }
+  } catch (error) {
+    console.error('排序失败:', error)
+    ElMessage.error('排序失败，请稍后重试')
+  }
 }
 
 const handleDelete = async (row) => {
   try {
-    await ElMessageBox.confirm('确定要删除该友情链接吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    await ElMessageBox.confirm(
+      `确定要删除友情链接"${row.name}"吗？删除后将无法恢复。`,
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
     
-    const res = await configApi.deleteFriendlyLink(row.id)
+    const res = await systemConfigApi.friendlyLinks.delete(row.id)
     if (res.success) {
-      ElMessage.success('删除成功')
+      ElMessage.success(res.message || '删除成功')
       loadData()
     } else {
       ElMessage.error(res.message || '删除失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败，请稍后重试')
     }
   }
 }
@@ -221,41 +256,44 @@ const handleDelete = async (row) => {
 const handleSubmit = async () => {
   if (!formRef.value) return
   
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    
-    submitting.value = true
-    try {
-      const submitData = {
-        name: formData.name,
-        url: formData.url,
-        logoId: formData.logoId || null,
-        description: formData.description || null,
-        sortOrder: formData.sortOrder,
-        status: formData.status
-      }
-      
-      let res
-      if (isEdit.value) {
-        res = await configApi.updateFriendlyLink(formData.id, submitData)
-      } else {
-        res = await configApi.createFriendlyLink(submitData)
-      }
-      
-      if (res.success) {
-        ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
-        dialogVisible.value = false
-        loadData()
-      } else {
-        ElMessage.error(res.message || '操作失败')
-      }
-    } catch (error) {
-      console.error('提交失败:', error)
-      ElMessage.error('提交失败')
-    } finally {
-      submitting.value = false
+  try {
+    await formRef.value.validate()
+  } catch (error) {
+    ElMessage.warning('请正确填写表单')
+    return
+  }
+  
+  submitting.value = true
+  try {
+    const submitData = {
+      name: formData.name,
+      url: formData.url,
+      logoId: formData.logoId,
+      description: formData.description || null,
+      sortOrder: formData.sortOrder,
+      status: formData.status
     }
-  })
+    
+    let res
+    if (isEdit.value) {
+      res = await systemConfigApi.friendlyLinks.update(formData.id, submitData)
+    } else {
+      res = await systemConfigApi.friendlyLinks.create(submitData)
+    }
+    
+    if (res.success) {
+      ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
+      dialogVisible.value = false
+      loadData()
+    } else {
+      ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
+    }
+  } catch (error) {
+    console.error('提交失败:', error)
+    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(() => {

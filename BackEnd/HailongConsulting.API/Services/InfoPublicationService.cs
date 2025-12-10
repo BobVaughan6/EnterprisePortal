@@ -46,7 +46,7 @@ public class InfoPublicationService : IInfoPublicationService
         }
     }
 
-    public async Task<InfoPublicationDto?> UpdateAsync(uint id, UpdateInfoPublicationDto updateDto)
+    public async Task<InfoPublicationDto?> UpdateAsync(int id, UpdateInfoPublicationDto updateDto)
     {
         try
         {
@@ -69,7 +69,7 @@ public class InfoPublicationService : IInfoPublicationService
         }
     }
 
-    public async Task<InfoPublicationDto?> GetByIdAsync(uint id)
+    public async Task<InfoPublicationDto?> GetByIdAsync(int id)
     {
         var publication = await _unitOfWork.InfoPublications.FirstOrDefaultAsync(p => p.Id == id && p.IsDeleted == 0);
         return publication == null ? null : _mapper.Map<InfoPublicationDto>(publication);
@@ -95,7 +95,7 @@ public class InfoPublicationService : IInfoPublicationService
         };
     }
 
-    public async Task<bool> DeleteAsync(uint id)
+    public async Task<bool> DeleteAsync(int id)
     {
         try
         {
@@ -110,7 +110,7 @@ public class InfoPublicationService : IInfoPublicationService
         }
     }
 
-    public async Task IncrementViewCountAsync(uint id)
+    public async Task IncrementViewCountAsync(int id)
     {
         try
         {

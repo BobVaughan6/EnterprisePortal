@@ -8,7 +8,7 @@ public class AnnouncementDto
     /// <summary>
     /// 公告ID
     /// </summary>
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 公告标题
@@ -88,12 +88,12 @@ public class AnnouncementDto
     /// <summary>
     /// 浏览次数
     /// </summary>
-    public uint ViewCount { get; set; }
+    public int ViewCount { get; set; }
 
     /// <summary>
     /// 附件ID列表
     /// </summary>
-    public List<uint>? AttachmentIds { get; set; }
+    public List<int>? AttachmentIds { get; set; }
 
     /// <summary>
     /// 附件列表
@@ -141,7 +141,7 @@ public class CreateAnnouncementDto
     public string Content { get; set; } = string.Empty;
     public string? Publisher { get; set; }
     public DateTime? PublishTime { get; set; }
-    public List<uint>? AttachmentIds { get; set; }
+    public List<int>? AttachmentIds { get; set; }
     public bool IsTop { get; set; }
     public int Status { get; set; } = 1;
 }
@@ -165,7 +165,7 @@ public class UpdateAnnouncementDto
     public string? Content { get; set; }
     public string? Publisher { get; set; }
     public DateTime? PublishTime { get; set; }
-    public List<uint>? AttachmentIds { get; set; }
+    public List<int>? AttachmentIds { get; set; }
     public bool? IsTop { get; set; }
     public int? Status { get; set; }
 }

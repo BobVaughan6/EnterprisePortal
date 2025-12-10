@@ -46,7 +46,7 @@ public class AnnouncementService : IAnnouncementService
         }
     }
 
-    public async Task<AnnouncementDto?> UpdateAsync(uint id, UpdateAnnouncementDto updateDto)
+    public async Task<AnnouncementDto?> UpdateAsync(int id, UpdateAnnouncementDto updateDto)
     {
         try
         {
@@ -69,7 +69,7 @@ public class AnnouncementService : IAnnouncementService
         }
     }
 
-    public async Task<AnnouncementDto?> GetByIdAsync(uint id)
+    public async Task<AnnouncementDto?> GetByIdAsync(int id)
     {
         var announcement = await _unitOfWork.Announcements.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == 0);
         return announcement == null ? null : _mapper.Map<AnnouncementDto>(announcement);
@@ -98,7 +98,7 @@ public class AnnouncementService : IAnnouncementService
         };
     }
 
-    public async Task<bool> DeleteAsync(uint id)
+    public async Task<bool> DeleteAsync(int id)
     {
         try
         {
@@ -113,7 +113,7 @@ public class AnnouncementService : IAnnouncementService
         }
     }
 
-    public async Task IncrementViewCountAsync(uint id)
+    public async Task IncrementViewCountAsync(int id)
     {
         try
         {

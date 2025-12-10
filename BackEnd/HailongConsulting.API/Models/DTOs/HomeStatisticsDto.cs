@@ -112,7 +112,7 @@ public class AchievementDto
     /// <summary>
     /// 业绩ID
     /// </summary>
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 项目名称

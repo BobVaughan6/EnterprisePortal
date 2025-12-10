@@ -27,7 +27,7 @@ public class ConfigRepository : IConfigRepository
             .ToListAsync();
     }
 
-    public async Task<CarouselBanner?> GetBannerByIdAsync(uint id)
+    public async Task<CarouselBanner?> GetBannerByIdAsync(int id)
     {
         return await _context.Set<CarouselBanner>()
             .FirstOrDefaultAsync(b => b.Id == id && b.IsDeleted == 0);
@@ -46,7 +46,7 @@ public class ConfigRepository : IConfigRepository
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> DeleteBannerAsync(uint id)
+    public async Task<bool> DeleteBannerAsync(int id)
     {
         var banner = await GetBannerByIdAsync(id);
         if (banner == null) return false;
@@ -103,7 +103,7 @@ public class ConfigRepository : IConfigRepository
             .ToListAsync();
     }
 
-    public async Task<MajorAchievement?> GetAchievementByIdAsync(uint id)
+    public async Task<MajorAchievement?> GetAchievementByIdAsync(int id)
     {
         return await _context.Set<MajorAchievement>()
             .FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == 0);
@@ -122,7 +122,7 @@ public class ConfigRepository : IConfigRepository
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> DeleteAchievementAsync(uint id)
+    public async Task<bool> DeleteAchievementAsync(int id)
     {
         var achievement = await GetAchievementByIdAsync(id);
         if (achievement == null) return false;
@@ -144,7 +144,7 @@ public class ConfigRepository : IConfigRepository
             .ToListAsync();
     }
 
-    public async Task<CompanyHonor?> GetHonorByIdAsync(uint id)
+    public async Task<CompanyHonor?> GetHonorByIdAsync(int id)
     {
         return await _context.Set<CompanyHonor>()
             .FirstOrDefaultAsync(h => h.Id == id && h.IsDeleted == 0);
@@ -163,7 +163,7 @@ public class ConfigRepository : IConfigRepository
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> DeleteHonorAsync(uint id)
+    public async Task<bool> DeleteHonorAsync(int id)
     {
         var honor = await GetHonorByIdAsync(id);
         if (honor == null) return false;
@@ -185,7 +185,7 @@ public class ConfigRepository : IConfigRepository
             .ToListAsync();
     }
 
-    public async Task<FriendlyLink?> GetLinkByIdAsync(uint id)
+    public async Task<FriendlyLink?> GetLinkByIdAsync(int id)
     {
         return await _context.Set<FriendlyLink>()
             .FirstOrDefaultAsync(l => l.Id == id && l.IsDeleted == 0);
@@ -204,7 +204,7 @@ public class ConfigRepository : IConfigRepository
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> DeleteLinkAsync(uint id)
+    public async Task<bool> DeleteLinkAsync(int id)
     {
         var link = await GetLinkByIdAsync(id);
         if (link == null) return false;
@@ -217,31 +217,31 @@ public class ConfigRepository : IConfigRepository
 
     #region 访问统计
 
-    public async Task<uint> GetTotalVisitsAsync()
+    public async Task<int> GetTotalVisitsAsync()
     {
         var total = await _context.Set<VisitStatistic>()
             .Where(v => v.IsDeleted == 0)
             .SumAsync(v => (long)v.VisitCount);
         
-        return (uint)total;
+        return (int)total;
     }
 
-    public async Task<uint> GetVisitsByDateAsync(DateOnly date)
+    public async Task<int> GetVisitsByDateAsync(DateOnly date)
     {
         var total = await _context.Set<VisitStatistic>()
             .Where(v => v.VisitDate == date && v.IsDeleted == 0)
             .SumAsync(v => (long)v.VisitCount);
         
-        return (uint)total;
+        return (int)total;
     }
 
-    public async Task<uint> GetVisitsByDateRangeAsync(DateOnly startDate, DateOnly endDate)
+    public async Task<int> GetVisitsByDateRangeAsync(DateOnly startDate, DateOnly endDate)
     {
         var total = await _context.Set<VisitStatistic>()
             .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0)
             .SumAsync(v => (long)v.VisitCount);
         
-        return (uint)total;
+        return (int)total;
     }
 
     public async Task RecordVisitAsync(VisitStatistic statistic)

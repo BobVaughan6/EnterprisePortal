@@ -14,7 +14,7 @@ public class CompanyQualification
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 资质名称
@@ -34,7 +34,7 @@ public class CompanyQualification
     /// 资质证书图片ID（关联attachments表）
     /// </summary>
     [Column("image_id")]
-    public uint? ImageId { get; set; }
+    public int? ImageId { get; set; }
 
     /// <summary>
     /// 证书编号

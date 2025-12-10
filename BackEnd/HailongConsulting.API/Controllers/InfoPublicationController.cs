@@ -54,7 +54,7 @@ public class InfoPublicationController : ControllerBase
     /// <param name="dto">信息发布更新DTO</param>
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> UpdateInfoPublication(uint id, [FromBody] UpdateInfoPublicationDto dto)
+    public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> UpdateInfoPublication(int id, [FromBody] UpdateInfoPublicationDto dto)
     {
         try
         {
@@ -77,7 +77,7 @@ public class InfoPublicationController : ControllerBase
     /// </summary>
     /// <param name="id">信息发布ID</param>
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> GetInfoPublication(uint id)
+    public async Task<ActionResult<ApiResponse<InfoPublicationDto>>> GetInfoPublication(int id)
     {
         try
         {
@@ -124,7 +124,7 @@ public class InfoPublicationController : ControllerBase
     /// <param name="id">信息发布ID</param>
     [HttpDelete("{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteInfoPublication(uint id)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteInfoPublication(int id)
     {
         try
         {

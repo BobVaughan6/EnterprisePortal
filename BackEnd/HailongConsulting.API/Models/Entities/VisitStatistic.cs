@@ -14,7 +14,7 @@ public class VisitStatistic
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 访问日期
@@ -62,7 +62,7 @@ public class VisitStatistic
     /// 访问次数
     /// </summary>
     [Column("visit_count")]
-    public uint VisitCount { get; set; } = 1;
+    public int VisitCount { get; set; } = 1;
 
     /// <summary>
     /// 软删除：0-未删除，1-已删除

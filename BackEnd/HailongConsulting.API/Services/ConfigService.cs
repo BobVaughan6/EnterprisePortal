@@ -27,7 +27,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<IEnumerable<CarouselBannerDto>>(banners);
     }
 
-    public async Task<CarouselBannerDto?> GetBannerByIdAsync(uint id)
+    public async Task<CarouselBannerDto?> GetBannerByIdAsync(int id)
     {
         var banner = await _repository.GetBannerByIdAsync(id);
         return banner == null ? null : _mapper.Map<CarouselBannerDto>(banner);
@@ -40,7 +40,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<CarouselBannerDto>(created);
     }
 
-    public async Task<bool> UpdateBannerAsync(uint id, UpdateCarouselBannerDto dto)
+    public async Task<bool> UpdateBannerAsync(int id, UpdateCarouselBannerDto dto)
     {
         var banner = await _repository.GetBannerByIdAsync(id);
         if (banner == null) return false;
@@ -56,7 +56,7 @@ public class ConfigService : IConfigService
         return await _repository.UpdateBannerAsync(banner);
     }
 
-    public async Task<bool> DeleteBannerAsync(uint id)
+    public async Task<bool> DeleteBannerAsync(int id)
     {
         return await _repository.DeleteBannerAsync(id);
     }
@@ -87,7 +87,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<IEnumerable<MajorAchievementDto>>(achievements);
     }
 
-    public async Task<MajorAchievementDto?> GetAchievementByIdAsync(uint id)
+    public async Task<MajorAchievementDto?> GetAchievementByIdAsync(int id)
     {
         var achievement = await _repository.GetAchievementByIdAsync(id);
         return achievement == null ? null : _mapper.Map<MajorAchievementDto>(achievement);
@@ -100,7 +100,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<MajorAchievementDto>(created);
     }
 
-    public async Task<bool> UpdateAchievementAsync(uint id, UpdateMajorAchievementDto dto)
+    public async Task<bool> UpdateAchievementAsync(int id, UpdateMajorAchievementDto dto)
     {
         var achievement = await _repository.GetAchievementByIdAsync(id);
         if (achievement == null) return false;
@@ -118,7 +118,7 @@ public class ConfigService : IConfigService
         return await _repository.UpdateAchievementAsync(achievement);
     }
 
-    public async Task<bool> DeleteAchievementAsync(uint id)
+    public async Task<bool> DeleteAchievementAsync(int id)
     {
         return await _repository.DeleteAchievementAsync(id);
     }
@@ -133,7 +133,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<IEnumerable<CompanyHonorDto>>(honors);
     }
 
-    public async Task<CompanyHonorDto?> GetHonorByIdAsync(uint id)
+    public async Task<CompanyHonorDto?> GetHonorByIdAsync(int id)
     {
         var honor = await _repository.GetHonorByIdAsync(id);
         return honor == null ? null : _mapper.Map<CompanyHonorDto>(honor);
@@ -146,7 +146,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<CompanyHonorDto>(created);
     }
 
-    public async Task<bool> UpdateHonorAsync(uint id, UpdateCompanyHonorDto dto)
+    public async Task<bool> UpdateHonorAsync(int id, UpdateCompanyHonorDto dto)
     {
         var honor = await _repository.GetHonorByIdAsync(id);
         if (honor == null) return false;
@@ -165,7 +165,7 @@ public class ConfigService : IConfigService
         return await _repository.UpdateHonorAsync(honor);
     }
 
-    public async Task<bool> DeleteHonorAsync(uint id)
+    public async Task<bool> DeleteHonorAsync(int id)
     {
         return await _repository.DeleteHonorAsync(id);
     }
@@ -180,7 +180,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<IEnumerable<FriendlyLinkDto>>(links);
     }
 
-    public async Task<FriendlyLinkDto?> GetLinkByIdAsync(uint id)
+    public async Task<FriendlyLinkDto?> GetLinkByIdAsync(int id)
     {
         var link = await _repository.GetLinkByIdAsync(id);
         return link == null ? null : _mapper.Map<FriendlyLinkDto>(link);
@@ -193,7 +193,7 @@ public class ConfigService : IConfigService
         return _mapper.Map<FriendlyLinkDto>(created);
     }
 
-    public async Task<bool> UpdateLinkAsync(uint id, UpdateFriendlyLinkDto dto)
+    public async Task<bool> UpdateLinkAsync(int id, UpdateFriendlyLinkDto dto)
     {
         var link = await _repository.GetLinkByIdAsync(id);
         if (link == null) return false;
@@ -209,7 +209,7 @@ public class ConfigService : IConfigService
         return await _repository.UpdateLinkAsync(link);
     }
 
-    public async Task<bool> DeleteLinkAsync(uint id)
+    public async Task<bool> DeleteLinkAsync(int id)
     {
         return await _repository.DeleteLinkAsync(id);
     }

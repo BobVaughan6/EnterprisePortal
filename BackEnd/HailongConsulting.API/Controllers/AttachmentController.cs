@@ -44,7 +44,7 @@ public class AttachmentController : ControllerBase
         IFormFile file,
         [FromForm] string category = "other",
         [FromForm] string? relatedType = null,
-        [FromForm] uint? relatedId = null)
+        [FromForm] int? relatedId = null)
     {
         try
         {
@@ -94,7 +94,7 @@ public class AttachmentController : ControllerBase
         List<IFormFile> files,
         [FromForm] string category = "other",
         [FromForm] string? relatedType = null,
-        [FromForm] uint? relatedId = null)
+        [FromForm] int? relatedId = null)
     {
         try
         {
@@ -137,7 +137,7 @@ public class AttachmentController : ControllerBase
     /// </summary>
     /// <param name="id">附件ID</param>
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<AttachmentDto>>> GetAttachment(uint id)
+    public async Task<ActionResult<ApiResponse<AttachmentDto>>> GetAttachment(int id)
     {
         try
         {
@@ -163,7 +163,7 @@ public class AttachmentController : ControllerBase
     [HttpGet("by-relation")]
     public async Task<ActionResult<ApiResponse<List<AttachmentDto>>>> GetAttachmentsByRelation(
         [FromQuery] string relatedType,
-        [FromQuery] uint relatedId)
+        [FromQuery] int relatedId)
     {
         try
         {
@@ -192,7 +192,7 @@ public class AttachmentController : ControllerBase
             }
 
             var idList = ids.Split(',')
-                .Select(id => uint.TryParse(id.Trim(), out var result) ? result : (uint?)null)
+                .Select(id => int.TryParse(id.Trim(), out var result) ? result : (int?)null)
                 .Where(id => id.HasValue)
                 .Select(id => id!.Value)
                 .ToList();
@@ -218,7 +218,7 @@ public class AttachmentController : ControllerBase
     /// <param name="id">附件ID</param>
     [HttpDelete("{id}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteAttachment(uint id)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteAttachment(int id)
     {
         try
         {
@@ -242,7 +242,7 @@ public class AttachmentController : ControllerBase
     /// <param name="ids">附件ID列表</param>
     [HttpDelete("batch")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteAttachments([FromBody] List<uint> ids)
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteAttachments([FromBody] List<int> ids)
     {
         try
         {
@@ -266,7 +266,7 @@ public class AttachmentController : ControllerBase
     /// </summary>
     /// <param name="id">附件ID</param>
     [HttpGet("{id}/download")]
-    public async Task<IActionResult> DownloadAttachment(uint id)
+    public async Task<IActionResult> DownloadAttachment(int id)
     {
         try
         {

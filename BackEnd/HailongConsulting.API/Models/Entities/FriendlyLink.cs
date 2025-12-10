@@ -14,7 +14,7 @@ public class FriendlyLink
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 链接名称
@@ -36,7 +36,7 @@ public class FriendlyLink
     /// Logo图片ID（关联attachments表）
     /// </summary>
     [Column("logo_id")]
-    public uint? LogoId { get; set; }
+    public int? LogoId { get; set; }
 
     /// <summary>
     /// 链接描述

@@ -30,26 +30,26 @@ public class MappingProfile : Profile
         CreateMap<CompanyProfile, CompanyProfileDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1))
             .ForMember(dest => dest.Highlights, opt => opt.MapFrom(src => DeserializeStringList(src.Highlights)))
-            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => DeserializeUintList(src.ImageIds)));
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => DeserializeintList(src.ImageIds)));
         
         CreateMap<UpdateCompanyProfileDto, CompanyProfile>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
             .ForMember(dest => dest.Highlights, opt => opt.MapFrom(src => SerializeStringList(src.Highlights)))
-            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeUintList(src.ImageIds)))
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeintList(src.ImageIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 重要业绩
         CreateMap<MajorAchievement, MajorAchievementDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1))
-            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => DeserializeUintList(src.ImageIds)));
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => DeserializeintList(src.ImageIds)));
         
         CreateMap<CreateMajorAchievementDto, MajorAchievement>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)))
-            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeUintList(src.ImageIds)));
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeintList(src.ImageIds)));
         
         CreateMap<UpdateMajorAchievementDto, MajorAchievement>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
-            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeUintList(src.ImageIds)))
+            .ForMember(dest => dest.ImageIds, opt => opt.MapFrom(src => SerializeintList(src.ImageIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 企业荣誉
@@ -82,50 +82,50 @@ public class MappingProfile : Profile
         CreateMap<Announcement, AnnouncementDto>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop == 1))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
-            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeUintList(src.AttachmentIds)));
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)));
         
         CreateMap<CreateAnnouncementDto, Announcement>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => (sbyte)(src.IsTop ? 1 : 0)))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)src.Status))
-            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeUintList(src.AttachmentIds)));
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)));
         
         CreateMap<UpdateAnnouncementDto, Announcement>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop.HasValue ? (sbyte)(src.IsTop.Value ? 1 : 0) : (sbyte?)null))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)src.Status.Value : (sbyte?)null))
-            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeUintList(src.AttachmentIds)))
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // 信息发布映射
         CreateMap<InfoPublication, InfoPublicationDto>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop == 1))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
-            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeUintList(src.AttachmentIds)));
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)));
         
         CreateMap<CreateInfoPublicationDto, InfoPublication>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => (sbyte)(src.IsTop ? 1 : 0)))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)src.Status))
-            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeUintList(src.AttachmentIds)));
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)));
         
         CreateMap<UpdateInfoPublicationDto, InfoPublication>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop.HasValue ? (sbyte)(src.IsTop.Value ? 1 : 0) : (sbyte?)null))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)src.Status.Value : (sbyte?)null))
-            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeUintList(src.AttachmentIds)))
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 
     // 辅助方法：序列化和反序列化 JSON
-    private static string? SerializeUintList(List<uint>? list)
+    private static string? SerializeintList(List<int>? list)
     {
         if (list == null || list.Count == 0)
             return null;
         return System.Text.Json.JsonSerializer.Serialize(list);
     }
 
-    private static List<uint>? DeserializeUintList(string? json)
+    private static List<int>? DeserializeintList(string? json)
     {
         if (string.IsNullOrEmpty(json))
             return null;
-        return System.Text.Json.JsonSerializer.Deserialize<List<uint>>(json);
+        return System.Text.Json.JsonSerializer.Deserialize<List<int>>(json);
     }
 
     private static string? SerializeStringList(List<string>? list)

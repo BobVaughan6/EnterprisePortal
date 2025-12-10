@@ -14,7 +14,7 @@ public class BusinessScope
     /// </summary>
     [Key]
     [Column("id")]
-    public uint Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// 业务名称
@@ -46,7 +46,7 @@ public class BusinessScope
     /// 业务图片ID（关联attachments表）
     /// </summary>
     [Column("image_id")]
-    public uint? ImageId { get; set; }
+    public int? ImageId { get; set; }
 
     /// <summary>
     /// 排序顺序

@@ -58,7 +58,7 @@ public class VisitStatisticRepository : Repository<VisitStatistic>, IVisitStatis
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<(string PageUrl, string? PageTitle, uint TotalViews)>> GetTopPagesAsync(int topCount, int days)
+    public async Task<IEnumerable<(string PageUrl, string? PageTitle, int TotalViews)>> GetTopPagesAsync(int topCount, int days)
     {
         var startDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-days));
         
@@ -75,15 +75,15 @@ public class VisitStatisticRepository : Repository<VisitStatistic>, IVisitStatis
             .Take(topCount)
             .ToListAsync();
 
-        return result.Select(r => (r.PageUrl ?? "", r.PageTitle, (uint)r.TotalViews));
+        return result.Select(r => (r.PageUrl ?? "", r.PageTitle, (int)r.TotalViews));
     }
 
-    public async Task<uint> GetPageTotalViewsAsync(string pageUrl)
+    public async Task<int> GetPageTotalViewsAsync(string pageUrl)
     {
         var totalViews = await _dbSet
             .Where(v => v.PageUrl == pageUrl && v.IsDeleted == 0)
-            .SumAsync(v => (long)v.VisitCount);
+            .SumAsync(v => v.VisitCount);
         
-        return (uint)totalViews;
+        return (int)totalViews;
     }
 }
