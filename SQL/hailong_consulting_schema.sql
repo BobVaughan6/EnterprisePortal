@@ -114,11 +114,11 @@ CREATE TABLE `announcements` (
 -- 3. 信息发布模块
 -- ============================================
 
--- 3.1 统一信息发布表（公司公告、政策法规、政策信息、通知公告）
+-- 3.1 统一信息发布表（新闻中心、政策法规）
 CREATE TABLE `info_publications` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '信息ID',
-  `type` VARCHAR(50) NOT NULL COMMENT '信息类型：COMPANY_NEWS-公司公告, POLICY_REGULATION-政策法规, POLICY_INFO-政策信息, NOTICE-通知公告',
-  `category` VARCHAR(100) DEFAULT NULL COMMENT '二级分类：公司新闻/行业动态/通知公告（新闻）；法律法规/部门规章/行政法规/地方政策（政策）',
+  `type` VARCHAR(50) NOT NULL COMMENT '信息类型：COMPANY_NEWS-新闻中心, POLICY_REGULATION-政策法规',
+  `category` VARCHAR(100) DEFAULT NULL COMMENT '二级分类：公司新闻/行业动态/通知公告（新闻）；法律法规/行政法规/地方政策（政策）',
   `title` VARCHAR(255) NOT NULL COMMENT '标题',
   `summary` VARCHAR(500) DEFAULT NULL COMMENT '摘要',
   `content` LONGTEXT NOT NULL COMMENT '内容（富文本）',
