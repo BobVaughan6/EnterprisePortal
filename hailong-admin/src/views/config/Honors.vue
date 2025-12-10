@@ -11,7 +11,7 @@
       <!-- 搜索区域 -->
       <el-form :model="searchForm" inline class="search-form">
         <el-form-item label="荣誉级别">
-          <el-select v-model="searchForm.level" placeholder="请选择" clearable style="width: 150px;">
+          <el-select v-model="searchForm.honorLevel" placeholder="请选择" clearable style="width: 150px;">
             <el-option label="国家级" value="国家级" />
             <el-option label="省级" value="省级" />
             <el-option label="市级" value="市级" />
@@ -27,13 +27,13 @@
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="title" label="荣誉名称" min-width="200" />
-        <el-table-column prop="level" label="荣誉级别" width="120" align="center">
+        <el-table-column prop="name" label="荣誉名称" min-width="200" />
+        <el-table-column prop="honorLevel" label="荣誉级别" width="120" align="center">
           <template #default="{ row }">
-            <el-tag :type="getLevelType(row.level)">{{ row.level }}</el-tag>
+            <el-tag :type="getLevelType(row.honorLevel)">{{ row.honorLevel }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="awardingOrganization" label="颁发机构" width="180" show-overflow-tooltip />
+        <el-table-column prop="awardOrganization" label="颁发机构" width="180" show-overflow-tooltip />
         <el-table-column prop="awardDate" label="获奖日期" width="120" align="center">
           <template #default="{ row }">
             {{ formatDate(row.awardDate) }}
@@ -42,8 +42,8 @@
         <el-table-column prop="sortOrder" label="排序" width="80" align="center" />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? '显示' : '隐藏' }}
+            <el-tag :type="row.status ? 'success' : 'danger'">
+              {{ row.status ? '显示' : '隐藏' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -82,9 +82,9 @@
         :rules="formRules" 
         label-width="100px"
       >
-        <el-form-item label="荣誉名称" prop="title">
+        <el-form-item label="荣誉名称" prop="name">
           <el-input 
-            v-model="formData.title" 
+            v-model="formData.name" 
             placeholder="请输入荣誉名称（最多200个字符）" 
             maxlength="200"
             show-word-limit
@@ -93,8 +93,8 @@
         
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="荣誉级别" prop="level">
-              <el-select v-model="formData.level" placeholder="请选择荣誉级别" style="width: 100%;">
+            <el-form-item label="荣誉级别" prop="honorLevel">
+              <el-select v-model="formData.honorLevel" placeholder="请选择荣誉级别" style="width: 100%;">
                 <el-option label="国家级" value="国家级" />
                 <el-option label="省级" value="省级" />
                 <el-option label="市级" value="市级" />
@@ -117,7 +117,7 @@
         
         <el-form-item label="颁发机构">
           <el-input 
-            v-model="formData.awardingOrganization" 
+            v-model="formData.awardOrganization" 
             placeholder="请输入颁发机构（最多200个字符）"
             maxlength="200"
           />
@@ -159,8 +159,8 @@
           <el-col :span="12">
             <el-form-item label="状态">
               <el-radio-group v-model="formData.status">
-                <el-radio :label="1">显示</el-radio>
-                <el-radio :label="0">隐藏</el-radio>
+                <el-radio :value="true">显示</el-radio>
+                <el-radio :value="false">隐藏</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -183,7 +183,7 @@ import FileUpload from '@/components/FileUpload.vue'
 
 // 搜索表单
 const searchForm = reactive({
-  level: ''
+  honorLevel: ''
 })
 
 // 分页信息
@@ -206,23 +206,23 @@ const formRef = ref(null)
 // 表单数据
 const formData = reactive({
   id: null,
-  title: '',
-  level: '',
-  awardingOrganization: '',
+  name: '',
+  honorLevel: '',
+  awardOrganization: '',
   awardDate: '',
   imageId: null,
   description: '',
   sortOrder: 1,
-  status: 1
+  status: true
 })
 
 // 表单验证规则
 const formRules = {
-  title: [
+  name: [
     { required: true, message: '请输入荣誉名称', trigger: 'blur' },
     { max: 200, message: '荣誉名称长度不能超过200个字符', trigger: 'blur' }
   ],
-  level: [
+  honorLevel: [
     { required: true, message: '请选择荣誉级别', trigger: 'change' }
   ],
   awardDate: [
@@ -258,7 +258,7 @@ const loadData = async () => {
   loading.value = true
   try {
     const params = {
-      level: searchForm.level || undefined,
+      honorLevel: searchForm.honorLevel || undefined,
       page: pagination.pageIndex,
       pageSize: pagination.pageSize
     }
@@ -266,8 +266,14 @@ const loadData = async () => {
     const res = await systemConfigApi.honors.getList(params)
     
     if (res.success && res.data) {
-      tableData.value = res.data.items || []
-      pagination.total = res.data.totalCount || 0
+      // 后端返回的是数组，不是分页对象
+      if (Array.isArray(res.data)) {
+        tableData.value = res.data
+        pagination.total = res.data.length
+      } else {
+        tableData.value = res.data.items || res.data || []
+        pagination.total = res.data.totalCount || res.data.length || 0
+      }
     } else {
       ElMessage.error(res.message || '加载数据失败')
     }
@@ -291,7 +297,7 @@ const handleSearch = () => {
  * 重置
  */
 const handleReset = () => {
-  searchForm.level = ''
+  searchForm.honorLevel = ''
   handleSearch()
 }
 
@@ -302,14 +308,14 @@ const handleAdd = () => {
   isEdit.value = false
   Object.assign(formData, {
     id: null,
-    title: '',
-    level: '',
-    awardingOrganization: '',
+    name: '',
+    honorLevel: '',
+    awardOrganization: '',
     awardDate: '',
     imageId: null,
     description: '',
     sortOrder: tableData.value.length + 1,
-    status: 1
+    status: true
   })
   dialogVisible.value = true
 }
@@ -324,9 +330,9 @@ const handleEdit = async (row) => {
     if (res.success && res.data) {
       Object.assign(formData, {
         id: res.data.id,
-        title: res.data.title,
-        level: res.data.level,
-        awardingOrganization: res.data.awardingOrganization || '',
+        name: res.data.name,
+        honorLevel: res.data.honorLevel,
+        awardOrganization: res.data.awardOrganization || '',
         awardDate: res.data.awardDate,
         imageId: res.data.imageId,
         description: res.data.description || '',
@@ -349,7 +355,7 @@ const handleEdit = async (row) => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除荣誉"${row.title}"吗？删除后将无法恢复。`,
+      `确定要删除荣誉"${row.name}"吗？删除后将无法恢复。`,
       '删除确认',
       {
         confirmButtonText: '确定',
@@ -392,9 +398,9 @@ const handleSubmit = async () => {
   submitting.value = true
   try {
     const submitData = {
-      title: formData.title,
-      level: formData.level,
-      awardingOrganization: formData.awardingOrganization || null,
+      name: formData.name,
+      honorLevel: formData.honorLevel,
+      awardOrganization: formData.awardOrganization || null,
       awardDate: formData.awardDate,
       imageId: formData.imageId,
       description: formData.description || null,
