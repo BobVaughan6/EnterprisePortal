@@ -1,7 +1,9 @@
 using AutoMapper;
+using HailongConsulting.API.Common;
 using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Models.Entities;
 using HailongConsulting.API.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HailongConsulting.API.Services;
 
@@ -22,6 +24,56 @@ public class AttachmentService : IAttachmentService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
+    }
+
+    public async Task<PagedResult<AttachmentDto>> GetPagedAsync(int page, int pageSize, string? category = null, string? relatedType = null, string? keyword = null)
+    {
+        try
+        {
+            // 构建查询条件
+            var allAttachments = await _unitOfWork.Attachments.FindAsync(a => a.IsDeleted == 0);
+            var query = allAttachments.AsQueryable();
+
+            // 分类筛选
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                query = query.Where(a => a.Category == category);
+            }
+
+            // 关联类型筛选
+            if (!string.IsNullOrWhiteSpace(relatedType))
+            {
+                query = query.Where(a => a.RelatedType == relatedType);
+            }
+
+            // 关键词搜索
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(a => a.FileName.Contains(keyword));
+            }
+
+            var totalCount = query.Count();
+            var items = query
+                .OrderByDescending(a => a.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var dtoItems = _mapper.Map<List<AttachmentDto>>(items);
+
+            return new PagedResult<AttachmentDto>
+            {
+                Items = dtoItems,
+                TotalCount = totalCount,
+                PageIndex = page,
+                PageSize = pageSize
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取分页附件列表失败");
+            throw;
+        }
     }
 
     public async Task<AttachmentDto> UploadAsync(UploadAttachmentDto uploadDto)

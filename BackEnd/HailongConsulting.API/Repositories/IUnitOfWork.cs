@@ -13,7 +13,7 @@ public interface IUnitOfWork : IDisposable
     IInfoPublicationRepository InfoPublications { get; }
     IRepository<BusinessScope> BusinessScopes { get; }
     IRepository<CompanyQualification> CompanyQualifications { get; }
-    IRepository<RegionDictionary> RegionDictionaries { get; }
+    IRegionDictionaryRepository RegionDictionaries { get; }
     IRepository<SystemLog> SystemLogs { get; }
     IRepository<CompanyProfile> CompanyProfiles { get; }
     IRepository<MajorAchievement> MajorAchievements { get; }

@@ -111,6 +111,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)src.Status.Value : (sbyte?)null))
             .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => SerializeintList(src.AttachmentIds)))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+        // 区域字典映射
+        CreateMap<RegionDictionary, RegionDictionaryDto>();
+        CreateMap<CreateRegionDictionaryDto, RegionDictionary>();
+        CreateMap<UpdateRegionDictionaryDto, RegionDictionary>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 
     // 辅助方法：序列化和反序列化 JSON

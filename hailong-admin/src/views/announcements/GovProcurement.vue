@@ -11,10 +11,10 @@
       <!-- 搜索区域 -->
       <el-form :model="searchForm" inline class="search-form">
         <el-form-item label="关键词">
-          <el-input 
-            v-model="searchForm.keyword" 
-            placeholder="搜索标题、招标人、中标人" 
-            clearable 
+          <el-input
+            v-model="searchForm.keyword"
+            placeholder="搜索标题、招标人、中标人"
+            clearable
             style="width: 220px;"
           />
         </el-form-item>
@@ -26,26 +26,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="项目区域">
-          <el-select v-model="searchForm.region" placeholder="请选择" clearable style="width: 150px;">
-            <el-option label="郑州" value="郑州" />
-            <el-option label="洛阳" value="洛阳" />
-            <el-option label="开封" value="开封" />
-            <el-option label="新乡" value="新乡" />
-            <el-option label="南阳" value="南阳" />
-            <el-option label="安阳" value="安阳" />
-            <el-option label="商丘" value="商丘" />
-            <el-option label="平顶山" value="平顶山" />
-            <el-option label="许昌" value="许昌" />
-            <el-option label="焦作" value="焦作" />
-            <el-option label="周口" value="周口" />
-            <el-option label="信阳" value="信阳" />
-            <el-option label="驻马店" value="驻马店" />
-            <el-option label="漯河" value="漯河" />
-            <el-option label="濮阳" value="濮阳" />
-            <el-option label="鹤壁" value="鹤壁" />
-            <el-option label="三门峡" value="三门峡" />
-            <el-option label="济源" value="济源" />
-          </el-select>
+          <RegionCascader
+            v-model="searchForm.regionPath"
+            :max-level="1"
+            placeholder="请选择省份"
+            :width="'150px'"
+            @change="handleRegionChange"
+          />
         </el-form-item>
         <el-form-item label="时间范围">
           <el-date-picker
@@ -68,7 +55,11 @@
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="noticeType" label="公告类型" width="100" align="center" />
+        <el-table-column prop="noticeType" label="公告类型" width="100" align="center">
+          <template #default="{ row }">
+            {{ formatNoticeType(row.noticeType) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="bidder" label="招标人" min-width="150" show-overflow-tooltip />
         <el-table-column prop="winner" label="中标人" min-width="150" show-overflow-tooltip />
         <el-table-column prop="projectRegion" label="项目区域" width="100" align="center" />
@@ -123,7 +114,7 @@
         </el-form-item>
         
         <el-row :gutter="20">
-          <el-col :span="8">
+          <el-col :span="12">
             <el-form-item label="公告类型" prop="noticeType">
               <el-select v-model="formData.noticeType" placeholder="请选择公告类型" style="width: 100%;">
                 <el-option label="招标公告" value="bidding" />
@@ -132,7 +123,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <el-form-item label="采购类型" prop="procurementType">
               <el-select v-model="formData.procurementType" placeholder="请选择采购类型" style="width: 100%;">
                 <el-option label="货物采购" value="goods" />
@@ -141,33 +132,19 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <el-form-item label="项目区域" prop="projectRegion">
-              <el-select v-model="formData.projectRegion" placeholder="请选择项目区域" style="width: 100%;">
-                <el-option label="郑州" value="郑州" />
-                <el-option label="洛阳" value="洛阳" />
-                <el-option label="开封" value="开封" />
-                <el-option label="新乡" value="新乡" />
-                <el-option label="南阳" value="南阳" />
-                <el-option label="安阳" value="安阳" />
-                <el-option label="商丘" value="商丘" />
-                <el-option label="平顶山" value="平顶山" />
-                <el-option label="许昌" value="许昌" />
-                <el-option label="焦作" value="焦作" />
-                <el-option label="周口" value="周口" />
-                <el-option label="信阳" value="信阳" />
-                <el-option label="驻马店" value="驻马店" />
-                <el-option label="漯河" value="漯河" />
-                <el-option label="濮阳" value="濮阳" />
-                <el-option label="鹤壁" value="鹤壁" />
-                <el-option label="三门峡" value="三门峡" />
-                <el-option label="济源" value="济源" />
-              </el-select>
-            </el-form-item>
-          </el-col>
         </el-row>
         
         <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="项目区域" prop="regionPath">
+              <RegionCascader
+                v-model="formData.regionPath"
+                placeholder="请选择省/市/区"
+                @change="handleFormRegionChange"
+                :width="'100%'"
+              />
+            </el-form-item>
+          </el-col>
           <el-col :span="12">
             <el-form-item label="招标人" prop="bidder">
               <el-input
@@ -177,6 +154,9 @@
               />
             </el-form-item>
           </el-col>
+        </el-row>
+        
+        <el-row :gutter="20" v-if="formData.noticeType === 'result'">
           <el-col :span="12">
             <el-form-item label="中标人" prop="winner">
               <el-input
@@ -197,6 +177,7 @@
                 :precision="2"
                 placeholder="请输入预算金额"
                 style="width: 100%;"
+                :controls="false"
               />
             </el-form-item>
           </el-col>
@@ -251,6 +232,14 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { announcementApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 import FileUpload from '@/components/FileUpload.vue'
+import RegionCascader from '@/components/RegionCascader.vue'
+
+// 公告类型映射
+const noticeTypeMap = {
+  'bidding': '招标公告',
+  'result': '结果公告',
+  'correction': '更正公告'
+}
 
 // 日期范围
 const dateRange = ref([])
@@ -259,6 +248,7 @@ const dateRange = ref([])
 const searchForm = reactive({
   keyword: '',
   type: '',
+  regionPath: [],
   region: '',
   startDate: '',
   endDate: ''
@@ -280,6 +270,7 @@ const dialogVisible = ref(false)
 const isEdit = ref(false)
 const submitting = ref(false)
 const formRef = ref(null)
+const regionSelectorRef = ref(null)
 
 // 表单数据
 const formData = reactive({
@@ -291,6 +282,7 @@ const formData = reactive({
   content: '',
   bidder: '', // 招标人
   winner: '', // 中标人
+  regionPath: [],
   province: '',
   city: '',
   district: '',
@@ -316,8 +308,8 @@ const formRules = {
   content: [
     { required: true, message: '请输入公告内容', trigger: 'blur' }
   ],
-  projectRegion: [
-    { required: true, message: '请选择项目区域', trigger: 'change' }
+  regionPath: [
+    { required: true, message: '请选择区域', trigger: 'change' }
   ],
   publishTime: [
     { required: true, message: '请选择发布日期', trigger: 'change' }
@@ -331,6 +323,13 @@ const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
   return date.toLocaleDateString('zh-CN')
+}
+
+/**
+ * 格式化公告类型
+ */
+const formatNoticeType = (type) => {
+  return noticeTypeMap[type] || type
 }
 
 /**
@@ -408,6 +407,7 @@ const handleAdd = () => {
     content: '',
     bidder: '',
     winner: '',
+    regionPath: [],
     province: '',
     city: '',
     district: '',
@@ -428,6 +428,12 @@ const handleEdit = async (row) => {
   try {
     const res = await announcementApi.getAnnouncementDetail(row.id)
     if (res.success && res.data) {
+      // 构建区域路径
+      const regionPath = []
+      if (res.data.province) regionPath.push(res.data.province)
+      if (res.data.city) regionPath.push(res.data.city)
+      if (res.data.district) regionPath.push(res.data.district)
+      
       Object.assign(formData, {
         id: res.data.id,
         title: res.data.title,
@@ -437,6 +443,7 @@ const handleEdit = async (row) => {
         content: res.data.content,
         bidder: res.data.bidder || '',
         winner: res.data.winner || '',
+        regionPath: regionPath,
         province: res.data.province || '',
         city: res.data.city || '',
         district: res.data.district || '',
@@ -547,6 +554,25 @@ const handleSubmit = async () => {
   }
 }
 
+/**
+ * 搜索区域变化
+ */
+const handleRegionChange = (regionInfo) => {
+  searchForm.region = regionInfo.provinceName || ''
+}
+
+/**
+ * 表单区域变化
+ */
+const handleFormRegionChange = (regionInfo) => {
+  formData.province = regionInfo.provinceCode
+  formData.city = regionInfo.cityCode
+  formData.district = regionInfo.districtCode
+  // 组合完整地址：省 + 市 + 区
+  const parts = [regionInfo.provinceName, regionInfo.cityName, regionInfo.districtName].filter(Boolean)
+  formData.projectRegion = parts.join('')
+}
+
 onMounted(() => {
   loadData()
 })
@@ -575,5 +601,6 @@ onMounted(() => {
   font-size: 12px;
   color: #909399;
   margin-top: 4px;
+  line-height: 1.5;
 }
 </style>

@@ -185,9 +185,19 @@ export const exportSystemLogs = (params) => {
  */
 export const getRegionList = (params) => {
   return request({
-    url: '/api/system/regions',
+    url: '/api/regions',
     method: 'get',
     params
+  })
+}
+
+/**
+ * 获取区域树形结构
+ */
+export const getRegionTree = () => {
+  return request({
+    url: '/api/regions/tree',
+    method: 'get'
   })
 }
 
@@ -196,7 +206,7 @@ export const getRegionList = (params) => {
  */
 export const getProvinceList = () => {
   return request({
-    url: '/api/system/regions/provinces',
+    url: '/api/regions/provinces',
     method: 'get'
   })
 }
@@ -207,7 +217,7 @@ export const getProvinceList = () => {
  */
 export const getCityList = (provinceCode) => {
   return request({
-    url: '/api/system/regions/cities',
+    url: '/api/regions/cities',
     method: 'get',
     params: { provinceCode }
   })
@@ -219,7 +229,7 @@ export const getCityList = (provinceCode) => {
  */
 export const getDistrictList = (cityCode) => {
   return request({
-    url: '/api/system/regions/districts',
+    url: '/api/regions/districts',
     method: 'get',
     params: { cityCode }
   })
@@ -231,7 +241,18 @@ export const getDistrictList = (cityCode) => {
  */
 export const getRegionDetail = (id) => {
   return request({
-    url: `/api/system/regions/${id}`,
+    url: `/api/regions/${id}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 根据区域代码获取区域详情
+ * @param {string} regionCode - 区域代码
+ */
+export const getRegionByCode = (regionCode) => {
+  return request({
+    url: `/api/regions/by-code/${regionCode}`,
     method: 'get'
   })
 }
@@ -247,7 +268,7 @@ export const getRegionDetail = (id) => {
  */
 export const createRegion = (data) => {
   return request({
-    url: '/api/system/regions',
+    url: '/api/regions',
     method: 'post',
     data
   })
@@ -260,7 +281,7 @@ export const createRegion = (data) => {
  */
 export const updateRegion = (id, data) => {
   return request({
-    url: `/api/system/regions/${id}`,
+    url: `/api/regions/${id}`,
     method: 'put',
     data
   })
@@ -272,34 +293,20 @@ export const updateRegion = (id, data) => {
  */
 export const deleteRegion = (id) => {
   return request({
-    url: `/api/system/regions/${id}`,
+    url: `/api/regions/${id}`,
     method: 'delete'
   })
 }
 
 /**
  * 批量导入区域数据
- * @param {FormData} formData - 文件数据
+ * @param {Array} regions - 区域数据数组
  */
-export const importRegions = (formData) => {
+export const importRegions = (regions) => {
   return request({
-    url: '/api/system/regions/import',
+    url: '/api/regions/import',
     method: 'post',
-    data: formData,
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  })
-}
-
-/**
- * 导出区域数据
- */
-export const exportRegions = () => {
-  return request({
-    url: '/api/system/regions/export',
-    method: 'get',
-    responseType: 'blob'
+    data: regions
   })
 }
 
@@ -319,14 +326,17 @@ export default {
   clearSystemLogs,
   exportSystemLogs,
   // 区域字典
-  getRegionList,
-  getProvinceList,
-  getCityList,
-  getDistrictList,
-  getRegionDetail,
-  createRegion,
-  updateRegion,
-  deleteRegion,
-  importRegions,
-  exportRegions
+  regions: {
+    getList: getRegionList,
+    getTree: getRegionTree,
+    getProvinces: getProvinceList,
+    getCities: getCityList,
+    getDistricts: getDistrictList,
+    getDetail: getRegionDetail,
+    getByCode: getRegionByCode,
+    create: createRegion,
+    update: updateRegion,
+    delete: deleteRegion,
+    import: importRegions
+  }
 }

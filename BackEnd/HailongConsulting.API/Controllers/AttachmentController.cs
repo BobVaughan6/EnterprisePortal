@@ -133,6 +133,34 @@ public class AttachmentController : ControllerBase
     }
 
     /// <summary>
+    /// 获取附件列表（分页）
+    /// </summary>
+    /// <param name="page">页码</param>
+    /// <param name="pageSize">每页数量</param>
+    /// <param name="category">分类筛选</param>
+    /// <param name="relatedType">关联类型筛选</param>
+    /// <param name="keyword">关键词搜索</param>
+    [HttpGet]
+    public async Task<ActionResult<ApiResponse<PagedResult<AttachmentDto>>>> GetAttachments(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? category = null,
+        [FromQuery] string? relatedType = null,
+        [FromQuery] string? keyword = null)
+    {
+        try
+        {
+            var result = await _attachmentService.GetPagedAsync(page, pageSize, category, relatedType, keyword);
+            return Ok(ApiResponse<PagedResult<AttachmentDto>>.SuccessResult(result, "获取附件列表成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取附件列表失败");
+            return StatusCode(500, ApiResponse<PagedResult<AttachmentDto>>.FailResult("获取附件列表失败"));
+        }
+    }
+
+    /// <summary>
     /// 根据ID获取附件
     /// </summary>
     /// <param name="id">附件ID</param>

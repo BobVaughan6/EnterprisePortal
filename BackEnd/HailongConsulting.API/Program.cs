@@ -101,6 +101,10 @@ builder.Services.AddScoped<IInfoPublicationService, InfoPublicationService>();
 builder.Services.AddScoped<IVisitStatisticRepository, VisitStatisticRepository>();
 builder.Services.AddScoped<IVisitStatisticService, VisitStatisticService>();
 
+// 区域字典服务
+builder.Services.AddScoped<IRegionDictionaryRepository, RegionDictionaryRepository>();
+builder.Services.AddScoped<IRegionDictionaryService, RegionDictionaryService>();
+
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger

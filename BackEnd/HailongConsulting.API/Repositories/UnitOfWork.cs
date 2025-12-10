@@ -18,7 +18,7 @@ public class UnitOfWork : IUnitOfWork
     private IInfoPublicationRepository? _infoPublications;
     private IRepository<BusinessScope>? _businessScopes;
     private IRepository<CompanyQualification>? _companyQualifications;
-    private IRepository<RegionDictionary>? _regionDictionaries;
+    private IRegionDictionaryRepository? _regionDictionaries;
     private IRepository<SystemLog>? _systemLogs;
     private IRepository<CompanyProfile>? _companyProfiles;
     private IRepository<MajorAchievement>? _majorAchievements;
@@ -37,7 +37,7 @@ public class UnitOfWork : IUnitOfWork
     public IInfoPublicationRepository InfoPublications => _infoPublications ??= new InfoPublicationRepository(_context);
     public IRepository<BusinessScope> BusinessScopes => _businessScopes ??= new Repository<BusinessScope>(_context);
     public IRepository<CompanyQualification> CompanyQualifications => _companyQualifications ??= new Repository<CompanyQualification>(_context);
-    public IRepository<RegionDictionary> RegionDictionaries => _regionDictionaries ??= new Repository<RegionDictionary>(_context);
+    public IRegionDictionaryRepository RegionDictionaries => _regionDictionaries ??= new RegionDictionaryRepository(_context);
     public IRepository<SystemLog> SystemLogs => _systemLogs ??= new Repository<SystemLog>(_context);
     public IRepository<CompanyProfile> CompanyProfiles => _companyProfiles ??= new Repository<CompanyProfile>(_context);
     public IRepository<MajorAchievement> MajorAchievements => _majorAchievements ??= new Repository<MajorAchievement>(_context);

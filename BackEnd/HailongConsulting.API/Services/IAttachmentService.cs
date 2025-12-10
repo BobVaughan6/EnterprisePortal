@@ -1,3 +1,4 @@
+using HailongConsulting.API.Common;
 using HailongConsulting.API.Models.DTOs;
 
 namespace HailongConsulting.API.Services;
@@ -7,6 +8,11 @@ namespace HailongConsulting.API.Services;
 /// </summary>
 public interface IAttachmentService
 {
+    /// <summary>
+    /// 获取分页附件列表
+    /// </summary>
+    Task<PagedResult<AttachmentDto>> GetPagedAsync(int page, int pageSize, string? category = null, string? relatedType = null, string? keyword = null);
+    
     /// <summary>
     /// 上传附件
     /// </summary>
