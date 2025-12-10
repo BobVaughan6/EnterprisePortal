@@ -3,7 +3,7 @@ import request from './request'
 /**
  * 信息发布 API
  * 对应数据库表：info_publications
- * 统一管理公司公告、政策法规、政策信息、通知公告
+ * 统一管理新闻中心、政策法规
  */
 
 /**
@@ -11,7 +11,7 @@ import request from './request'
  * @param {Object} params - 查询参数
  * @param {number} params.page - 页码
  * @param {number} params.pageSize - 每页数量
- * @param {string} params.type - 信息类型：COMPANY_NEWS/POLICY_REGULATION/POLICY_INFO/NOTICE
+ * @param {string} params.type - 信息类型：COMPANY_NEWS-新闻中心, POLICY_REGULATION-政策法规
  * @param {string} params.category - 二级分类
  * @param {string} params.keyword - 搜索关键词
  * @param {string} params.author - 作者
@@ -40,7 +40,7 @@ export const getInfoPublicationDetail = (id) => {
 /**
  * 创建信息发布
  * @param {Object} data - 信息数据
- * @param {string} data.type - 信息类型
+ * @param {string} data.type - 信息类型：COMPANY_NEWS-新闻中心, POLICY_REGULATION-政策法规
  * @param {string} data.category - 二级分类
  * @param {string} data.title - 标题
  * @param {string} data.summary - 摘要
@@ -148,7 +148,7 @@ export const getInfoPublicationStatistics = (params) => {
 
 /**
  * 获取分类列表
- * @param {string} type - 信息类型
+ * @param {string} type - 信息类型：COMPANY_NEWS-新闻中心, POLICY_REGULATION-政策法规
  */
 export const getCategoryList = (type) => {
   return request({

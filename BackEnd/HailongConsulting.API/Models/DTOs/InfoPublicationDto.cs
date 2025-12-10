@@ -11,7 +11,7 @@ public class InfoPublicationDto
     public int Id { get; set; }
 
     /// <summary>
-    /// 信息类型：COMPANY_NEWS-公司公告, POLICY_REGULATION-政策法规, POLICY_INFO-政策信息, NOTICE-通知公告
+    /// 信息类型：COMPANY_NEWS-新闻中心, POLICY_REGULATION-政策法规
     /// </summary>
     public string Type { get; set; } = string.Empty;
 

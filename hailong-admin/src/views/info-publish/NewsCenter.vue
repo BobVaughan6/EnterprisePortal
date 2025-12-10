@@ -22,7 +22,7 @@
           <el-select v-model="searchForm.category" placeholder="请选择" clearable style="width: 150px;">
             <el-option label="公司新闻" value="公司新闻" />
             <el-option label="行业动态" value="行业动态" />
-            <el-option label="媒体报道" value="媒体报道" />
+            <el-option label="通知公告" value="通知公告" />
           </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
@@ -126,7 +126,7 @@
               <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%;">
                 <el-option label="公司新闻" value="公司新闻" />
                 <el-option label="行业动态" value="行业动态" />
-                <el-option label="媒体报道" value="媒体报道" />
+                <el-option label="通知公告" value="通知公告" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -259,7 +259,7 @@ const formRef = ref(null)
 // 表单数据
 const formData = reactive({
   id: null,
-  type: 'NEWS_CENTER', // 固定为新闻中心
+  type: 'COMPANY_NEWS', // 固定为新闻中心
   category: '',
   title: '',
   summary: '',
@@ -315,7 +315,7 @@ const loadData = async () => {
     }
     
     const params = {
-      type: 'NEWS_CENTER', // 固定为新闻中心
+      type: 'COMPANY_NEWS', // 固定为新闻中心
       keyword: searchForm.keyword || undefined,
       category: searchForm.category || undefined,
       startDate: searchForm.startDate || undefined,
@@ -365,7 +365,7 @@ const handleAdd = () => {
   isEdit.value = false
   Object.assign(formData, {
     id: null,
-    type: 'NEWS_CENTER',
+    type: 'COMPANY_NEWS',
     category: '',
     title: '',
     summary: '',

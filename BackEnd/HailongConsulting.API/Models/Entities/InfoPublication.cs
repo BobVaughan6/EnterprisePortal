@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HailongConsulting.API.Models.Entities;
 
 /// <summary>
-/// 统一信息发布实体（公司公告 + 政策法规 + 政策信息 + 通知公告）
+/// 统一信息发布实体（新闻中心 + 政策法规）
 /// </summary>
 [Table("info_publications")]
 public class InfoPublication
@@ -17,7 +17,7 @@ public class InfoPublication
     public int Id { get; set; }
 
     /// <summary>
-    /// 信息类型：COMPANY_NEWS-公司公告, POLICY_REGULATION-政策法规, POLICY_INFO-政策信息, NOTICE-通知公告
+    /// 信息类型：COMPANY_NEWS-新闻中心, POLICY_REGULATION-政策法规
     /// </summary>
     [Column("type")]
     [Required]
@@ -25,7 +25,7 @@ public class InfoPublication
     public string Type { get; set; } = string.Empty;
 
     /// <summary>
-    /// 二级分类：公司新闻/行业动态/通知公告（新闻）；法律法规/部门规章/行政法规/地方政策（政策）
+    /// 二级分类：公司新闻/行业动态/通知公告（新闻）；法律法规/行政法规/地方政策（政策）
     /// </summary>
     [Column("category")]
     [MaxLength(100)]

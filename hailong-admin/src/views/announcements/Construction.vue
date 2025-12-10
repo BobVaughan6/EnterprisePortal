@@ -217,6 +217,15 @@
         <el-form-item label="公告内容" prop="content">
           <RichEditor v-model="formData.content" />
         </el-form-item>
+        
+        <el-form-item label="附件" prop="attachmentIds">
+          <FileUpload
+            v-model="formData.attachmentIds"
+            :limit="10"
+            list-type="text"
+          />
+          <div class="form-tip">支持上传PDF、Word、Excel等文档，最多10个附件</div>
+        </el-form-item>
       </el-form>
       
       <template #footer>
@@ -232,6 +241,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { announcementApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
+import FileUpload from '@/components/FileUpload.vue'
 
 // 日期范围
 const dateRange = ref([])
@@ -543,5 +553,11 @@ onMounted(() => {
 
 .search-form :deep(.el-form-item) {
   margin-bottom: 10px;
+}
+
+.form-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
 }
 </style>

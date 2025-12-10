@@ -21,7 +21,6 @@
         <el-form-item label="分类">
           <el-select v-model="searchForm.category" placeholder="请选择" clearable style="width: 150px;">
             <el-option label="法律法规" value="法律法规" />
-            <el-option label="部门规章" value="部门规章" />
             <el-option label="行政法规" value="行政法规" />
             <el-option label="地方政策" value="地方政策" />
           </el-select>
@@ -126,7 +125,6 @@
             <el-form-item label="分类" prop="category">
               <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%;">
                 <el-option label="法律法规" value="法律法规" />
-                <el-option label="部门规章" value="部门规章" />
                 <el-option label="行政法规" value="行政法规" />
                 <el-option label="地方政策" value="地方政策" />
               </el-select>
