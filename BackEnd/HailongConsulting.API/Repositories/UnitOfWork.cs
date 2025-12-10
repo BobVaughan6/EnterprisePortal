@@ -16,8 +16,6 @@ public class UnitOfWork : IUnitOfWork
     private IAttachmentRepository? _attachments;
     private IAnnouncementRepository? _announcements;
     private IInfoPublicationRepository? _infoPublications;
-    private IRepository<AdminUser>? _adminUsers;
-    private IRepository<AdminRole>? _adminRoles;
     private IRepository<BusinessScope>? _businessScopes;
     private IRepository<CompanyQualification>? _companyQualifications;
     private IRepository<RegionDictionary>? _regionDictionaries;
@@ -33,12 +31,10 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public IRepository<User> Users => _users ??= new Repository<User>(_context);    
+    public IRepository<User> Users => _users ??= new Repository<User>(_context);
     public IAttachmentRepository Attachments => _attachments ??= new AttachmentRepository(_context);
     public IAnnouncementRepository Announcements => _announcements ??= new AnnouncementRepository(_context);
     public IInfoPublicationRepository InfoPublications => _infoPublications ??= new InfoPublicationRepository(_context);
-    public IRepository<AdminUser> AdminUsers => _adminUsers ??= new Repository<AdminUser>(_context);
-    public IRepository<AdminRole> AdminRoles => _adminRoles ??= new Repository<AdminRole>(_context);
     public IRepository<BusinessScope> BusinessScopes => _businessScopes ??= new Repository<BusinessScope>(_context);
     public IRepository<CompanyQualification> CompanyQualifications => _companyQualifications ??= new Repository<CompanyQualification>(_context);
     public IRepository<RegionDictionary> RegionDictionaries => _regionDictionaries ??= new Repository<RegionDictionary>(_context);

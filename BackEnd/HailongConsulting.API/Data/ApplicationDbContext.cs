@@ -15,8 +15,6 @@ public class ApplicationDbContext : DbContext
 
     // 用户权限管理模块
     public DbSet<User> Users { get; set; }
-    public DbSet<AdminUser> AdminUsers { get; set; }
-    public DbSet<AdminRole> AdminRoles { get; set; }
 
     // 附件管理模块
     public DbSet<Attachment> Attachments { get; set; }
@@ -56,23 +54,6 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Email);
             entity.HasIndex(e => e.RefreshToken);
             entity.HasIndex(e => e.Role);
-            entity.HasIndex(e => e.Status);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // AdminUser配置
-        modelBuilder.Entity<AdminUser>(entity =>
-        {
-            entity.HasIndex(e => e.Username).IsUnique();
-            entity.HasIndex(e => e.RoleId);
-            entity.HasIndex(e => e.Status);
-            entity.HasIndex(e => e.IsDeleted);
-        });
-
-        // AdminRole配置
-        modelBuilder.Entity<AdminRole>(entity =>
-        {
-            entity.HasIndex(e => e.RoleCode).IsUnique();
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.IsDeleted);
         });

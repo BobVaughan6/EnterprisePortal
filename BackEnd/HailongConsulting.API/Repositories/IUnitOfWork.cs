@@ -11,8 +11,6 @@ public interface IUnitOfWork : IDisposable
     IAttachmentRepository Attachments { get; }
     IAnnouncementRepository Announcements { get; }
     IInfoPublicationRepository InfoPublications { get; }
-    IRepository<AdminUser> AdminUsers { get; }
-    IRepository<AdminRole> AdminRoles { get; }
     IRepository<BusinessScope> BusinessScopes { get; }
     IRepository<CompanyQualification> CompanyQualifications { get; }
     IRepository<RegionDictionary> RegionDictionaries { get; }

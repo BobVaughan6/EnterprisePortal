@@ -41,28 +41,7 @@ CREATE TABLE `attachments` (
 -- 1. 用户权限管理模块
 -- ============================================
 
--- 1.1 管理员账号表
-CREATE TABLE `admin_users` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '管理员ID',
-  `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
-  `password` VARCHAR(255) NOT NULL COMMENT '密码（加密存储）',
-  `real_name` VARCHAR(50) DEFAULT NULL COMMENT '真实姓名',
-  `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
-  `phone` VARCHAR(20) DEFAULT NULL COMMENT '手机号',
-  `role_id` INT UNSIGNED DEFAULT NULL COMMENT '角色ID',
-  `status` TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
-  `last_login_time` DATETIME DEFAULT NULL COMMENT '最后登录时间',
-  `last_login_ip` VARCHAR(50) DEFAULT NULL COMMENT '最后登录IP',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_username` (`username`),
-  INDEX `idx_role_id` (`role_id`),
-  INDEX `idx_status` (`status`),
-  INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员账号表';
-
--- 1.2 用户表（用于API认证）
+-- 1.1 用户表（用于API认证）
 CREATE TABLE `users` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
   `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
@@ -86,22 +65,6 @@ CREATE TABLE `users` (
   INDEX `idx_status` (`status`),
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表（API认证）';
-
--- 1.3 角色表
-CREATE TABLE `admin_roles` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '角色ID',
-  `role_name` VARCHAR(50) NOT NULL COMMENT '角色名称',
-  `role_code` VARCHAR(50) NOT NULL UNIQUE COMMENT '角色代码',
-  `description` VARCHAR(255) DEFAULT NULL COMMENT '角色描述',
-  `permissions` TEXT DEFAULT NULL COMMENT '权限列表（JSON格式）',
-  `status` TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
-  `is_deleted` TINYINT DEFAULT 0 COMMENT '软删除：0-未删除，1-已删除',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  INDEX `idx_role_code` (`role_code`),
-  INDEX `idx_status` (`status`),
-  INDEX `idx_is_deleted` (`is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色权限表';
 
 -- ============================================
 -- 2. 公告信息模块（核心）
@@ -360,37 +323,7 @@ CREATE TABLE `region_dictionary` (
   INDEX `idx_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='项目区域字典表（省市区三级）';
 
--- 插入河南省区域数据（基于city.json）
-INSERT INTO `region_dictionary` (`region_code`, `region_name`, `region_level`, `parent_code`, `sort_order`) VALUES
--- 省份
-('410000', '河南省', 1, NULL, 1),
--- 城市
-('410100', '郑州市', 2, '410000', 1),
-('410200', '开封市', 2, '410000', 2),
-('410300', '洛阳市', 2, '410000', 3),
-('410400', '平顶山市', 2, '410000', 4),
-('410500', '安阳市', 2, '410000', 5),
-('410600', '鹤壁市', 2, '410000', 6),
-('410700', '新乡市', 2, '410000', 7),
-('410800', '焦作市', 2, '410000', 8),
-('410900', '濮阳市', 2, '410000', 9),
-('411000', '许昌市', 2, '410000', 10),
-('411100', '漯河市', 2, '410000', 11),
-('411200', '三门峡市', 2, '410000', 12),
-('411300', '南阳市', 2, '410000', 13),
-('411400', '商丘市', 2, '410000', 14),
-('411500', '信阳市', 2, '410000', 15),
-('411600', '周口市', 2, '410000', 16),
-('411700', '驻马店市', 2, '410000', 17),
-('419001', '济源市', 2, '410000', 18),
--- 郑州市区县
-('410101', '郑州市区', 3, '410100', 1),
-('410122', '中牟县', 3, '410100', 2),
-('410182', '荥阳市', 3, '410100', 3),
-('410183', '新郑市', 3, '410100', 4),
-('410184', '新密市', 3, '410100', 5),
-('410185', '登封市', 3, '410100', 6);
--- 其他城市的区县数据可以根据需要继续添加...
+
 
 -- ============================================
 -- 7. 系统日志表
@@ -415,15 +348,6 @@ CREATE TABLE `system_logs` (
   INDEX `idx_status` (`status`),
   INDEX `idx_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统操作日志表';
-
--- ============================================
--- 添加外键约束
--- ============================================
-
-ALTER TABLE `admin_users` 
-  ADD CONSTRAINT `fk_admin_users_role` 
-  FOREIGN KEY (`role_id`) REFERENCES `admin_roles`(`id`) 
-  ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- ============================================
 -- 创建视图：首页统计数据视图（基于统一公告表）
