@@ -158,7 +158,7 @@ const getProjectTypeCount = (type) => {
  */
 const loadStatistics = async () => {
   try {
-    const response = await statisticsApi.getOverview()
+    const response = await statisticsApi.getHomeStatistics()
     if (response.success) {
       statistics.value = response.data
     } else {

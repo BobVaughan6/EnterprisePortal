@@ -3,8 +3,8 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>通知公告管理</span>
-          <el-button type="primary" icon="Plus" @click="handleAdd">发布通知</el-button>
+          <span>新闻中心管理</span>
+          <el-button type="primary" icon="Plus" @click="handleAdd">新增新闻</el-button>
         </div>
       </template>
       
@@ -17,6 +17,13 @@
             clearable 
             style="width: 220px;"
           />
+        </el-form-item>
+        <el-form-item label="分类">
+          <el-select v-model="searchForm.category" placeholder="请选择" clearable style="width: 150px;">
+            <el-option label="公司新闻" value="公司新闻" />
+            <el-option label="行业动态" value="行业动态" />
+            <el-option label="媒体报道" value="媒体报道" />
+          </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
           <el-date-picker
@@ -39,7 +46,8 @@
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="author" label="作者" width="120" align="center" />
+        <el-table-column prop="category" label="分类" width="100" align="center" />
+        <el-table-column prop="author" label="作者" width="100" align="center" />
         <el-table-column prop="publishTime" label="发布时间" width="110" align="center">
           <template #default="{ row }">
             {{ formatDate(row.publishTime) }}
@@ -48,21 +56,29 @@
         <el-table-column prop="viewCount" label="浏览量" width="80" align="center" />
         <el-table-column prop="isTop" label="置顶" width="80" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.isTop ? 'success' : 'info'">
+            <el-tag :type="row.isTop ? 'success' : 'info'" size="small">
               {{ row.isTop ? '是' : '否' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+            <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
               {{ row.status === 1 ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right" align="center">
+        <el-table-column label="操作" width="200" fixed="right" align="center">
           <template #default="{ row }">
             <el-button type="primary" size="small" link @click="handleEdit(row)">编辑</el-button>
+            <el-button 
+              :type="row.isTop ? 'warning' : 'success'" 
+              size="small" 
+              link 
+              @click="handleToggleTop(row)"
+            >
+              {{ row.isTop ? '取消置顶' : '置顶' }}
+            </el-button>
             <el-button type="danger" size="small" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -70,7 +86,7 @@
       
       <!-- 分页 -->
       <el-pagination
-        v-model:current-page="pagination.pageIndex"
+        v-model:current-page="pagination.pageNumber"
         v-model:page-size="pagination.pageSize"
         :total="pagination.total"
         :page-sizes="[10, 20, 50, 100]"
@@ -84,7 +100,7 @@
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="isEdit ? '编辑通知' : '发布通知'"
+      :title="isEdit ? '编辑新闻' : '新增新闻'"
       width="900px"
       destroy-on-close
       :close-on-click-modal="false"
@@ -95,50 +111,51 @@
         :rules="formRules" 
         label-width="100px"
       >
-        <el-form-item label="标题" prop="title">
+        <el-form-item label="新闻标题" prop="title">
           <el-input 
             v-model="formData.title" 
-            placeholder="请输入标题（最多500个字符）" 
-            maxlength="500"
-            show-word-limit
-          />
-        </el-form-item>
-        
-        <el-form-item label="摘要">
-          <el-input 
-            v-model="formData.summary" 
-            type="textarea"
-            :rows="3"
-            placeholder="请输入摘要（最多500个字符）"
-            maxlength="500"
+            placeholder="请输入新闻标题（最多255个字符）" 
+            maxlength="255"
             show-word-limit
           />
         </el-form-item>
         
         <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="作者">
-              <el-input 
-                v-model="formData.author" 
-                placeholder="请输入作者"
+          <el-col :span="12">
+            <el-form-item label="分类" prop="category">
+              <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%;">
+                <el-option label="公司新闻" value="公司新闻" />
+                <el-option label="行业动态" value="行业动态" />
+                <el-option label="媒体报道" value="媒体报道" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="作者" prop="author">
+              <el-input
+                v-model="formData.author"
+                placeholder="请输入作者名称"
                 maxlength="100"
               />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <el-form-item label="发布人">
-              <el-input 
-                v-model="formData.publisher" 
+        </el-row>
+        
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="发布人" prop="publisher">
+              <el-input
+                v-model="formData.publisher"
                 placeholder="请输入发布人"
-                maxlength="100"
+                maxlength="50"
               />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <el-form-item label="发布时间" prop="publishTime">
-              <el-date-picker 
-                v-model="formData.publishTime" 
-                type="datetime" 
+              <el-date-picker
+                v-model="formData.publishTime"
+                type="datetime"
                 placeholder="选择发布时间"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 style="width: 100%;"
@@ -147,18 +164,46 @@
           </el-col>
         </el-row>
         
+        <el-form-item label="摘要" prop="summary">
+          <el-input
+            v-model="formData.summary"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入摘要（最多500个字符）"
+            maxlength="500"
+            show-word-limit
+          />
+        </el-form-item>
+        
+        <el-form-item label="封面图片" prop="coverImageId">
+          <FileUpload
+            v-model="formData.coverImageId"
+            :limit="1"
+            accept="image/*"
+            list-type="picture-card"
+          />
+        </el-form-item>
+        
+        <el-form-item label="新闻内容" prop="content">
+          <RichEditor v-model="formData.content" />
+        </el-form-item>
+        
+        <el-form-item label="附件" prop="attachmentIds">
+          <FileUpload
+            v-model="formData.attachmentIds"
+            :limit="10"
+            list-type="text"
+          />
+        </el-form-item>
+        
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="是否置顶">
-              <el-switch 
-                v-model="formData.isTop" 
-                :active-value="1"
-                :inactive-value="0"
-              />
+            <el-form-item label="是否置顶" prop="isTop">
+              <el-switch v-model="formData.isTop" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="状态">
+            <el-form-item label="状态" prop="status">
               <el-radio-group v-model="formData.status">
                 <el-radio :label="1">启用</el-radio>
                 <el-radio :label="0">禁用</el-radio>
@@ -166,10 +211,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
-        <el-form-item label="内容" prop="content">
-          <RichEditor v-model="formData.content" />
-        </el-form-item>
       </el-form>
       
       <template #footer>
@@ -185,64 +226,86 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { infoPublicationApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
+import FileUpload from '@/components/FileUpload.vue'
 
+// 日期范围
 const dateRange = ref([])
+
+// 搜索表单
 const searchForm = reactive({
   keyword: '',
+  category: '',
   startDate: '',
   endDate: ''
 })
 
+// 分页信息
 const pagination = reactive({
-  pageIndex: 1,
+  pageNumber: 1,
   pageSize: 10,
   total: 0
 })
 
+// 表格数据
 const tableData = ref([])
 const loading = ref(false)
+
+// 对话框
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const submitting = ref(false)
 const formRef = ref(null)
 
+// 表单数据
 const formData = reactive({
   id: null,
-  type: 'NOTICE',
+  type: 'NEWS_CENTER', // 固定为新闻中心
   category: '',
   title: '',
   summary: '',
   content: '',
+  coverImageId: null,
   author: '',
   publisher: '',
   publishTime: '',
-  coverImageId: null,
   attachmentIds: [],
-  isTop: 0,
+  isTop: false,
   status: 1
 })
 
+// 表单验证规则
 const formRules = {
   title: [
-    { required: true, message: '请输入标题', trigger: 'blur' },
-    { max: 500, message: '标题长度不能超过500个字符', trigger: 'blur' }
+    { required: true, message: '请输入新闻标题', trigger: 'blur' },
+    { max: 255, message: '标题长度不能超过255个字符', trigger: 'blur' }
+  ],
+  category: [
+    { required: true, message: '请选择分类', trigger: 'change' }
   ],
   content: [
-    { required: true, message: '请输入内容', trigger: 'blur' }
+    { required: true, message: '请输入新闻内容', trigger: 'blur' }
   ],
   publishTime: [
     { required: true, message: '请选择发布时间', trigger: 'change' }
   ]
 }
 
+/**
+ * 格式化日期
+ */
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('zh-CN')
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('zh-CN')
 }
 
+/**
+ * 加载数据
+ */
 const loadData = async () => {
   loading.value = true
   try {
+    // 处理时间范围
     if (dateRange.value && dateRange.value.length === 2) {
       searchForm.startDate = dateRange.value[0]
       searchForm.endDate = dateRange.value[1]
@@ -252,11 +315,12 @@ const loadData = async () => {
     }
     
     const params = {
-      type: 'NOTICE',
+      type: 'NEWS_CENTER', // 固定为新闻中心
       keyword: searchForm.keyword || undefined,
+      category: searchForm.category || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined,
-      page: pagination.pageIndex,
+      pageNumber: pagination.pageNumber,
       pageSize: pagination.pageSize
     }
     
@@ -276,37 +340,50 @@ const loadData = async () => {
   }
 }
 
+/**
+ * 搜索
+ */
 const handleSearch = () => {
-  pagination.pageIndex = 1
+  pagination.pageNumber = 1
   loadData()
 }
 
+/**
+ * 重置
+ */
 const handleReset = () => {
   searchForm.keyword = ''
+  searchForm.category = ''
   dateRange.value = []
   handleSearch()
 }
 
+/**
+ * 新增
+ */
 const handleAdd = () => {
   isEdit.value = false
   Object.assign(formData, {
     id: null,
-    type: 'NOTICE',
+    type: 'NEWS_CENTER',
     category: '',
     title: '',
     summary: '',
     content: '',
+    coverImageId: null,
     author: '',
     publisher: '',
     publishTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-    coverImageId: null,
     attachmentIds: [],
-    isTop: 0,
+    isTop: false,
     status: 1
   })
   dialogVisible.value = true
 }
 
+/**
+ * 编辑
+ */
 const handleEdit = async (row) => {
   isEdit.value = true
   try {
@@ -319,29 +396,54 @@ const handleEdit = async (row) => {
         title: res.data.title,
         summary: res.data.summary || '',
         content: res.data.content,
+        coverImageId: res.data.coverImageId,
         author: res.data.author || '',
         publisher: res.data.publisher || '',
         publishTime: res.data.publishTime,
-        coverImageId: res.data.coverImageId,
         attachmentIds: res.data.attachmentIds || [],
         isTop: res.data.isTop,
         status: res.data.status
       })
       dialogVisible.value = true
     } else {
-      ElMessage.error(res.message || '获取详情失败')
+      ElMessage.error(res.message || '获取新闻详情失败')
     }
   } catch (error) {
-    console.error('获取详情失败:', error)
-    ElMessage.error('获取详情失败，请稍后重试')
+    console.error('获取新闻详情失败:', error)
+    ElMessage.error('获取新闻详情失败，请稍后重试')
   }
 }
 
+/**
+ * 置顶/取消置顶
+ */
+const handleToggleTop = async (row) => {
+  try {
+    const newIsTop = !row.isTop
+    const res = await infoPublicationApi.updateInfoPublication(row.id, {
+      isTop: newIsTop
+    })
+    
+    if (res.success) {
+      ElMessage.success(newIsTop ? '置顶成功' : '取消置顶成功')
+      loadData()
+    } else {
+      ElMessage.error(res.message || '操作失败')
+    }
+  } catch (error) {
+    console.error('操作失败:', error)
+    ElMessage.error('操作失败，请稍后重试')
+  }
+}
+
+/**
+ * 删除
+ */
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除通知"${row.title}"吗？删除后将无法恢复。`,
-      '删除确认',
+      `确定要删除新闻"${row.title}"吗？删除后将无法恢复。`, 
+      '删除确认', 
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -352,8 +454,9 @@ const handleDelete = async (row) => {
     const res = await infoPublicationApi.deleteInfoPublication(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
-      if (tableData.value.length === 1 && pagination.pageIndex > 1) {
-        pagination.pageIndex--
+      // 如果当前页只有一条数据且不是第一页，则返回上一页
+      if (tableData.value.length === 1 && pagination.pageNumber > 1) {
+        pagination.pageNumber--
       }
       loadData()
     } else {
@@ -367,6 +470,9 @@ const handleDelete = async (row) => {
   }
 }
 
+/**
+ * 提交表单
+ */
 const handleSubmit = async () => {
   if (!formRef.value) return
   
@@ -381,14 +487,14 @@ const handleSubmit = async () => {
   try {
     const submitData = {
       type: formData.type,
-      category: formData.category || null,
+      category: formData.category,
       title: formData.title,
       summary: formData.summary || null,
       content: formData.content,
+      coverImageId: formData.coverImageId || null,
       author: formData.author || null,
       publisher: formData.publisher || null,
       publishTime: formData.publishTime,
-      coverImageId: formData.coverImageId,
       attachmentIds: formData.attachmentIds,
       isTop: formData.isTop,
       status: formData.status
@@ -402,15 +508,15 @@ const handleSubmit = async () => {
     }
     
     if (res.success) {
-      ElMessage.success(res.message || (isEdit.value ? '更新成功' : '发布成功'))
+      ElMessage.success(res.message || (isEdit.value ? '更新成功' : '创建成功'))
       dialogVisible.value = false
       loadData()
     } else {
-      ElMessage.error(res.message || (isEdit.value ? '更新失败' : '发布失败'))
+      ElMessage.error(res.message || (isEdit.value ? '更新失败' : '创建失败'))
     }
   } catch (error) {
     console.error('提交失败:', error)
-    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '发布失败，请稍后重试')
+    ElMessage.error(isEdit.value ? '更新失败，请稍后重试' : '创建失败，请稍后重试')
   } finally {
     submitting.value = false
   }

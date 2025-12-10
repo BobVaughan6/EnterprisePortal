@@ -40,6 +40,25 @@ public class HomeController : ControllerBase
     }
 
     /// <summary>
+    /// 获取首页统计数据（兼容旧路由）
+    /// </summary>
+    /// <returns>统计数据</returns>
+    [HttpGet("/api/statistics/home")]
+    public async Task<IActionResult> GetHomeStatistics()
+    {
+        try
+        {
+            var statistics = await _homeService.GetStatisticsOverviewAsync();
+            return Ok(ApiResponse<object>.SuccessResult(statistics));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取首页统计数据失败");
+            return StatusCode(500, ApiResponse<object>.FailResult("获取统计数据失败"));
+        }
+    }
+
+    /// <summary>
     /// 获取最新公告列表
     /// </summary>
     /// <returns>最新公告列表</returns>

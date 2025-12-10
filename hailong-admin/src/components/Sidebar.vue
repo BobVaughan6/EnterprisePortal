@@ -16,9 +16,9 @@
       active-text-color="#409eff"
       router
     >
-      <el-menu-item index="/home">
+      <el-menu-item index="/dashboard">
         <el-icon><Odometer /></el-icon>
-        <template #title>首页看板</template>
+        <template #title>数据看板</template>
       </el-menu-item>
       
       <el-sub-menu index="announcements">
@@ -35,10 +35,8 @@
           <el-icon><DocumentCopy /></el-icon>
           <span>信息发布</span>
         </template>
-        <el-menu-item index="/info-publish/company-news">公司公告</el-menu-item>
-        <el-menu-item index="/info-publish/policies">政策法规</el-menu-item>
-        <el-menu-item index="/info-publish/policy-info">政策信息</el-menu-item>
-        <el-menu-item index="/info-publish/notices">通知公告</el-menu-item>
+        <el-menu-item index="/info-publish/news-center">新闻中心</el-menu-item>
+        <el-menu-item index="/info-publish/policy-regulation">政策法规</el-menu-item>
       </el-sub-menu>
       
       <el-menu-item index="/attachments">

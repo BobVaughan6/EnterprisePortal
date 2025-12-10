@@ -35,26 +35,20 @@ const routes = [
       {
         path: '/info-publish',
         name: 'InfoPublish',
-        redirect: '/info-publish/company-news',
+        redirect: '/info-publish/news-center',
         meta: { title: '信息发布', icon: 'DocumentCopy' },
         children: [
           {
-            path: '/info-publish/company-news',
-            name: 'CompanyNews',
-            component: () => import('@/views/info-publish/CompanyNews.vue'),
-            meta: { title: '公司公告' }
+            path: '/info-publish/news-center',
+            name: 'NewsCenter',
+            component: () => import('@/views/info-publish/NewsCenter.vue'),
+            meta: { title: '新闻中心' }
           },
           {
             path: '/info-publish/policy-regulation',
             name: 'PolicyRegulation',
             component: () => import('@/views/info-publish/PolicyRegulation.vue'),
             meta: { title: '政策法规' }
-          },
-          {
-            path: '/info-publish/notice',
-            name: 'Notice',
-            component: () => import('@/views/info-publish/Notice.vue'),
-            meta: { title: '通知公告' }
           }
         ]
       },
