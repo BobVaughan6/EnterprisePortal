@@ -38,7 +38,7 @@ public class AuthService : IAuthService
         }
 
         // 生成Token和RefreshToken
-        var token = _jwtHelper.GenerateToken((int)user.Id, user.Username, user.Role);
+        var token = _jwtHelper.GenerateToken(user.Id, user.Username, user.Role);
         var refreshToken = _jwtHelper.GenerateRefreshToken();
         var expireHours = Convert.ToDouble(_configuration["Jwt:ExpireHours"]);
 
@@ -53,7 +53,7 @@ public class AuthService : IAuthService
 
         return new LoginResponseDto
         {
-            UserId = (int)user.Id,
+            UserId = user.Id,
             Username = user.Username,
             FullName = user.RealName,
             Email = user.Email,
@@ -76,7 +76,7 @@ public class AuthService : IAuthService
         }
 
         // 生成新的Token和RefreshToken
-        var newToken = _jwtHelper.GenerateToken((int)user.Id, user.Username, user.Role);
+        var newToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Role);
         var newRefreshToken = _jwtHelper.GenerateRefreshToken();
         var expireHours = Convert.ToDouble(_configuration["Jwt:ExpireHours"]);
 
@@ -90,7 +90,7 @@ public class AuthService : IAuthService
 
         return new LoginResponseDto
         {
-            UserId = (int)user.Id,
+            UserId = user.Id,
             Username = user.Username,
             FullName = user.RealName,
             Email = user.Email,
@@ -112,7 +112,7 @@ public class AuthService : IAuthService
 
         return new UserInfoDto
         {
-            UserId = (int)user.Id,
+            UserId = user.Id,
             Username = user.Username,
             FullName = user.RealName,
             Email = user.Email,
