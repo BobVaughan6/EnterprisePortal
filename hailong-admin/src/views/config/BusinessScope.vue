@@ -108,6 +108,7 @@
             file-type="image"
             :limit="1"
             list-type="picture-card"
+            return-type="id"
           />
         </el-form-item>
         
@@ -165,7 +166,7 @@ const formData = reactive({
   description: '',
   content: '',
   features: [],
-  imageId: null,
+  imageId: [],
   sortOrder: 1,
   status: true
 })
@@ -216,7 +217,7 @@ const handleAdd = () => {
     description: '',
     content: '',
     features: [],
-    imageId: null,
+    imageId: [],
     sortOrder: tableData.value.length + 1,
     status: true
   })
@@ -237,7 +238,7 @@ const handleEdit = async (row) => {
         description: res.data.description || '',
         content: res.data.content || '',
         features: res.data.features || [],
-        imageId: res.data.imageId || null,
+        imageId: res.data.imageId ? [res.data.imageId] : [],
         sortOrder: res.data.sortOrder,
         status: res.data.status
       })
@@ -341,7 +342,7 @@ const handleSubmit = async () => {
       description: formData.description || null,
       content: formData.content || null,
       features: formData.features.length > 0 ? formData.features : null,
-      imageId: formData.imageId || null,
+      imageId: formData.imageId && formData.imageId.length > 0 ? formData.imageId[0] : null,
       sortOrder: formData.sortOrder,
       status: formData.status
     }

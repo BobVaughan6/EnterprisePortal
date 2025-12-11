@@ -109,6 +109,7 @@
             file-type="image"
             :limit="1"
             list-type="picture-card"
+            return-type="id"
           />
           <div class="form-tip">建议上传清晰的证书扫描件或照片</div>
         </el-form-item>
@@ -164,7 +165,7 @@ const formData = reactive({
   issuingAuthority: '',
   issueDate: '',
   expiryDate: '',
-  certificateImageId: null,
+  certificateImageId: [],
   description: '',
   status: true
 })
@@ -228,7 +229,7 @@ const handleAdd = () => {
     issuingAuthority: '',
     issueDate: '',
     expiryDate: '',
-    certificateImageId: null,
+    certificateImageId: [],
     description: '',
     status: true
   })
@@ -250,7 +251,7 @@ const handleEdit = async (row) => {
         issuingAuthority: res.data.issuingAuthority || '',
         issueDate: res.data.issueDate,
         expiryDate: res.data.expiryDate,
-        certificateImageId: res.data.certificateImageId,
+        certificateImageId: res.data.certificateImageId ? [res.data.certificateImageId] : [],
         description: res.data.description || '',
         status: res.data.status
       })
@@ -315,7 +316,9 @@ const handleSubmit = async () => {
       issuingAuthority: formData.issuingAuthority || null,
       issueDate: formData.issueDate,
       expiryDate: formData.expiryDate,
-      certificateImageId: formData.certificateImageId,
+      certificateImageId: formData.certificateImageId && formData.certificateImageId.length > 0
+        ? formData.certificateImageId[0]
+        : null,
       description: formData.description || null,
       status: formData.status
     }

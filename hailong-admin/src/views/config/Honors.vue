@@ -129,6 +129,7 @@
             file-type="image"
             :limit="1"
             list-type="picture-card"
+            return-type="id"
           />
           <div class="form-tip">建议上传荣誉证书或奖牌照片</div>
         </el-form-item>
@@ -210,7 +211,7 @@ const formData = reactive({
   honorLevel: '',
   awardOrganization: '',
   awardDate: '',
-  imageId: null,
+  imageId: [],
   description: '',
   sortOrder: 1,
   status: true
@@ -312,7 +313,7 @@ const handleAdd = () => {
     honorLevel: '',
     awardOrganization: '',
     awardDate: '',
-    imageId: null,
+    imageId: [],
     description: '',
     sortOrder: tableData.value.length + 1,
     status: true
@@ -334,7 +335,7 @@ const handleEdit = async (row) => {
         honorLevel: res.data.honorLevel,
         awardOrganization: res.data.awardOrganization || '',
         awardDate: res.data.awardDate,
-        imageId: res.data.imageId,
+        imageId: res.data.imageId ? [res.data.imageId] : [],
         description: res.data.description || '',
         sortOrder: res.data.sortOrder,
         status: res.data.status
@@ -402,7 +403,7 @@ const handleSubmit = async () => {
       honorLevel: formData.honorLevel,
       awardOrganization: formData.awardOrganization || null,
       awardDate: formData.awardDate,
-      imageId: formData.imageId,
+      imageId: formData.imageId && formData.imageId.length > 0 ? formData.imageId[0] : null,
       description: formData.description || null,
       sortOrder: formData.sortOrder,
       status: formData.status
