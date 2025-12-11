@@ -21,10 +21,20 @@ public class HomeService : IHomeService
     /// </summary>
     public async Task<HomeStatisticsDto> GetStatisticsOverviewAsync()
     {
-        // 统计政府采购公告数量
-        var govCount = await _context.Announcements
-            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
+        // 统计政府采购公告数量（按采购类型细分）
+        var govGoodsCount = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT" && x.ProcurementType == "goods")
             .CountAsync();
+
+        var govServiceCount = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT" && x.ProcurementType == "service")
+            .CountAsync();
+
+        var govProjectCount = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT" && x.ProcurementType == "project")
+            .CountAsync();
+
+        var govCount = govGoodsCount + govServiceCount + govProjectCount;
 
         // 统计建设工程公告数量
         var constructionCount = await _context.Announcements
@@ -44,19 +54,60 @@ public class HomeService : IHomeService
         
         if (totalProjects > 0)
         {
-            projectTypes.Add(new ProjectTypeStatDto
+            // 政府采购（主类型，用于卡片显示）
+            if (govCount > 0)
             {
-                Type = "政府采购",
-                Count = govCount,
-                Percentage = Math.Round((decimal)govCount * 100 / totalProjects, 2)
-            });
+                projectTypes.Add(new ProjectTypeStatDto
+                {
+                    Type = "政府采购",
+                    Count = govCount,
+                    Percentage = Math.Round((decimal)govCount * 100 / totalProjects, 2)
+                });
+            }
 
-            projectTypes.Add(new ProjectTypeStatDto
+            // 政府采购 - 货物（子类型，用于饼图显示）
+            if (govGoodsCount > 0)
             {
-                Type = "建设工程",
-                Count = constructionCount,
-                Percentage = Math.Round((decimal)constructionCount * 100 / totalProjects, 2)
-            });
+                projectTypes.Add(new ProjectTypeStatDto
+                {
+                    Type = "政府采购-货物",
+                    Count = govGoodsCount,
+                    Percentage = Math.Round((decimal)govGoodsCount * 100 / totalProjects, 2)
+                });
+            }
+
+            // 政府采购 - 服务（子类型，用于饼图显示）
+            if (govServiceCount > 0)
+            {
+                projectTypes.Add(new ProjectTypeStatDto
+                {
+                    Type = "政府采购-服务",
+                    Count = govServiceCount,
+                    Percentage = Math.Round((decimal)govServiceCount * 100 / totalProjects, 2)
+                });
+            }
+
+            // 政府采购 - 工程（子类型，用于饼图显示）
+            if (govProjectCount > 0)
+            {
+                projectTypes.Add(new ProjectTypeStatDto
+                {
+                    Type = "政府采购-工程",
+                    Count = govProjectCount,
+                    Percentage = Math.Round((decimal)govProjectCount * 100 / totalProjects, 2)
+                });
+            }
+
+            // 建设工程
+            if (constructionCount > 0)
+            {
+                projectTypes.Add(new ProjectTypeStatDto
+                {
+                    Type = "建设工程",
+                    Count = constructionCount,
+                    Percentage = Math.Round((decimal)constructionCount * 100 / totalProjects, 2)
+                });
+            }
         }
 
         // 统计地区排行（政府采购）
