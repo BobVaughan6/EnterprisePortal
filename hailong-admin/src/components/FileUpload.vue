@@ -1,5 +1,5 @@
 <template>
-  <div class="file-upload">
+  <div class="file-upload" :class="{ 'hide-upload-btn': fileList.length >= limit }">
     <el-upload
       ref="uploadRef"
       v-model:file-list="fileList"
@@ -17,13 +17,16 @@
       :multiple="multiple"
       :disabled="disabled"
       :auto-upload="true"
+      :show-file-list="true"
     >
-      <template v-if="listType === 'picture-card'">
+      <template v-if="listType === 'picture-card'" #default>
         <el-icon><Plus /></el-icon>
       </template>
-      <el-button v-else type="primary" :icon="Upload" :disabled="disabled">
-        选择{{ fileTypeText }}
-      </el-button>
+      <template v-else #default>
+        <el-button type="primary" :icon="Upload" :disabled="disabled">
+          选择{{ fileTypeText }}
+        </el-button>
+      </template>
       <template #tip>
         <div class="el-upload__tip">
           {{ tipText }}
@@ -414,5 +417,14 @@ onMounted(() => {
 
 :deep(.el-upload-list__item:hover) {
   background-color: #f5f7fa;
+}
+
+/* 当达到上传限制时，隐藏上传按钮 */
+.hide-upload-btn :deep(.el-upload--picture-card) {
+  display: none !important;
+}
+
+.hide-upload-btn :deep(.el-upload) {
+  display: none !important;
 }
 </style>

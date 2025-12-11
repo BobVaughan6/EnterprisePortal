@@ -55,6 +55,16 @@ public class CompanyProfileDto
     public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    
+    /// <summary>
+    /// 获取第一张图片ID（用于单图片显示）
+    /// </summary>
+    public int? ImageId => ImageIds?.FirstOrDefault();
+    
+    /// <summary>
+    /// 图片完整URL列表（由Service层填充）
+    /// </summary>
+    public List<string>? ImageUrls { get; set; }
 }
 
 /// <summary>
@@ -86,6 +96,16 @@ public class MajorAchievementDto
     public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    
+    /// <summary>
+    /// 获取第一张图片ID（用于单图片显示）
+    /// </summary>
+    public int? ImageId => ImageIds?.FirstOrDefault();
+    
+    /// <summary>
+    /// 图片完整URL列表（由Service层填充）
+    /// </summary>
+    public List<string>? ImageUrls { get; set; }
 }
 
 /// <summary>

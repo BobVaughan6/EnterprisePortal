@@ -15,7 +15,7 @@
             @click="$emit('achievement-click', achievement.id)"
             class="flex-shrink-0 w-80 bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden hover:bg-white/20 transition-all cursor-pointer group">
             <div class="h-48 overflow-hidden bg-gray-700">
-              <img v-if="achievement.imageUrl" :src="achievement.imageUrl" :alt="achievement.projectName"
+              <img v-if="achievement.imageUrls && achievement.imageUrls.length > 0" :src="achievement.imageUrls[0]" :alt="achievement.projectName"
                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
                 <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,6 +258,7 @@ const formatRegionAmount = (amount) => {
   }
   return (amount / 10000).toFixed(2) + '亿'
 }
+
 
 onMounted(() => {
   loadAchievements()

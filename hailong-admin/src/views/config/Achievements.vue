@@ -22,8 +22,8 @@
         <el-table-column prop="sortOrder" label="排序" width="80" align="center" />
         <el-table-column label="状态" width="80" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-              {{ row.status === 1 ? '启用' : '禁用' }}
+            <el-tag :type="row.status ? 'success' : 'info'" size="small">
+              {{ row.status ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -94,13 +94,14 @@
         
         <el-form-item label="项目图片">
           <FileUpload
-            v-model="formData.imageUrls"
+            v-model="formData.imageIds"
             file-type="image"
-            :limit="5"
-            :multiple="true"
+            :limit="1"
+            :multiple="false"
             list-type="picture-card"
+            return-type="id"
           />
-          <div class="form-tip">建议尺寸：800x600，支持上传多张图片，最多5张</div>
+          <div class="form-tip">建议尺寸：800x600，仅支持上传1张图片</div>
         </el-form-item>
         
         <el-form-item label="项目描述">
@@ -122,8 +123,8 @@
         <el-form-item label="状态">
           <el-switch
             v-model="formData.status"
-            :active-value="1"
-            :inactive-value="0"
+            :active-value="true"
+            :inactive-value="false"
             active-text="启用"
             inactive-text="禁用"
           />
@@ -158,10 +159,10 @@ const formData = reactive({
   clientName: '',
   projectAmount: null,
   completionDate: '',
-  imageUrls: [],
+  imageIds: [],
   description: '',
   sortOrder: 0,
-  status: 1
+  status: true
 })
 
 const rules = {
@@ -206,10 +207,10 @@ const handleAdd = () => {
     clientName: '',
     projectAmount: null,
     completionDate: '',
-    imageUrls: [],
+    imageIds: [],
     description: '',
     sortOrder: 0,
-    status: 1
+    status: true
   })
   dialogVisible.value = true
 }
@@ -223,7 +224,7 @@ const handleEdit = (row) => {
     clientName: row.clientName,
     projectAmount: row.projectAmount,
     completionDate: row.completionDate,
-    imageUrls: row.imageUrls || [],
+    imageIds: row.imageIds || [],
     description: row.description || '',
     sortOrder: row.sortOrder,
     status: row.status

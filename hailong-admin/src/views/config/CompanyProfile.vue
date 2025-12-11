@@ -12,13 +12,14 @@
         
         <el-form-item label="企业图片">
           <FileUpload
-            v-model="formData.imageUrls"
+            v-model="formData.imageIds"
             file-type="image"
-            :limit="5"
-            :multiple="true"
+            :limit="1"
+            :multiple="false"
             list-type="picture-card"
+            return-type="id"
           />
-          <div class="form-tip">建议尺寸：1200x800，支持上传多张图片，最多5张</div>
+          <div class="form-tip">建议尺寸：1200x800，仅支持上传1张图片</div>
         </el-form-item>
         
         <el-form-item label="企业简介" prop="content">
@@ -71,8 +72,8 @@
         <el-form-item label="状态">
           <el-switch
             v-model="formData.status"
-            :active-value="1"
-            :inactive-value="0"
+            :active-value="true"
+            :inactive-value="false"
             active-text="启用"
             inactive-text="禁用"
           />
@@ -102,12 +103,12 @@ const formRef = ref(null)
 const formData = reactive({
   title: '',
   content: '',
-  imageUrls: [],
+  imageIds: [],
   highlights: [],
   contactPhone: '',
   contactEmail: '',
   address: '',
-  status: 1
+  status: true
 })
 
 const rules = {
@@ -142,12 +143,12 @@ const loadData = async () => {
       Object.assign(formData, {
         title: res.data.title || '',
         content: res.data.content || '',
-        imageUrls: res.data.imageUrls || [],
+        imageIds: res.data.imageIds || [],
         highlights: res.data.highlights || [],
         contactPhone: res.data.contactPhone || '',
         contactEmail: res.data.contactEmail || '',
         address: res.data.address || '',
-        status: res.data.status ?? 1
+        status: res.data.status ?? true
       })
     }
   } catch (error) {

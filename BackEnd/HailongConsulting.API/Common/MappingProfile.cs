@@ -155,7 +155,8 @@ public class MappingProfile : Profile
     {
         if (list == null || list.Count == 0)
             return null;
-        return System.Text.Json.JsonSerializer.Serialize(list);
+        // 限制只保存第一个元素
+        return System.Text.Json.JsonSerializer.Serialize(new List<int> { list[0] });
     }
 
     private static List<int>? DeserializeintList(string? json)

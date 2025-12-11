@@ -12,11 +12,13 @@ public class ConfigService : IConfigService
 {
     private readonly IConfigRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IAttachmentService _attachmentService;
 
-    public ConfigService(IConfigRepository repository, IMapper mapper)
+    public ConfigService(IConfigRepository repository, IMapper mapper, IAttachmentService attachmentService)
     {
         _repository = repository;
         _mapper = mapper;
+        _attachmentService = attachmentService;
     }
 
     #region 轮播图
@@ -68,7 +70,18 @@ public class ConfigService : IConfigService
     public async Task<CompanyProfileDto?> GetCompanyProfileAsync()
     {
         var profile = await _repository.GetCompanyProfileAsync();
-        return profile == null ? null : _mapper.Map<CompanyProfileDto>(profile);
+        if (profile == null) return null;
+        
+        var dto = _mapper.Map<CompanyProfileDto>(profile);
+        
+        // 填充图片URL
+        if (dto.ImageIds != null && dto.ImageIds.Any())
+        {
+            var attachments = await _attachmentService.GetByIdsAsync(dto.ImageIds);
+            dto.ImageUrls = attachments.Select(a => a.FileUrl).ToList();
+        }
+        
+        return dto;
     }
 
     public async Task<bool> UpdateCompanyProfileAsync(UpdateCompanyProfileDto dto)
@@ -84,13 +97,36 @@ public class ConfigService : IConfigService
     public async Task<IEnumerable<MajorAchievementDto>> GetAllAchievementsAsync()
     {
         var achievements = await _repository.GetAllAchievementsAsync();
-        return _mapper.Map<IEnumerable<MajorAchievementDto>>(achievements);
+        var dtos = _mapper.Map<IEnumerable<MajorAchievementDto>>(achievements).ToList();
+        
+        // 填充图片URL
+        foreach (var dto in dtos)
+        {
+            if (dto.ImageIds != null && dto.ImageIds.Any())
+            {
+                var attachments = await _attachmentService.GetByIdsAsync(dto.ImageIds);
+                dto.ImageUrls = attachments.Select(a => a.FileUrl).ToList();
+            }
+        }
+        
+        return dtos;
     }
 
     public async Task<MajorAchievementDto?> GetAchievementByIdAsync(int id)
     {
         var achievement = await _repository.GetAchievementByIdAsync(id);
-        return achievement == null ? null : _mapper.Map<MajorAchievementDto>(achievement);
+        if (achievement == null) return null;
+        
+        var dto = _mapper.Map<MajorAchievementDto>(achievement);
+        
+        // 填充图片URL
+        if (dto.ImageIds != null && dto.ImageIds.Any())
+        {
+            var attachments = await _attachmentService.GetByIdsAsync(dto.ImageIds);
+            dto.ImageUrls = attachments.Select(a => a.FileUrl).ToList();
+        }
+        
+        return dto;
     }
 
     public async Task<MajorAchievementDto> CreateAchievementAsync(CreateMajorAchievementDto dto)
@@ -112,7 +148,7 @@ public class ConfigService : IConfigService
         if (dto.ClientName != null) achievement.ClientName = dto.ClientName;
         if (dto.CompletionDate.HasValue) achievement.CompletionDate = dto.CompletionDate;
         if (dto.Description != null) achievement.Description = dto.Description;
-        if (dto.ImageIds != null) achievement.ImageIds = System.Text.Json.JsonSerializer.Serialize(dto.ImageIds);
+        if (dto.ImageIds != null) achievement.ImageIds = System.Text.Json.JsonSerializer.Serialize(dto.ImageIds.Take(1).ToList());
         if (dto.SortOrder.HasValue) achievement.SortOrder = dto.SortOrder.Value;
 
         return await _repository.UpdateAchievementAsync(achievement);
