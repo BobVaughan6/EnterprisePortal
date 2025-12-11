@@ -165,8 +165,8 @@
         <el-form-item label="封面图片" prop="coverImageId">
           <FileUpload
             v-model="formData.coverImageId"
+            file-type="image"
             :limit="1"
-            accept="image/*"
             list-type="picture-card"
           />
         </el-form-item>

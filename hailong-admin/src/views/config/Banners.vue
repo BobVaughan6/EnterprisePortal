@@ -66,8 +66,8 @@
         <el-form-item label="轮播图" prop="imageId">
           <FileUpload
             v-model="formData.imageId"
+            file-type="image"
             :limit="1"
-            accept="image/*"
             list-type="picture-card"
           />
           <div class="form-tip">建议尺寸：1920x600px，支持jpg、png格式</div>

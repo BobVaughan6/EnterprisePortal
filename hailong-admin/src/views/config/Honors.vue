@@ -124,10 +124,10 @@
         </el-form-item>
         
         <el-form-item label="荣誉图片">
-          <FileUpload 
+          <FileUpload
             v-model="formData.imageId"
+            file-type="image"
             :limit="1"
-            accept="image/*"
             list-type="picture-card"
           />
           <div class="form-tip">建议上传荣誉证书或奖牌照片</div>

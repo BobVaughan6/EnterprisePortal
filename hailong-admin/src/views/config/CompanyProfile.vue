@@ -13,9 +13,9 @@
         <el-form-item label="企业图片">
           <FileUpload
             v-model="formData.imageUrls"
+            file-type="image"
             :limit="5"
             :multiple="true"
-            accept="image/*"
             list-type="picture-card"
           />
           <div class="form-tip">建议尺寸：1200x800，支持上传多张图片，最多5张</div>

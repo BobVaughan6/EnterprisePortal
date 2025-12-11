@@ -78,7 +78,7 @@
         <el-form-item label="Logo" prop="logoId">
           <FileUpload
             v-model="formData.logoId"
-            accept="image/*"
+            file-type="image"
             :limit="1"
             list-type="picture-card"
           />

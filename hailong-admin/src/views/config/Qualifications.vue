@@ -104,10 +104,10 @@
         </el-row>
         
         <el-form-item label="证书图片">
-          <FileUpload 
+          <FileUpload
             v-model="formData.certificateImageId"
+            file-type="image"
             :limit="1"
-            accept="image/*"
             list-type="picture-card"
           />
           <div class="form-tip">建议上传清晰的证书扫描件或照片</div>

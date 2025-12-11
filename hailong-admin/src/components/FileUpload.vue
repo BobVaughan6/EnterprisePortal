@@ -131,15 +131,15 @@ const fileTypeText = computed(() => {
 // 允许的文件类型配置
 const fileTypeConfig = {
   image: {
-    extensions: ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'],
+    extensions: ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'],
     accept: 'image/*'
   },
   document: {
-    extensions: ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'],
-    accept: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx'
+    extensions: ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'],
+    accept: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,image/*'
   },
   video: {
-    extensions: ['.mp4', '.avi', '.mov', '.wmv', '.flv'],
+    extensions: ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.mkv', '.webm'],
     accept: 'video/*'
   }
 }
@@ -157,11 +157,11 @@ const tipText = computed(() => {
   
   let typeText = ''
   if (props.fileType === 'image') {
-    typeText = '支持 JPG、PNG、GIF 等图片格式'
+    typeText = '支持 JPG、PNG、GIF、BMP、WEBP、SVG 等图片格式'
   } else if (props.fileType === 'document') {
-    typeText = '支持 PDF、DOC、DOCX、XLS、XLSX 等文档格式'
+    typeText = '支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX、TXT 等文档格式，以及 JPG、PNG、GIF 等图片格式'
   } else if (props.fileType === 'video') {
-    typeText = '支持 MP4、AVI、MOV 等视频格式'
+    typeText = '支持 MP4、AVI、MOV、WMV、FLV、MKV、WEBM 等视频格式'
   }
   
   return `${typeText}，${sizeText}${limitText}`

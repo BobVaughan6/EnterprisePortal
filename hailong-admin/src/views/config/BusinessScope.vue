@@ -105,8 +105,8 @@
         <el-form-item label="业务图片" prop="imageId">
           <FileUpload
             v-model="formData.imageId"
+            file-type="image"
             :limit="1"
-            accept="image/*"
             list-type="picture-card"
           />
         </el-form-item>
