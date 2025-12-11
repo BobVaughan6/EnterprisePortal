@@ -1,8 +1,19 @@
 /**
  * 获取交易类型饼图配置
- * @param {Array} data - 项目类型数据 [{type: '政府采购', count: 680, percentage: 54.05}]
+ * @param {Array} data - 项目类型数据 [{type: '政府采购-货物', count: 680, percentage: 54.05}]
  */
 export const getPieChartOption = (data) => {
+  // 为4个类型定义专属颜色
+  const colorMap = {
+    '建设工程': '#10B981',      // 绿色
+    '政府采购-货物': '#3B82F6',  // 蓝色
+    '政府采购-服务': '#F59E0B',  // 橙色
+    '政府采购-工程': '#8B5CF6'   // 紫色
+  }
+  
+  // 根据类型名称分配颜色
+  const colors = data.map(item => colorMap[item.type] || '#6B7280')
+  
   return {
     title: {
       text: '交易类型占比',
@@ -20,7 +31,10 @@ export const getPieChartOption = (data) => {
     legend: {
       orient: 'vertical',
       right: 10,
-      top: 'center'
+      top: 'center',
+      textStyle: {
+        fontSize: 12
+      }
     },
     series: [
       {
@@ -36,7 +50,8 @@ export const getPieChartOption = (data) => {
         },
         label: {
           show: true,
-          formatter: '{b}\n{d}%'
+          formatter: '{b}\n{d}%',
+          fontSize: 12
         },
         emphasis: {
           label: {
@@ -51,7 +66,7 @@ export const getPieChartOption = (data) => {
         }))
       }
     ],
-    color: ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de']
+    color: colors
   }
 }
 

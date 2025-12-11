@@ -125,9 +125,13 @@ const statistics = ref({
 // 定时器
 let refreshTimer = null
 
-// 饼图配置
+// 饼图配置 - 过滤掉"政府采购"主类型，只显示细分类型
 const pieChartOption = computed(() => {
-  return getPieChartOption(statistics.value.projectTypes)
+  // 过滤掉"政府采购"主类型，只保留细分类型和建设工程
+  const filteredTypes = statistics.value.projectTypes.filter(
+    item => item.type !== '政府采购'
+  )
+  return getPieChartOption(filteredTypes)
 })
 
 // 柱状图配置

@@ -78,16 +78,16 @@
           <div class="bg-white rounded-2xl p-8 shadow-lg">
             <h3 class="text-2xl font-bold text-gray-900 mb-6">交易类型占比</h3>
             <div v-if="typeDistribution.length === 0" class="text-center py-8 text-gray-500">暂无类型数据</div>
-            <div v-else class="flex flex-col items-center justify-center h-64">
-              <div class="relative w-48 h-48">
+            <div v-else class="flex items-center justify-center gap-8">
+              <!-- 环形图 -->
+              <div class="relative w-48 h-48 flex-shrink-0">
                 <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" stroke-width="20" />
-                  <circle v-if="typeDistribution.length > 0" cx="50" cy="50" r="40" fill="none" :stroke="typeDistribution[0].color"
-                    stroke-width="20" :stroke-dasharray="`${typeDistribution[0].percentage * 2.51} 251`"
-                    class="transition-all duration-500 hover:stroke-width-[22]" />
-                  <circle v-if="typeDistribution.length > 1" cx="50" cy="50" r="40" fill="none" :stroke="typeDistribution[1].color"
-                    stroke-width="20" :stroke-dasharray="`${typeDistribution[1].percentage * 2.51} 251`"
-                    :stroke-dashoffset="`-${typeDistribution[0].percentage * 2.51}`"
+                  <circle v-for="(item, index) in typeDistribution" :key="item.type"
+                    cx="50" cy="50" r="40" fill="none" :stroke="item.color"
+                    stroke-width="20" 
+                    :stroke-dasharray="`${item.percentage * 2.51} 251`"
+                    :stroke-dashoffset="getStrokeDashOffset(index)"
                     class="transition-all duration-500 hover:stroke-width-[22]" />
                 </svg>
                 <div class="absolute inset-0 flex items-center justify-center">
@@ -97,14 +97,15 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-6 space-y-3 w-full">
+              <!-- 图例 -->
+              <div class="grid grid-cols-1 gap-3 flex-1">
                 <div v-for="item in typeDistribution" :key="item.type"
                   class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div class="flex items-center">
-                    <div class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: item.color }"></div>
-                    <span class="text-gray-700 font-medium">{{ item.type }}</span>
+                    <div class="w-3 h-3 rounded-full mr-3 flex-shrink-0" :style="{ backgroundColor: item.color }"></div>
+                    <span class="text-gray-700 font-medium text-sm">{{ item.type }}</span>
                   </div>
-                  <div class="text-right">
+                  <div class="text-right ml-4">
                     <div class="text-lg font-bold" :style="{ color: item.color }">{{ item.count }}</div>
                     <div class="text-xs text-gray-500">{{ item.percentage }}%</div>
                   </div>
@@ -171,20 +172,43 @@ const statistics = ref({
   regionRanking: []
 })
 
-// 交易类型占比 - 根据后端返回的projectTypes计算
+// 交易类型占比 - 过滤掉"政府采购"主类型，只显示4个细分类型
 const typeDistribution = computed(() => {
   if (!statistics.value.projectTypes || statistics.value.projectTypes.length === 0) {
     return []
   }
   
-  // 映射颜色
-  return statistics.value.projectTypes.map(item => ({
+  // 过滤掉"政府采购"主类型，只保留细分类型
+  const filteredTypes = statistics.value.projectTypes.filter(
+    item => item.type !== '政府采购'
+  )
+  
+  // 为4个类型分配不同的颜色
+  const colorMap = {
+    '建设工程': '#10B981',      // 绿色
+    '政府采购-货物': '#3B82F6',  // 蓝色
+    '政府采购-服务': '#F59E0B',  // 橙色
+    '政府采购-工程': '#8B5CF6'   // 紫色
+  }
+  
+  return filteredTypes.map(item => ({
     type: item.type,
     count: item.count,
     percentage: Number(item.percentage.toFixed(1)),
-    color: item.type === '政府采购' ? '#0EA5E9' : '#10B981'
+    color: colorMap[item.type] || '#6B7280'
   }))
 })
+
+// 计算环形图的偏移量
+const getStrokeDashOffset = (index) => {
+  if (index === 0) return 0
+  
+  let offset = 0
+  for (let i = 0; i < index; i++) {
+    offset -= typeDistribution.value[i].percentage * 2.51
+  }
+  return offset
+}
 
 // 地区排行
 const regionRanking = computed(() => {
