@@ -3,7 +3,7 @@
     <el-card class="search-card">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="附件分类">
-          <el-select v-model="searchForm.category" placeholder="请选择" clearable>
+          <el-select v-model="searchForm.category" placeholder="请选择" clearable style="width: 180px;">
             <el-option label="图片" value="image" />
             <el-option label="文档" value="document" />
             <el-option label="视频" value="video" />
@@ -11,15 +11,19 @@
           </el-select>
         </el-form-item>
         <el-form-item label="关联类型">
-          <el-select v-model="searchForm.relatedType" placeholder="请选择" clearable>
+          <el-select v-model="searchForm.relatedType" placeholder="请选择" clearable style="width: 180px;">
             <el-option label="公告" value="announcement" />
             <el-option label="信息发布" value="info_publication" />
             <el-option label="企业简介" value="company_profile" />
             <el-option label="轮播图" value="carousel_banner" />
+            <el-option label="业务范围" value="business_scope" />
+            <el-option label="企业荣誉" value="company_honor" />
+            <el-option label="企业资质" value="company_qualification" />
+            <el-option label="重大业绩" value="major_achievement" />
           </el-select>
         </el-form-item>
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="文件名称" clearable />
+          <el-input v-model="searchForm.keyword" placeholder="文件名称" clearable style="width: 200px;" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
@@ -55,6 +59,8 @@
               v-if="row.category === 'image'"
               :src="row.fileUrl"
               :preview-src-list="[row.fileUrl]"
+              :preview-teleported="true"
+              :z-index="9999"
               fit="cover"
               style="width: 60px; height: 60px; border-radius: 4px;"
             />
@@ -78,7 +84,14 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="relatedType" label="关联类型" width="120" />
+        <el-table-column label="关联类型" width="150">
+          <template #default="{ row }">
+            <el-tag v-if="row.relatedType" type="info">
+              {{ getRelatedTypeLabel(row.relatedType) }}
+            </el-tag>
+            <span v-else style="color: #999;">-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="createdAt" label="上传时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
@@ -102,38 +115,74 @@
     </el-card>
 
     <!-- 上传对话框 -->
-    <el-dialog v-model="uploadDialogVisible" title="上传附件" width="600px">
-      <el-upload
-        ref="uploadRef"
-        :action="uploadAction"
-        :headers="uploadHeaders"
-        :on-success="handleUploadSuccess"
-        :on-error="handleUploadError"
-        :before-upload="beforeUpload"
-        :file-list="fileList"
-        multiple
-        drag
-      >
-        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">
-          将文件拖到此处，或<em>点击上传</em>
-        </div>
-        <template #tip>
-          <div class="el-upload__tip">
-            支持图片、文档、视频等多种格式，单个文件不超过50MB
-          </div>
-        </template>
-      </el-upload>
+    <el-dialog v-model="uploadDialogVisible" title="上传附件" width="600px" @close="handleDialogClose">
+      <el-form :model="uploadForm" label-width="100px">
+        <el-form-item label="附件分类" required>
+          <el-select v-model="uploadForm.category" placeholder="请选择分类" style="width: 100%;">
+            <el-option label="图片" value="image" />
+            <el-option label="文档" value="document" />
+            <el-option label="视频" value="video" />
+            <el-option label="其他" value="other" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="关联类型">
+          <el-select v-model="uploadForm.relatedType" placeholder="请选择关联类型（可选）" clearable style="width: 100%;">
+            <el-option label="公告" value="announcement" />
+            <el-option label="信息发布" value="info_publication" />
+            <el-option label="企业简介" value="company_profile" />
+            <el-option label="轮播图" value="carousel_banner" />
+            <el-option label="业务范围" value="business_scope" />
+            <el-option label="企业荣誉" value="company_honor" />
+            <el-option label="企业资质" value="company_qualification" />
+            <el-option label="重大业绩" value="major_achievement" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="关联ID">
+          <el-input-number 
+            v-model="uploadForm.relatedId" 
+            :min="1" 
+            placeholder="请输入关联ID（可选）"
+            style="width: 100%;"
+            :disabled="!uploadForm.relatedType"
+          />
+        </el-form-item>
+        <el-form-item label="选择文件" required>
+          <el-upload
+            ref="uploadRef"
+            :action="getUploadAction"
+            :headers="uploadHeaders"
+            :on-success="handleUploadSuccess"
+            :on-error="handleUploadError"
+            :before-upload="beforeUpload"
+            :file-list="fileList"
+            :auto-upload="false"
+            multiple
+            drag
+          >
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">
+              将文件拖到此处，或<em>点击上传</em>
+            </div>
+            <template #tip>
+              <div class="el-upload__tip">
+                支持图片、文档、视频等多种格式，单个文件不超过50MB
+              </div>
+            </template>
+          </el-upload>
+        </el-form-item>
+      </el-form>
       <template #footer>
         <el-button @click="uploadDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleUploadConfirm">确定</el-button>
+        <el-button type="primary" @click="handleUploadConfirm" :loading="uploading">
+          {{ uploading ? '上传中...' : '开始上传' }}
+        </el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Upload, Delete, Document, VideoPlay, Files, UploadFilled } from '@element-plus/icons-vue'
 import { attachmentApi } from '@/api'
@@ -144,6 +193,13 @@ const searchForm = reactive({
   category: '',
   relatedType: '',
   keyword: ''
+})
+
+// 上传表单
+const uploadForm = reactive({
+  category: 'other',
+  relatedType: '',
+  relatedId: null
 })
 
 // 分页
@@ -162,10 +218,24 @@ const selectedIds = ref([])
 const uploadDialogVisible = ref(false)
 const uploadRef = ref(null)
 const fileList = ref([])
+const uploading = ref(false)
 const uploadAction = import.meta.env.VITE_API_BASE_URL + '/api/attachments/upload'
 const uploadHeaders = {
   Authorization: `Bearer ${tokenUtils.getToken()}`
 }
+
+// 动态生成上传URL，包含查询参数
+const getUploadAction = computed(() => {
+  const params = new URLSearchParams()
+  params.append('category', uploadForm.category || 'other')
+  if (uploadForm.relatedType) {
+    params.append('relatedType', uploadForm.relatedType)
+  }
+  if (uploadForm.relatedId) {
+    params.append('relatedId', uploadForm.relatedId.toString())
+  }
+  return `${uploadAction}?${params.toString()}`
+})
 
 /**
  * 获取附件列表
@@ -179,11 +249,18 @@ const getAttachmentList = async () => {
       ...searchForm
     }
     const res = await attachmentApi.getAttachmentList(params)
-    if (res.code === 200) {
-      tableData.value = res.data.items
-      pagination.total = res.data.total
+    console.log('附件列表响应:', res)
+    if (res.success && res.data) {
+      tableData.value = res.data.items || []
+      pagination.total = res.data.totalCount || 0
+      console.log('表格数据:', tableData.value)
+      console.log('总数:', pagination.total)
+    } else if (res.code === 200 && res.data) {
+      tableData.value = res.data.items || []
+      pagination.total = res.data.totalCount || 0
     }
   } catch (error) {
+    console.error('获取附件列表失败:', error)
     ElMessage.error('获取附件列表失败')
   } finally {
     loading.value = false
@@ -237,6 +314,16 @@ const handleSelectionChange = (selection) => {
 const handleUpload = () => {
   uploadDialogVisible.value = true
   fileList.value = []
+  Object.assign(uploadForm, {
+    category: 'other',
+    relatedType: '',
+    relatedId: null
+  })
+}
+
+const handleDialogClose = () => {
+  fileList.value = []
+  uploadRef.value?.clearFiles()
 }
 
 const beforeUpload = (file) => {
@@ -261,8 +348,28 @@ const handleUploadError = (error, file) => {
 }
 
 const handleUploadConfirm = () => {
-  uploadDialogVisible.value = false
-  getAttachmentList()
+  if (!uploadRef.value) return
+  
+  const files = uploadRef.value.uploadFiles
+  if (!files || files.length === 0) {
+    ElMessage.warning('请先选择文件')
+    return
+  }
+
+  if (!uploadForm.category) {
+    ElMessage.warning('请选择附件分类')
+    return
+  }
+
+  uploading.value = true
+  uploadRef.value.submit()
+  
+  // 等待上传完成
+  setTimeout(() => {
+    uploading.value = false
+    uploadDialogVisible.value = false
+    getAttachmentList()
+  }, 2000)
 }
 
 /**
@@ -359,6 +466,23 @@ const getCategoryType = (category) => {
   return map[category] || 'info'
 }
 
+/**
+ * 获取关联类型标签
+ */
+const getRelatedTypeLabel = (relatedType) => {
+  const map = {
+    announcement: '公告',
+    info_publication: '信息发布',
+    company_profile: '企业简介',
+    carousel_banner: '轮播图',
+    business_scope: '业务范围',
+    company_honor: '企业荣誉',
+    company_qualification: '企业资质',
+    major_achievement: '重大业绩'
+  }
+  return map[relatedType] || relatedType
+}
+
 onMounted(() => {
   getAttachmentList()
 })
@@ -398,4 +522,9 @@ onMounted(() => {
   color: #409EFF;
   margin-bottom: 16px;
 }
+
+:deep(.el-upload-dragger) {
+  padding: 40px;
+}
+
 </style>

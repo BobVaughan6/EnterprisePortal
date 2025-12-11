@@ -164,10 +164,12 @@
         
         <el-form-item label="封面图片" prop="coverImageId">
           <FileUpload
-            v-model="formData.coverImageId"
+            v-model="coverImageIds"
             file-type="image"
             :limit="1"
             list-type="picture-card"
+            return-type="id"
+            @change="handleCoverImageChange"
           />
         </el-form-item>
         
@@ -180,6 +182,7 @@
             v-model="formData.attachmentIds"
             :limit="10"
             list-type="text"
+            return-type="id"
           />
         </el-form-item>
         

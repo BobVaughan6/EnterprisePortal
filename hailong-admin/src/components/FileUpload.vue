@@ -39,11 +39,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Upload, Plus } from '@element-plus/icons-vue'
 import { tokenUtils } from '@/utils/auth'
 import { API_CONFIG } from '@/config/api.config'
+import { getAttachmentDetail } from '@/api/attachment'
 
 const props = defineProps({
   modelValue: {
@@ -94,6 +95,12 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
+  },
+  // 返回值类型：url-返回URL数组，id-返回ID数组
+  returnType: {
+    type: String,
+    default: 'url',
+    validator: (value) => ['url', 'id'].includes(value)
   }
 })
 
@@ -170,14 +177,38 @@ const tipText = computed(() => {
 /**
  * 初始化文件列表
  */
-const initFileList = () => {
+const initFileList = async () => {
   if (props.modelValue && props.modelValue.length > 0) {
-    fileList.value = props.modelValue.map((url, index) => ({
-      name: getFileName(url),
-      url: url,
-      uid: Date.now() + index,
-      status: 'success'
-    }))
+    if (props.returnType === 'id') {
+      // ID类型：从后端获取文件信息
+      try {
+        const ids = props.modelValue.filter(id => typeof id === 'number')
+        const filePromises = ids.map(id => getAttachmentDetail(id))
+        const responses = await Promise.all(filePromises)
+        
+        fileList.value = responses
+          .filter(res => res.success && res.data)
+          .map((res, index) => ({
+            name: res.data.fileName,
+            url: res.data.fileUrl,
+            id: res.data.id,
+            uid: Date.now() + index,
+            status: 'success',
+            response: res.data
+          }))
+      } catch (error) {
+        console.error('初始化文件列表失败:', error)
+        fileList.value = []
+      }
+    } else {
+      // URL类型，直接使用
+      fileList.value = props.modelValue.map((url, index) => ({
+        name: getFileName(url),
+        url: url,
+        uid: Date.now() + index,
+        status: 'success'
+      }))
+    }
   } else {
     fileList.value = []
   }
@@ -196,7 +227,8 @@ const getFileName = (url) => {
  * 监听外部值变化
  */
 watch(() => props.modelValue, (newVal) => {
-  if (JSON.stringify(newVal) !== JSON.stringify(getUrls())) {
+  const currentValues = props.returnType === 'id' ? getIds() : getUrls()
+  if (JSON.stringify(newVal) !== JSON.stringify(currentValues)) {
     initFileList()
   }
 }, { deep: true })
@@ -232,13 +264,17 @@ const beforeUpload = (file) => {
  */
 const handleSuccess = (response, file, fileListParam) => {
   if (response.success && response.data) {
-    // 更新文件列表中的URL
+    // 更新文件列表中的URL和ID
     const index = fileListParam.findIndex(f => f.uid === file.uid)
     if (index > -1) {
       fileListParam[index].url = response.data.fileUrl || response.data.url
+      fileListParam[index].id = response.data.id
       fileListParam[index].response = response.data
+      fileListParam[index].name = response.data.fileName || file.name
+      fileListParam[index].status = 'success'
     }
     
+    // 立即更新值
     updateValue()
     ElMessage.success('文件上传成功')
   } else {
@@ -269,7 +305,10 @@ const handleError = (error, file, fileListParam) => {
  * 移除文件
  */
 const handleRemove = (file, fileListParam) => {
-  updateValue()
+  // 延迟更新，确保文件已从列表中移除
+  nextTick(() => {
+    updateValue()
+  })
 }
 
 /**
@@ -304,12 +343,26 @@ const getUrls = () => {
 }
 
 /**
+ * 获取所有文件ID
+ */
+const getIds = () => {
+  return fileList.value
+    .filter(file => file.status === 'success' && file.id)
+    .map(file => file.id)
+}
+
+/**
  * 更新值
  */
 const updateValue = () => {
-  const urls = getUrls()
-  emit('update:modelValue', urls)
-  emit('change', urls)
+  let value
+  if (props.returnType === 'id') {
+    value = getIds()
+  } else {
+    value = getUrls()
+  }
+  emit('update:modelValue', value)
+  emit('change', value)
 }
 
 /**
@@ -333,7 +386,8 @@ const submit = () => {
 defineExpose({
   clearFiles,
   submit,
-  getUrls
+  getUrls,
+  getIds
 })
 
 // 组件挂载时初始化

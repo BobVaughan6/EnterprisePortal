@@ -61,10 +61,51 @@ public class ApplicationDbContext : DbContext
         // Attachment配置
         modelBuilder.Entity<Attachment>(entity =>
         {
-            entity.HasIndex(e => new { e.RelatedType, e.RelatedId });
-            entity.HasIndex(e => e.Category);
-            entity.HasIndex(e => e.UploadUserId);
-            entity.HasIndex(e => e.IsDeleted);
+            entity.ToTable("attachments");
+            
+            // 配置主键为自增
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+            
+            // 配置必填字段
+            entity.Property(e => e.FileName)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("file_name");
+            
+            entity.Property(e => e.FilePath)
+                .IsRequired()
+                .HasMaxLength(500)
+                .HasColumnName("file_path");
+            
+            entity.Property(e => e.FileUrl)
+                .IsRequired()
+                .HasMaxLength(500)
+                .HasColumnName("file_url");
+            
+            entity.Property(e => e.IsDeleted)
+                .IsRequired()
+                .HasColumnName("is_deleted")
+                .HasDefaultValue((sbyte)0);
+            
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            // 配置索引
+            entity.HasIndex(e => new { e.RelatedType, e.RelatedId })
+                .HasDatabaseName("idx_related_type_id");
+            entity.HasIndex(e => e.Category)
+                .HasDatabaseName("idx_category");
+            entity.HasIndex(e => e.UploadUserId)
+                .HasDatabaseName("idx_upload_user_id");
+            entity.HasIndex(e => e.IsDeleted)
+                .HasDatabaseName("idx_is_deleted");
         });
 
         // Announcement配置（统一公告表）

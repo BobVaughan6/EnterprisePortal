@@ -103,9 +103,9 @@ export const deleteAttachment = (id) => {
  */
 export const batchDeleteAttachments = (ids) => {
   return request({
-    url: '/api/attachments/batch-delete',
-    method: 'post',
-    data: { ids }
+    url: '/api/attachments/batch',
+    method: 'delete',
+    data: ids
   })
 }
 

@@ -12,6 +12,19 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 配置 WebRootPath（从配置文件读取或使用默认值）
+var rootPath = builder.Configuration["FileUpload:RootPath"] ?? "wwwroot";
+if (string.IsNullOrEmpty(builder.Environment.WebRootPath))
+{
+    builder.Environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), rootPath);
+}
+
+// 确保 wwwroot 目录存在
+if (!Directory.Exists(builder.Environment.WebRootPath))
+{
+    Directory.CreateDirectory(builder.Environment.WebRootPath);
+}
+
 // 配置Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -82,6 +95,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // 注册服务
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<FileHelper>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
 builder.Services.AddScoped<IConfigService, ConfigService>();

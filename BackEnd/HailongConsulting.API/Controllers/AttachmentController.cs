@@ -1,5 +1,8 @@
 using HailongConsulting.API.Common;
+using HailongConsulting.API.Common.Helpers;
 using HailongConsulting.API.Models.DTOs;
+using HailongConsulting.API.Models.Entities;
+using HailongConsulting.API.Repositories;
 using HailongConsulting.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,17 +20,23 @@ public class AttachmentController : ControllerBase
     private readonly IFileUploadService _fileUploadService;
     private readonly ILogger<AttachmentController> _logger;
     private readonly IWebHostEnvironment _environment;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly FileHelper _fileHelper;
 
     public AttachmentController(
         IAttachmentService attachmentService,
         IFileUploadService fileUploadService,
         ILogger<AttachmentController> logger,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment environment,
+        IUnitOfWork unitOfWork,
+        FileHelper fileHelper)
     {
         _attachmentService = attachmentService;
         _fileUploadService = fileUploadService;
         _logger = logger;
         _environment = environment;
+        _unitOfWork = unitOfWork;
+        _fileHelper = fileHelper;
     }
 
     /// <summary>
@@ -53,6 +62,12 @@ public class AttachmentController : ControllerBase
                 return BadRequest(ApiResponse<AttachmentDto>.FailResult("文件不能为空"));
             }
 
+            // 如果没有指定分类，根据文件扩展名自动识别
+            if (string.IsNullOrEmpty(category) || category == "other")
+            {
+                category = _fileHelper.GetCategoryByExtension(file.FileName);
+            }
+
             // 上传文件
             var uploadResult = await _fileUploadService.UploadFileAsync(file, category);
             if (!uploadResult.success)
@@ -60,18 +75,43 @@ public class AttachmentController : ControllerBase
                 return BadRequest(ApiResponse<AttachmentDto>.FailResult(uploadResult.errorMessage ?? "文件上传失败"));
             }
 
-            // 创建附件记录
-            var dto = new UploadAttachmentDto
+
+            // 创建附件实体
+            var attachment = new Attachment
             {
+                FileName = file.FileName ?? "unknown",
+                FilePath = uploadResult.filePath,
+                FileUrl = $"{Request.Scheme}://{Request.Host}{uploadResult.filePath}",
+                FileSize = file.Length,
+                FileType = file.ContentType ?? "application/octet-stream",
+                FileExtension = Path.GetExtension(file.FileName) ?? "",
                 Category = category,
                 RelatedType = relatedType,
-                RelatedId = relatedId
+                RelatedId = relatedId,
+                IsDeleted = 0,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
-            // 需要手动设置文件信息到 DTO（这里需要扩展 UploadAttachmentDto）
-            var attachment = await _attachmentService.UploadAsync(dto);
+            await _unitOfWork.Attachments.AddAsync(attachment);
+            await _unitOfWork.SaveChangesAsync();
+
+            var attachmentDto = new AttachmentDto
+            {
+                Id = attachment.Id,
+                FileName = attachment.FileName,
+                FilePath = attachment.FilePath,
+                FileUrl = attachment.FileUrl,
+                FileSize = attachment.FileSize,
+                FileType = attachment.FileType,
+                FileExtension = attachment.FileExtension,
+                Category = attachment.Category,
+                RelatedType = attachment.RelatedType,
+                RelatedId = attachment.RelatedId,
+                CreatedAt = attachment.CreatedAt
+            };
             
-            return Ok(ApiResponse<AttachmentDto>.SuccessResult(attachment, "上传附件成功"));
+            return Ok(ApiResponse<AttachmentDto>.SuccessResult(attachmentDto, "上传附件成功"));
         }
         catch (Exception ex)
         {
@@ -108,17 +148,59 @@ public class AttachmentController : ControllerBase
             {
                 if (file.Length > 0)
                 {
-                    var uploadResult = await _fileUploadService.UploadFileAsync(file, category);
+                    // 如果没有指定分类，根据文件扩展名自动识别
+                    var fileCategory = category;
+                    if (string.IsNullOrEmpty(fileCategory) || fileCategory == "other")
+                    {
+                        fileCategory = _fileHelper.GetCategoryByExtension(file.FileName);
+                    }
+
+                    // 上传文件
+                    var uploadResult = await _fileUploadService.UploadFileAsync(file, fileCategory);
                     if (uploadResult.success)
                     {
-                        var dto = new UploadAttachmentDto
+                        // 验证必填字段
+                        if (string.IsNullOrEmpty(uploadResult.filePath))
                         {
-                            Category = category,
+                            continue; // 跳过这个文件
+                        }
+            
+                        // 创建附件实体
+                        var attachment = new Attachment
+                        {
+                            FileName = file.FileName ?? "unknown",
+                            FilePath = uploadResult.filePath,
+                            FileUrl = $"{Request.Scheme}://{Request.Host}{uploadResult.filePath}",
+                            FileSize = file.Length,
+                            FileType = file.ContentType ?? "application/octet-stream",
+                            FileExtension = Path.GetExtension(file.FileName) ?? "",
+                            Category = fileCategory,
                             RelatedType = relatedType,
-                            RelatedId = relatedId
+                            RelatedId = relatedId,
+                            IsDeleted = 0,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now
                         };
-                        var attachment = await _attachmentService.UploadAsync(dto);
-                        attachments.Add(attachment);
+
+                        await _unitOfWork.Attachments.AddAsync(attachment);
+                        await _unitOfWork.SaveChangesAsync();
+
+                        var attachmentDto = new AttachmentDto
+                        {
+                            Id = attachment.Id,
+                            FileName = attachment.FileName,
+                            FilePath = attachment.FilePath,
+                            FileUrl = attachment.FileUrl,
+                            FileSize = attachment.FileSize,
+                            FileType = attachment.FileType,
+                            FileExtension = attachment.FileExtension,
+                            Category = attachment.Category,
+                            RelatedType = attachment.RelatedType,
+                            RelatedId = attachment.RelatedId,
+                            CreatedAt = attachment.CreatedAt
+                        };
+
+                        attachments.Add(attachmentDto);
                     }
                 }
             }

@@ -528,7 +528,7 @@ const handleSubmit = async () => {
       deadline: formData.deadline || null,
       attachmentIds: formData.attachmentIds,
       status: 1,
-      isTop: 0
+      isTop: false
     }
     
     let res

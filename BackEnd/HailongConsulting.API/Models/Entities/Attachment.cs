@@ -14,6 +14,7 @@ public class Attachment
     /// </summary>
     [Key]
     [Column("id")]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     /// <summary>
@@ -90,6 +91,7 @@ public class Attachment
     /// 软删除：0-未删除，1-已删除
     /// </summary>
     [Column("is_deleted")]
+    [Required]
     public sbyte IsDeleted { get; set; } = 0;
 
     /// <summary>

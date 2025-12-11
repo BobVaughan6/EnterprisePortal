@@ -22,7 +22,7 @@ CREATE TABLE `attachments` (
   `file_path` VARCHAR(500) NOT NULL COMMENT '文件路径',
   `file_url` VARCHAR(500) NOT NULL COMMENT '文件访问URL',
   `file_size` BIGINT UNSIGNED DEFAULT NULL COMMENT '文件大小（字节）',
-  `file_type` VARCHAR(50) DEFAULT NULL COMMENT '文件类型（MIME类型）',
+  `file_type` VARCHAR(200) DEFAULT NULL COMMENT '文件类型（MIME类型）',
   `file_extension` VARCHAR(20) DEFAULT NULL COMMENT '文件扩展名',
   `category` VARCHAR(50) DEFAULT NULL COMMENT '附件分类：image-图片, document-文档, video-视频, other-其他',
   `related_type` VARCHAR(50) DEFAULT NULL COMMENT '关联类型：announcement-公告, info_publication-信息发布, company_profile-企业简介等',

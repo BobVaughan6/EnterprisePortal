@@ -13,30 +13,35 @@ namespace HailongConsulting.API.Services
     {
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<FileUploadService> _logger;
+        private readonly FileHelper _fileHelper;
 
-        public FileUploadService(IWebHostEnvironment environment, ILogger<FileUploadService> logger)
+        public FileUploadService(
+            IWebHostEnvironment environment,
+            ILogger<FileUploadService> logger,
+            FileHelper fileHelper)
         {
             _environment = environment;
             _logger = logger;
+            _fileHelper = fileHelper;
         }
 
         public async Task<(bool success, string? filePath, string? errorMessage)> UploadFileAsync(IFormFile file, string category)
         {
             try
             {
-                if (!FileHelper.IsValidFile(file, out string errorMessage))
+                if (!_fileHelper.IsValidFile(file, out string errorMessage))
                 {
                     return (false, null, errorMessage);
                 }
 
-                var uniqueFileName = FileHelper.GenerateUniqueFileName(file.FileName);
-                var relativePath = FileHelper.GetRelativePath(category, uniqueFileName);
-                var physicalPath = FileHelper.GetPhysicalPath(_environment.WebRootPath, relativePath);
+                var uniqueFileName = _fileHelper.GenerateUniqueFileName(file.FileName);
+                var relativePath = _fileHelper.GetRelativePath(category, uniqueFileName);
+                var physicalPath = _fileHelper.GetPhysicalPath(_environment.WebRootPath, relativePath);
 
                 var directory = Path.GetDirectoryName(physicalPath);
                 if (directory != null)
                 {
-                    FileHelper.EnsureDirectoryExists(directory);
+                    _fileHelper.EnsureDirectoryExists(directory);
                 }
 
                 using (var stream = new FileStream(physicalPath, FileMode.Create))
@@ -72,8 +77,8 @@ namespace HailongConsulting.API.Services
 
         public bool DeleteFile(string webRootPath, string relativePath)
         {
-            var physicalPath = FileHelper.GetPhysicalPath(webRootPath, relativePath.TrimStart('/'));
-            return FileHelper.DeleteFile(physicalPath);
+            var physicalPath = _fileHelper.GetPhysicalPath(webRootPath, relativePath.TrimStart('/'));
+            return _fileHelper.DeleteFile(physicalPath);
         }
     }
 }

@@ -177,10 +177,12 @@
         
         <el-form-item label="封面图片" prop="coverImageId">
           <FileUpload
-            v-model="formData.coverImageId"
+            v-model="coverImageIds"
             file-type="image"
             :limit="1"
             list-type="picture-card"
+            return-type="id"
+            @change="handleCoverImageChange"
           />
         </el-form-item>
         
@@ -193,6 +195,7 @@
             v-model="formData.attachmentIds"
             :limit="10"
             list-type="text"
+            return-type="id"
           />
         </el-form-item>
         
@@ -272,6 +275,14 @@ const formData = reactive({
   isTop: false,
   status: 1
 })
+
+// 封面图片ID数组（用于FileUpload组件）
+const coverImageIds = ref([])
+
+// 处理封面图片变化
+const handleCoverImageChange = (ids) => {
+  formData.coverImageId = ids && ids.length > 0 ? ids[0] : null
+}
 
 // 表单验证规则
 const formRules = {
@@ -378,6 +389,7 @@ const handleAdd = () => {
     isTop: false,
     status: 1
   })
+  coverImageIds.value = []
   dialogVisible.value = true
 }
 
@@ -397,6 +409,9 @@ const handleEdit = async (row) => {
         summary: res.data.summary || '',
         content: res.data.content,
         coverImageId: res.data.coverImageId,
+      })
+      coverImageIds.value = res.data.coverImageId ? [res.data.coverImageId] : []
+      Object.assign(formData, {
         author: res.data.author || '',
         publisher: res.data.publisher || '',
         publishTime: res.data.publishTime,
