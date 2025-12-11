@@ -31,15 +31,17 @@
         <h2 class="text-5xl font-bold text-hailong-dark mb-4 font-tech">企业简介</h2>
         <div class="w-24 h-1 bg-gradient-to-r from-hailong-primary to-hailong-secondary mx-auto"></div>
       </div>
-      <div class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
+      <div v-if="profileLoading" class="text-center py-8 text-gray-500">加载中...</div>
+      <div v-else-if="!profileContent" class="text-center py-8 text-gray-500">暂无企业简介</div>
+      <div v-else class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
           <div class="lg:col-span-2">
             <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
-              {{ companyProfile.content }}
+              {{ profileContent }}
             </p>
           </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div v-for="highlight in companyProfile.highlights" :key="highlight"
+          <div v-if="profileHighlights.length > 0" class="grid grid-cols-2 gap-4">
+            <div v-for="highlight in profileHighlights" :key="highlight"
               class="text-center p-6 bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5 rounded-xl hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer group">
               <div
                 class="w-12 h-12 bg-hailong-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-hailong-primary/20 transition-colors">
@@ -72,19 +74,19 @@
             <router-link to="/announcements?tab=GOV_PROCUREMENT"
               class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
           </div>
-          <div class="space-y-4">
-            <div v-for="announcement in govProcurementAnnouncements" :key="announcement.id"
+          <div v-if="loading" class="text-center py-8 text-gray-500">加载中...</div>
+          <div v-else-if="govProcurementList.length === 0" class="text-center py-8 text-gray-500">暂无公告</div>
+          <div v-else class="space-y-4">
+            <div v-for="announcement in govProcurementList" :key="announcement.id"
               @click="$emit('announcement-click', announcement.id)"
               class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-primary">
               <div class="flex justify-between items-start mb-3">
-                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ announcement.type }}</span>
-                <span class="text-xs text-gray-500">{{ announcement.publishDate }}</span>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ announcement.noticeType }}</span>
+                <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>
               <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-600">预算: <strong class="text-hailong-primary">{{ announcement.budget
-                    }}</strong></span>
-                <span class="text-gray-500">截止: {{ announcement.deadline }}</span>
+                <span class="text-gray-600">区域: <strong class="text-hailong-primary">{{ announcement.projectRegion }}</strong></span>
               </div>
             </div>
           </div>
@@ -97,20 +99,19 @@
             <router-link to="/announcements?tab=CONSTRUCTION"
               class="text-hailong-primary hover:underline text-sm">查看全部 →</router-link>
           </div>
-          <div class="space-y-4">
-            <div v-for="announcement in constructionAnnouncements" :key="announcement.id"
+          <div v-if="loading" class="text-center py-8 text-gray-500">加载中...</div>
+          <div v-else-if="constructionList.length === 0" class="text-center py-8 text-gray-500">暂无公告</div>
+          <div v-else class="space-y-4">
+            <div v-for="announcement in constructionList" :key="announcement.id"
               @click="$emit('announcement-click', announcement.id)"
               class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-secondary">
               <div class="flex justify-between items-start mb-3">
-                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.type
-                  }}</span>
-                <span class="text-xs text-gray-500">{{ announcement.publishDate }}</span>
+                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.noticeType }}</span>
+                <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>
               <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-600">预算: <strong class="text-hailong-secondary">{{ announcement.budget
-                    }}</strong></span>
-                <span class="text-gray-500">截止: {{ announcement.deadline }}</span>
+                <span class="text-gray-600">区域: <strong class="text-hailong-secondary">{{ announcement.projectRegion }}</strong></span>
               </div>
             </div>
           </div>
@@ -121,13 +122,73 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { companyProfile, govProcurementAnnouncements, constructionAnnouncements } from '@/config/data.js'
+import { ref, computed, onMounted } from 'vue'
 import { getCompanyInfo } from '@/utils/config'
+import { getCompanyProfile } from '@/api/config'
+import { getRecentAnnouncements } from '@/api/home'
 
 defineEmits(['show-contact', 'announcement-click'])
 
 const companyInfo = computed(() => getCompanyInfo())
+
+// 企业简介数据
+const profileLoading = ref(false)
+const profileContent = ref('')
+const profileHighlights = ref([])
+
+// 公告数据
+const loading = ref(false)
+const govProcurementList = ref([])
+const constructionList = ref([])
+
+// 加载企业简介
+const loadCompanyProfile = async () => {
+  profileLoading.value = true
+  try {
+    const response = await getCompanyProfile()
+    if (response.success && response.data) {
+      profileContent.value = response.data.content || ''
+      profileHighlights.value = response.data.highlights || []
+    }
+  } catch (error) {
+    console.error('加载企业简介失败:', error)
+  } finally {
+    profileLoading.value = false
+  }
+}
+
+// 加载最新公告
+const loadRecentAnnouncements = async () => {
+  loading.value = true
+  try {
+    const response = await getRecentAnnouncements()
+    if (response.success && response.data) {
+      // 根据sourceType分类公告
+      govProcurementList.value = response.data
+        .filter(item => item.sourceType === '政府采购')
+        .slice(0, 3)
+      constructionList.value = response.data
+        .filter(item => item.sourceType === '建设工程')
+        .slice(0, 3)
+    }
+  } catch (error) {
+    console.error('加载最新公告失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 格式化日期
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+onMounted(() => {
+  loadCompanyProfile()
+  loadRecentAnnouncements()
+})
 </script>
 
 <style scoped>
