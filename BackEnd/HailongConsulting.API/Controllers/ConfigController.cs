@@ -22,112 +22,112 @@ public class ConfigController : ControllerBase
         _logger = logger;
     }
 
-    #region 轮播图管理
+    #region 轮播图管理 - 已暂时注释，不对接前端
 
-    /// <summary>
-    /// 获取所有轮播图
-    /// </summary>
-    [HttpGet("banners")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<CarouselBannerDto>>>> GetBanners()
-    {
-        try
-        {
-            var banners = await _configService.GetAllBannersAsync();
-            return Ok(ApiResponse<IEnumerable<CarouselBannerDto>>.SuccessResult(banners, "获取轮播图列表成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "获取轮播图列表失败");
-            return StatusCode(500, ApiResponse<IEnumerable<CarouselBannerDto>>.FailResult("获取轮播图列表失败"));
-        }
-    }
+    // /// <summary>
+    // /// 获取所有轮播图
+    // /// </summary>
+    // [HttpGet("banners")]
+    // public async Task<ActionResult<ApiResponse<IEnumerable<CarouselBannerDto>>>> GetBanners()
+    // {
+    //     try
+    //     {
+    //         var banners = await _configService.GetAllBannersAsync();
+    //         return Ok(ApiResponse<IEnumerable<CarouselBannerDto>>.SuccessResult(banners, "获取轮播图列表成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "获取轮播图列表失败");
+    //         return StatusCode(500, ApiResponse<IEnumerable<CarouselBannerDto>>.FailResult("获取轮播图列表失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 根据ID获取轮播图
-    /// </summary>
-    [HttpGet("banners/{id}")]
-    public async Task<ActionResult<ApiResponse<CarouselBannerDto>>> GetBanner(int id)
-    {
-        try
-        {
-            var banner = await _configService.GetBannerByIdAsync(id);
-            if (banner == null)
-            {
-                return NotFound(ApiResponse<CarouselBannerDto>.FailResult("轮播图不存在"));
-            }
-            return Ok(ApiResponse<CarouselBannerDto>.SuccessResult(banner, "获取轮播图成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "获取轮播图失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<CarouselBannerDto>.FailResult("获取轮播图失败"));
-        }
-    }
+    // /// <summary>
+    // /// 根据ID获取轮播图
+    // /// </summary>
+    // [HttpGet("banners/{id}")]
+    // public async Task<ActionResult<ApiResponse<CarouselBannerDto>>> GetBanner(int id)
+    // {
+    //     try
+    //     {
+    //         var banner = await _configService.GetBannerByIdAsync(id);
+    //         if (banner == null)
+    //         {
+    //             return NotFound(ApiResponse<CarouselBannerDto>.FailResult("轮播图不存在"));
+    //         }
+    //         return Ok(ApiResponse<CarouselBannerDto>.SuccessResult(banner, "获取轮播图成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "获取轮播图失败，ID: {Id}", id);
+    //         return StatusCode(500, ApiResponse<CarouselBannerDto>.FailResult("获取轮播图失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 创建轮播图
-    /// </summary>
-    [HttpPost("banners")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse<CarouselBannerDto>>> CreateBanner([FromBody] CreateCarouselBannerDto dto)
-    {
-        try
-        {
-            var banner = await _configService.CreateBannerAsync(dto);
-            return Ok(ApiResponse<CarouselBannerDto>.SuccessResult(banner, "创建轮播图成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "创建轮播图失败");
-            return StatusCode(500, ApiResponse<CarouselBannerDto>.FailResult("创建轮播图失败"));
-        }
-    }
+    // /// <summary>
+    // /// 创建轮播图
+    // /// </summary>
+    // [HttpPost("banners")]
+    // [Authorize]
+    // public async Task<ActionResult<ApiResponse<CarouselBannerDto>>> CreateBanner([FromBody] CreateCarouselBannerDto dto)
+    // {
+    //     try
+    //     {
+    //         var banner = await _configService.CreateBannerAsync(dto);
+    //         return Ok(ApiResponse<CarouselBannerDto>.SuccessResult(banner, "创建轮播图成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "创建轮播图失败");
+    //         return StatusCode(500, ApiResponse<CarouselBannerDto>.FailResult("创建轮播图失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 更新轮播图
-    /// </summary>
-    [HttpPut("banners/{id}")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> UpdateBanner(int id, [FromBody] UpdateCarouselBannerDto dto)
-    {
-        try
-        {
-            var result = await _configService.UpdateBannerAsync(id, dto);
-            if (!result)
-            {
-                return NotFound(ApiResponse<bool>.FailResult("轮播图不存在"));
-            }
-            return Ok(ApiResponse<bool>.SuccessResult(true, "更新轮播图成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "更新轮播图失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新轮播图失败"));
-        }
-    }
+    // /// <summary>
+    // /// 更新轮播图
+    // /// </summary>
+    // [HttpPut("banners/{id}")]
+    // [Authorize]
+    // public async Task<ActionResult<ApiResponse<bool>>> UpdateBanner(int id, [FromBody] UpdateCarouselBannerDto dto)
+    // {
+    //     try
+    //     {
+    //         var result = await _configService.UpdateBannerAsync(id, dto);
+    //         if (!result)
+    //         {
+    //             return NotFound(ApiResponse<bool>.FailResult("轮播图不存在"));
+    //         }
+    //         return Ok(ApiResponse<bool>.SuccessResult(true, "更新轮播图成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "更新轮播图失败，ID: {Id}", id);
+    //         return StatusCode(500, ApiResponse<bool>.FailResult("更新轮播图失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 删除轮播图
-    /// </summary>
-    [HttpDelete("banners/{id}")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteBanner(int id)
-    {
-        try
-        {
-            var result = await _configService.DeleteBannerAsync(id);
-            if (!result)
-            {
-                return NotFound(ApiResponse<bool>.FailResult("轮播图不存在"));
-            }
-            return Ok(ApiResponse<bool>.SuccessResult(true, "删除轮播图成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "删除轮播图失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除轮播图失败"));
-        }
-    }
+    // /// <summary>
+    // /// 删除轮播图
+    // /// </summary>
+    // [HttpDelete("banners/{id}")]
+    // [Authorize]
+    // public async Task<ActionResult<ApiResponse<bool>>> DeleteBanner(int id)
+    // {
+    //     try
+    //     {
+    //         var result = await _configService.DeleteBannerAsync(id);
+    //         if (!result)
+    //         {
+    //             return NotFound(ApiResponse<bool>.FailResult("轮播图不存在"));
+    //         }
+    //         return Ok(ApiResponse<bool>.SuccessResult(true, "删除轮播图成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "删除轮播图失败，ID: {Id}", id);
+    //         return StatusCode(500, ApiResponse<bool>.FailResult("删除轮播图失败"));
+    //     }
+    // }
 
     #endregion
 
@@ -394,112 +394,112 @@ public class ConfigController : ControllerBase
 
     #endregion
 
-    #region 友情链接管理
+    #region 友情链接管理 - 已暂时注释，不对接前端
 
-    /// <summary>
-    /// 获取所有友情链接
-    /// </summary>
-    [HttpGet("links")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<FriendlyLinkDto>>>> GetLinks()
-    {
-        try
-        {
-            var links = await _configService.GetAllLinksAsync();
-            return Ok(ApiResponse<IEnumerable<FriendlyLinkDto>>.SuccessResult(links, "获取友情链接列表成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "获取友情链接列表失败");
-            return StatusCode(500, ApiResponse<IEnumerable<FriendlyLinkDto>>.FailResult("获取友情链接列表失败"));
-        }
-    }
+    // /// <summary>
+    // /// 获取所有友情链接
+    // /// </summary>
+    // [HttpGet("links")]
+    // public async Task<ActionResult<ApiResponse<IEnumerable<FriendlyLinkDto>>>> GetLinks()
+    // {
+    //     try
+    //     {
+    //         var links = await _configService.GetAllLinksAsync();
+    //         return Ok(ApiResponse<IEnumerable<FriendlyLinkDto>>.SuccessResult(links, "获取友情链接列表成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "获取友情链接列表失败");
+    //         return StatusCode(500, ApiResponse<IEnumerable<FriendlyLinkDto>>.FailResult("获取友情链接列表失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 根据ID获取友情链接
-    /// </summary>
-    [HttpGet("links/{id}")]
-    public async Task<ActionResult<ApiResponse<FriendlyLinkDto>>> GetLink(int id)
-    {
-        try
-        {
-            var link = await _configService.GetLinkByIdAsync(id);
-            if (link == null)
-            {
-                return NotFound(ApiResponse<FriendlyLinkDto>.FailResult("友情链接不存在"));
-            }
-            return Ok(ApiResponse<FriendlyLinkDto>.SuccessResult(link, "获取友情链接成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "获取友情链接失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<FriendlyLinkDto>.FailResult("获取友情链接失败"));
-        }
-    }
+    // /// <summary>
+    // /// 根据ID获取友情链接
+    // /// </summary>
+    // [HttpGet("links/{id}")]
+    // public async Task<ActionResult<ApiResponse<FriendlyLinkDto>>> GetLink(int id)
+    // {
+    //     try
+    //     {
+    //         var link = await _configService.GetLinkByIdAsync(id);
+    //         if (link == null)
+    //         {
+    //             return NotFound(ApiResponse<FriendlyLinkDto>.FailResult("友情链接不存在"));
+    //         }
+    //         return Ok(ApiResponse<FriendlyLinkDto>.SuccessResult(link, "获取友情链接成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "获取友情链接失败，ID: {Id}", id);
+    //         return StatusCode(500, ApiResponse<FriendlyLinkDto>.FailResult("获取友情链接失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 创建友情链接
-    /// </summary>
-    [HttpPost("links")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse<FriendlyLinkDto>>> CreateLink([FromBody] CreateFriendlyLinkDto dto)
-    {
-        try
-        {
-            var link = await _configService.CreateLinkAsync(dto);
-            return Ok(ApiResponse<FriendlyLinkDto>.SuccessResult(link, "创建友情链接成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "创建友情链接失败");
-            return StatusCode(500, ApiResponse<FriendlyLinkDto>.FailResult("创建友情链接失败"));
-        }
-    }
+    // /// <summary>
+    // /// 创建友情链接
+    // /// </summary>
+    // [HttpPost("links")]
+    // [Authorize]
+    // public async Task<ActionResult<ApiResponse<FriendlyLinkDto>>> CreateLink([FromBody] CreateFriendlyLinkDto dto)
+    // {
+    //     try
+    //     {
+    //         var link = await _configService.CreateLinkAsync(dto);
+    //         return Ok(ApiResponse<FriendlyLinkDto>.SuccessResult(link, "创建友情链接成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "创建友情链接失败");
+    //         return StatusCode(500, ApiResponse<FriendlyLinkDto>.FailResult("创建友情链接失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 更新友情链接
-    /// </summary>
-    [HttpPut("links/{id}")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> UpdateLink(int id, [FromBody] UpdateFriendlyLinkDto dto)
-    {
-        try
-        {
-            var result = await _configService.UpdateLinkAsync(id, dto);
-            if (!result)
-            {
-                return NotFound(ApiResponse<bool>.FailResult("友情链接不存在"));
-            }
-            return Ok(ApiResponse<bool>.SuccessResult(true, "更新友情链接成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "更新友情链接失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("更新友情链接失败"));
-        }
-    }
+    // /// <summary>
+    // /// 更新友情链接
+    // /// </summary>
+    // [HttpPut("links/{id}")]
+    // [Authorize]
+    // public async Task<ActionResult<ApiResponse<bool>>> UpdateLink(int id, [FromBody] UpdateFriendlyLinkDto dto)
+    // {
+    //     try
+    //     {
+    //         var result = await _configService.UpdateLinkAsync(id, dto);
+    //         if (!result)
+    //         {
+    //             return NotFound(ApiResponse<bool>.FailResult("友情链接不存在"));
+    //         }
+    //         return Ok(ApiResponse<bool>.SuccessResult(true, "更新友情链接成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "更新友情链接失败，ID: {Id}", id);
+    //         return StatusCode(500, ApiResponse<bool>.FailResult("更新友情链接失败"));
+    //     }
+    // }
 
-    /// <summary>
-    /// 删除友情链接
-    /// </summary>
-    [HttpDelete("links/{id}")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteLink(int id)
-    {
-        try
-        {
-            var result = await _configService.DeleteLinkAsync(id);
-            if (!result)
-            {
-                return NotFound(ApiResponse<bool>.FailResult("友情链接不存在"));
-            }
-            return Ok(ApiResponse<bool>.SuccessResult(true, "删除友情链接成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "删除友情链接失败，ID: {Id}", id);
-            return StatusCode(500, ApiResponse<bool>.FailResult("删除友情链接失败"));
-        }
-    }
+    // /// <summary>
+    // /// 删除友情链接
+    // /// </summary>
+    // [HttpDelete("links/{id}")]
+    // [Authorize]
+    // public async Task<ActionResult<ApiResponse<bool>>> DeleteLink(int id)
+    // {
+    //     try
+    //     {
+    //         var result = await _configService.DeleteLinkAsync(id);
+    //         if (!result)
+    //         {
+    //             return NotFound(ApiResponse<bool>.FailResult("友情链接不存在"));
+    //         }
+    //         return Ok(ApiResponse<bool>.SuccessResult(true, "删除友情链接成功"));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "删除友情链接失败，ID: {Id}", id);
+    //         return StatusCode(500, ApiResponse<bool>.FailResult("删除友情链接失败"));
+    //     }
+    // }
 
     #endregion
 
@@ -543,6 +543,8 @@ public class ConfigController : ControllerBase
             return StatusCode(500, ApiResponse<bool>.FailResult("记录访问失败"));
         }
     }
+
+    #endregion
 
     #region 业务范围管理
 
@@ -737,7 +739,7 @@ public class ConfigController : ControllerBase
         }
     }
 
-    /// <summary>
+  /// <summary>
     /// 删除企业资质
     /// </summary>
     [HttpDelete("qualifications/{id}")]

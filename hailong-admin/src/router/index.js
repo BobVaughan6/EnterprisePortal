@@ -61,15 +61,16 @@ const routes = [
       {
         path: '/config',
         name: 'Config',
-        redirect: '/config/banners',
+        redirect: '/config/company-profile',
         meta: { title: '系统配置', icon: 'Setting' },
         children: [
-          {
-            path: '/config/banners',
-            name: 'Banners',
-            component: () => import('@/views/config/Banners.vue'),
-            meta: { title: '轮播图管理' }
-          },
+          // 轮播图管理 - 已暂时注释，不对接后台
+          // {
+          //   path: '/config/banners',
+          //   name: 'Banners',
+          //   component: () => import('@/views/config/Banners.vue'),
+          //   meta: { title: '轮播图管理' }
+          // },
           {
             path: '/config/company-profile',
             name: 'CompanyProfile',
@@ -99,13 +100,14 @@ const routes = [
             name: 'Achievements',
             component: () => import('@/views/config/Achievements.vue'),
             meta: { title: '重大业绩' }
-          },
-          {
-            path: '/config/friendly-links',
-            name: 'FriendlyLinks',
-            component: () => import('@/views/config/FriendlyLinks.vue'),
-            meta: { title: '友情链接' }
           }
+          // 友情链接 - 已暂时注释
+          // {
+          //   path: '/config/friendly-links',
+          //   name: 'FriendlyLinks',
+          //   component: () => import('@/views/config/FriendlyLinks.vue'),
+          //   meta: { title: '友情链接' }
+          // }
         ]
       },
       {
