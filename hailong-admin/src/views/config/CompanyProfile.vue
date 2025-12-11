@@ -25,6 +25,37 @@
           <RichEditor v-model="formData.content" :height="400" />
         </el-form-item>
         
+        <el-form-item label="企业亮点">
+          <div class="highlights-container">
+            <div v-for="(highlight, index) in formData.highlights" :key="index" class="highlight-item">
+              <el-input 
+                v-model="formData.highlights[index]" 
+                placeholder="请输入企业亮点"
+                maxlength="20"
+                show-word-limit
+              >
+                <template #append>
+                  <el-button 
+                    :icon="Delete" 
+                    @click="removeHighlight(index)"
+                    :disabled="formData.highlights.length <= 1"
+                  />
+                </template>
+              </el-input>
+            </div>
+            <el-button 
+              type="primary" 
+              :icon="Plus" 
+              @click="addHighlight"
+              :disabled="formData.highlights.length >= 8"
+              style="width: 100%"
+            >
+              添加亮点
+            </el-button>
+          </div>
+          <div class="form-tip">企业亮点将显示在首页企业简介区域，建议4-8个，每个不超过20字</div>
+        </el-form-item>
+        
         <el-form-item label="联系电话">
           <el-input v-model="formData.contactPhone" placeholder="请输入联系电话" maxlength="50" />
         </el-form-item>
@@ -59,6 +90,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Plus, Delete } from '@element-plus/icons-vue'
 import { systemConfigApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 import FileUpload from '@/components/FileUpload.vue'
@@ -71,6 +103,7 @@ const formData = reactive({
   title: '',
   content: '',
   imageUrls: [],
+  highlights: [],
   contactPhone: '',
   contactEmail: '',
   address: '',
@@ -87,6 +120,20 @@ const rules = {
   ]
 }
 
+// 添加亮点
+const addHighlight = () => {
+  if (formData.highlights.length < 8) {
+    formData.highlights.push('')
+  }
+}
+
+// 删除亮点
+const removeHighlight = (index) => {
+  if (formData.highlights.length > 1) {
+    formData.highlights.splice(index, 1)
+  }
+}
+
 const loadData = async () => {
   loading.value = true
   try {
@@ -96,6 +143,7 @@ const loadData = async () => {
         title: res.data.title || '',
         content: res.data.content || '',
         imageUrls: res.data.imageUrls || [],
+        highlights: res.data.highlights || [],
         contactPhone: res.data.contactPhone || '',
         contactEmail: res.data.contactEmail || '',
         address: res.data.address || '',
@@ -113,12 +161,23 @@ const loadData = async () => {
 const handleSubmit = async () => {
   if (!formRef.value) return
   
+  // 过滤掉空的亮点
+  const filteredHighlights = formData.highlights.filter(h => h && h.trim())
+  if (filteredHighlights.length === 0) {
+    ElMessage.warning('请至少添加一个企业亮点')
+    return
+  }
+  
   await formRef.value.validate(async (valid) => {
     if (!valid) return
     
     submitting.value = true
     try {
-      const res = await systemConfigApi.companyProfile.update(formData)
+      const submitData = {
+        ...formData,
+        highlights: filteredHighlights
+      }
+      const res = await systemConfigApi.companyProfile.update(submitData)
       if (res.success) {
         ElMessage.success('保存成功')
         loadData()
@@ -152,5 +211,17 @@ onMounted(() => {
   font-size: 12px;
   color: #999;
   margin-top: 5px;
+}
+
+.highlights-container {
+  width: 100%;
+}
+
+.highlight-item {
+  margin-bottom: 12px;
+}
+
+.highlight-item:last-of-type {
+  margin-bottom: 16px;
 }
 </style>
