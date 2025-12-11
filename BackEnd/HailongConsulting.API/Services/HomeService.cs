@@ -34,6 +34,11 @@ public class HomeService : IHomeService
         // 总项目数
         var totalProjects = govCount + constructionCount;
 
+        // 计算代理总额：统计 notice_type 为 result 的 budget_amount 金额总和
+        var totalAmount = await _context.Announcements
+            .Where(x => x.IsDeleted == 0 && x.NoticeType == "result" && x.BudgetAmount.HasValue)
+            .SumAsync(x => x.BudgetAmount.Value);
+
         // 计算交易类型占比
         var projectTypes = new List<ProjectTypeStatDto>();
         
@@ -93,7 +98,7 @@ public class HomeService : IHomeService
         return new HomeStatisticsDto
         {
             TotalProjects = totalProjects,
-            TotalAmount = 0, // 数据库中没有金额字段，返回0
+            TotalAmount = totalAmount,
             ProjectTypes = projectTypes,
             RegionRanking = regionRanking
         };
