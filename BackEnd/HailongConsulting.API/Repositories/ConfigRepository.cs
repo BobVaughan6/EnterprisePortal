@@ -269,5 +269,86 @@ public class ConfigRepository : IConfigRepository
         await _context.SaveChangesAsync();
     }
 
+    #region 业务范围
+
+    public async Task<IEnumerable<BusinessScope>> GetAllBusinessScopesAsync()
+    {
+        return await _context.Set<BusinessScope>()
+            .Where(s => s.IsDeleted == 0)
+            .OrderBy(s => s.SortOrder)
+            .ThenByDescending(s => s.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<BusinessScope?> GetBusinessScopeByIdAsync(int id)
+    {
+        return await _context.Set<BusinessScope>()
+            .FirstOrDefaultAsync(s => s.Id == id && s.IsDeleted == 0);
+    }
+
+    public async Task<BusinessScope> AddBusinessScopeAsync(BusinessScope scope)
+    {
+        await _context.Set<BusinessScope>().AddAsync(scope);
+        await _context.SaveChangesAsync();
+        return scope;
+    }
+
+    public async Task<bool> UpdateBusinessScopeAsync(BusinessScope scope)
+    {
+        _context.Set<BusinessScope>().Update(scope);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteBusinessScopeAsync(int id)
+    {
+        var scope = await GetBusinessScopeByIdAsync(id);
+        if (scope == null) return false;
+
+        scope.IsDeleted = 1;
+        return await UpdateBusinessScopeAsync(scope);
+    }
+
+    #endregion
+
+    #region 企业资质
+
+    public async Task<IEnumerable<CompanyQualification>> GetAllQualificationsAsync()
+    {
+        return await _context.Set<CompanyQualification>()
+            .Where(q => q.IsDeleted == 0)
+            .OrderBy(q => q.SortOrder)
+            .ThenByDescending(q => q.IssueDate)
+            .ToListAsync();
+    }
+
+    public async Task<CompanyQualification?> GetQualificationByIdAsync(int id)
+    {
+        return await _context.Set<CompanyQualification>()
+            .FirstOrDefaultAsync(q => q.Id == id && q.IsDeleted == 0);
+    }
+
+    public async Task<CompanyQualification> AddQualificationAsync(CompanyQualification qualification)
+    {
+        await _context.Set<CompanyQualification>().AddAsync(qualification);
+        await _context.SaveChangesAsync();
+        return qualification;
+    }
+
+    public async Task<bool> UpdateQualificationAsync(CompanyQualification qualification)
+    {
+        _context.Set<CompanyQualification>().Update(qualification);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteQualificationAsync(int id)
+    {
+        var qualification = await GetQualificationByIdAsync(id);
+        if (qualification == null) return false;
+
+        qualification.IsDeleted = 1;
+        return await UpdateQualificationAsync(qualification);
+    }
+
+    #endregion
     #endregion
 }

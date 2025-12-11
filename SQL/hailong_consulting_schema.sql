@@ -187,6 +187,7 @@ CREATE TABLE `company_qualifications` (
   `description` TEXT DEFAULT NULL COMMENT '资质描述',
   `image_id` INT UNSIGNED DEFAULT NULL COMMENT '资质证书图片ID（关联attachments表）',
   `certificate_no` VARCHAR(100) DEFAULT NULL COMMENT '证书编号',
+  `issuing_authority` VARCHAR(200) DEFAULT NULL COMMENT '颁发机构',
   `issue_date` DATE DEFAULT NULL COMMENT '颁发日期',
   `expiry_date` DATE DEFAULT NULL COMMENT '有效期至',
   `sort_order` INT DEFAULT 0 COMMENT '排序顺序',

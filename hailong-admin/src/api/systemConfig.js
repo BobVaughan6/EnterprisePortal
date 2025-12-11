@@ -2,8 +2,7 @@ import request from './request'
 
 /**
  * 系统配置 API
- * 包含：企业简介、重要业绩、企业荣誉、轮播图、友情链接
- * 注意：业务范围和企业资质的后端API尚未实现
+ * 包含：企业简介、业务范围、企业资质、重要业绩、企业荣誉、轮播图、友情链接
  */
 
 // ==================== 企业简介 ====================
@@ -20,57 +19,57 @@ export const companyProfile = {
 }
 
 // ==================== 业务范围 ====================
-// 注意：后端API尚未实现，暂时返回空数据
 export const businessScope = {
-  getList: (params) => {
-    console.warn('业务范围API尚未在后端实现')
-    return Promise.resolve({ success: true, data: [], message: '业务范围功能开发中' })
-  },
-  getDetail: (id) => {
-    console.warn('业务范围API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '业务范围功能开发中' })
-  },
-  create: (data) => {
-    console.warn('业务范围API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '业务范围功能开发中' })
-  },
-  update: (id, data) => {
-    console.warn('业务范围API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '业务范围功能开发中' })
-  },
-  delete: (id) => {
-    console.warn('业务范围API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '业务范围功能开发中' })
-  },
-  updateSort: (id, direction) => {
-    console.warn('业务范围API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '业务范围功能开发中' })
-  }
+  getList: (params) => request({
+    url: '/api/config/business-scope',
+    method: 'get',
+    params
+  }),
+  getDetail: (id) => request({
+    url: `/api/config/business-scope/${id}`,
+    method: 'get'
+  }),
+  create: (data) => request({
+    url: '/api/config/business-scope',
+    method: 'post',
+    data
+  }),
+  update: (id, data) => request({
+    url: `/api/config/business-scope/${id}`,
+    method: 'put',
+    data
+  }),
+  delete: (id) => request({
+    url: `/api/config/business-scope/${id}`,
+    method: 'delete'
+  })
 }
 
 // ==================== 企业资质 ====================
-// 注意：后端API尚未实现，暂时返回空数据
 export const qualifications = {
-  getList: (params) => {
-    console.warn('企业资质API尚未在后端实现')
-    return Promise.resolve({ success: true, data: { items: [], totalCount: 0 }, message: '企业资质功能开发中' })
-  },
-  getDetail: (id) => {
-    console.warn('企业资质API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '企业资质功能开发中' })
-  },
-  create: (data) => {
-    console.warn('企业资质API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '企业资质功能开发中' })
-  },
-  update: (id, data) => {
-    console.warn('企业资质API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '企业资质功能开发中' })
-  },
-  delete: (id) => {
-    console.warn('企业资质API尚未在后端实现')
-    return Promise.resolve({ success: false, message: '企业资质功能开发中' })
-  }
+  getList: (params) => request({
+    url: '/api/config/qualifications',
+    method: 'get',
+    params
+  }),
+  getDetail: (id) => request({
+    url: `/api/config/qualifications/${id}`,
+    method: 'get'
+  }),
+  create: (data) => request({
+    url: '/api/config/qualifications',
+    method: 'post',
+    data
+  }),
+  update: (id, data) => request({
+    url: `/api/config/qualifications/${id}`,
+    method: 'put',
+    data
+  }),
+  delete: (id) => request({
+    url: `/api/config/qualifications/${id}`,
+    method: 'delete'
+  })
 }
 
 // ==================== 重要业绩 ====================

@@ -37,6 +37,20 @@ public interface IConfigRepository
     Task<FriendlyLink?> GetLinkByIdAsync(int id);
     Task<FriendlyLink> AddLinkAsync(FriendlyLink link);
     Task<bool> UpdateLinkAsync(FriendlyLink link);
+    // 业务范围
+    Task<IEnumerable<BusinessScope>> GetAllBusinessScopesAsync();
+    Task<BusinessScope?> GetBusinessScopeByIdAsync(int id);
+    Task<BusinessScope> AddBusinessScopeAsync(BusinessScope scope);
+    Task<bool> UpdateBusinessScopeAsync(BusinessScope scope);
+    Task<bool> DeleteBusinessScopeAsync(int id);
+
+    // 企业资质
+    Task<IEnumerable<CompanyQualification>> GetAllQualificationsAsync();
+    Task<CompanyQualification?> GetQualificationByIdAsync(int id);
+    Task<CompanyQualification> AddQualificationAsync(CompanyQualification qualification);
+    Task<bool> UpdateQualificationAsync(CompanyQualification qualification);
+    Task<bool> DeleteQualificationAsync(int id);
+
     Task<bool> DeleteLinkAsync(int id);
 
     // 访问统计

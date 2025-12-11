@@ -7,6 +7,14 @@
       "RelativeMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|solutionrelative:hailongconsulting.api\\controllers\\announcementcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|c:\\users\\administrator\\desktop\\protral\\backend\\hailongconsulting.api\\controllers\\infopublicationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|solutionrelative:hailongconsulting.api\\controllers\\infopublicationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|c:\\users\\administrator\\desktop\\protral\\backend\\hailongconsulting.api\\services\\infopublicationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|solutionrelative:hailongconsulting.api\\services\\infopublicationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|c:\\users\\administrator\\desktop\\protral\\backend\\hailongconsulting.api\\models\\entities\\announcement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|solutionrelative:hailongconsulting.api\\models\\entities\\announcement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -17,10 +25,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|c:\\users\\administrator\\desktop\\protral\\backend\\hailongconsulting.api\\controllers\\searchcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|solutionrelative:hailongconsulting.api\\controllers\\searchcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|c:\\users\\administrator\\desktop\\protral\\backend\\hailongconsulting.api\\controllers\\infopublicationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|solutionrelative:hailongconsulting.api\\controllers\\infopublicationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2ACB2276-C7F5-B3A0-62D7-2BE910EDE84F}|HailongConsulting.API\\HailongConsulting.API.csproj|c:\\users\\administrator\\desktop\\protral\\backend\\hailongconsulting.api\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -46,7 +50,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -74,7 +78,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "InfoPublicationService.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Services\\InfoPublicationService.cs",
+              "RelativeDocumentMoniker": "HailongConsulting.API\\Services\\InfoPublicationService.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Services\\InfoPublicationService.cs",
+              "RelativeToolTip": "HailongConsulting.API\\Services\\InfoPublicationService.cs",
+              "ViewState": "AgIAAFUAAAAAAAAAAAAIwGUAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-10T05:03:30.381Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Announcement.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Models\\Entities\\Announcement.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Models\\Entities\\Announcement.cs",
@@ -87,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "RegionDictionary.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Models\\Entities\\RegionDictionary.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Models\\Entities\\RegionDictionary.cs",
@@ -106,14 +123,14 @@
               "RelativeDocumentMoniker": "HailongConsulting.API\\Controllers\\AnnouncementController.cs",
               "ToolTip": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\AnnouncementController.cs",
               "RelativeToolTip": "HailongConsulting.API\\Controllers\\AnnouncementController.cs",
-              "ViewState": "AgIAAEsAAAAAAAAAAAAhwFoAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAhwFcAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-10T03:40:07.087Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "AttachmentController.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\AttachmentController.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Controllers\\AttachmentController.cs",
@@ -126,7 +143,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Controllers\\AuthController.cs",
@@ -139,7 +156,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "ConfigController.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\ConfigController.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Controllers\\ConfigController.cs",
@@ -152,33 +169,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "HomeController.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\HomeController.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Controllers\\HomeController.cs",
               "ToolTip": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\HomeController.cs",
               "RelativeToolTip": "HailongConsulting.API\\Controllers\\HomeController.cs",
-              "ViewState": "AgIAAEwAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAF8AAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-10T03:39:52.845Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "InfoPublicationController.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\InfoPublicationController.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Controllers\\InfoPublicationController.cs",
               "ToolTip": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\InfoPublicationController.cs",
               "RelativeToolTip": "HailongConsulting.API\\Controllers\\InfoPublicationController.cs",
-              "ViewState": "AgIAAIMAAAAAAAAAAAAcwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEQAAAAAAAAAAAAEwFMAAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-10T03:39:51.195Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "SearchController.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Desktop\\Protral\\BackEnd\\HailongConsulting.API\\Controllers\\SearchController.cs",
               "RelativeDocumentMoniker": "HailongConsulting.API\\Controllers\\SearchController.cs",

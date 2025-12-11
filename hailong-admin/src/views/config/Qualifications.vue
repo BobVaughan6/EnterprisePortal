@@ -25,8 +25,8 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? '有效' : '失效' }}
+            <el-tag :type="row.status ? 'success' : 'danger'">
+              {{ row.status ? '有效' : '失效' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -37,18 +37,6 @@
           </template>
         </el-table-column>
       </el-table>
-      
-      <!-- 分页 -->
-      <el-pagination
-        v-model:current-page="pagination.pageIndex"
-        v-model:page-size="pagination.pageSize"
-        :total="pagination.total"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
-        @size-change="loadData"
-        @current-change="loadData"
-        style="margin-top: 20px; justify-content: flex-end;"
-      />
     </el-card>
     
     <!-- 新增/编辑对话框 -->
@@ -138,8 +126,8 @@
         
         <el-form-item label="状态">
           <el-radio-group v-model="formData.status">
-            <el-radio :label="1">有效</el-radio>
-            <el-radio :label="0">失效</el-radio>
+            <el-radio :value="true">有效</el-radio>
+            <el-radio :value="false">失效</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -157,13 +145,6 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemConfigApi } from '@/api'
 import FileUpload from '@/components/FileUpload.vue'
-
-// 分页信息
-const pagination = reactive({
-  pageIndex: 1,
-  pageSize: 10,
-  total: 0
-})
 
 // 表格数据
 const tableData = ref([])
@@ -185,7 +166,7 @@ const formData = reactive({
   expiryDate: '',
   certificateImageId: null,
   description: '',
-  status: 1
+  status: true
 })
 
 // 表单验证规则
@@ -220,16 +201,10 @@ const formatDate = (dateStr) => {
 const loadData = async () => {
   loading.value = true
   try {
-    const params = {
-      page: pagination.pageIndex,
-      pageSize: pagination.pageSize
-    }
-    
-    const res = await systemConfigApi.qualifications.getList(params)
+    const res = await systemConfigApi.qualifications.getList()
     
     if (res.success && res.data) {
-      tableData.value = res.data.items || []
-      pagination.total = res.data.totalCount || 0
+      tableData.value = res.data
     } else {
       ElMessage.error(res.message || '加载数据失败')
     }
@@ -255,7 +230,7 @@ const handleAdd = () => {
     expiryDate: '',
     certificateImageId: null,
     description: '',
-    status: 1
+    status: true
   })
   dialogVisible.value = true
 }
@@ -307,9 +282,6 @@ const handleDelete = async (row) => {
     const res = await systemConfigApi.qualifications.delete(row.id)
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
-      if (tableData.value.length === 1 && pagination.pageIndex > 1) {
-        pagination.pageIndex--
-      }
       loadData()
     } else {
       ElMessage.error(res.message || '删除失败')

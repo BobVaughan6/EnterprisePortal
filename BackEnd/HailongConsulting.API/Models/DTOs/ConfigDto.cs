@@ -233,3 +233,102 @@ public class UpdateCompanyHonorDto
     public int? SortOrder { get; set; }
     public bool? Status { get; set; }
 }
+// ==================== 业务范围 ====================
+
+/// <summary>
+/// 业务范围DTO
+/// </summary>
+public class BusinessScopeDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public string? Content { get; set; }
+    public List<string>? Features { get; set; }
+    public int? ImageId { get; set; }
+    public int SortOrder { get; set; }
+    public bool Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// 创建业务范围DTO
+/// </summary>
+public class CreateBusinessScopeDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public string? Content { get; set; }
+    public List<string>? Features { get; set; }
+    public int? ImageId { get; set; }
+    public int SortOrder { get; set; } = 0;
+    public bool Status { get; set; } = true;
+}
+
+/// <summary>
+/// 更新业务范围DTO
+/// </summary>
+public class UpdateBusinessScopeDto
+{
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public string? Content { get; set; }
+    public List<string>? Features { get; set; }
+    public int? ImageId { get; set; }
+    public int? SortOrder { get; set; }
+    public bool? Status { get; set; }
+}
+
+// ==================== 企业资质 ====================
+
+/// <summary>
+/// 企业资质DTO
+/// </summary>
+public class CompanyQualificationDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? CertificateNumber { get; set; }
+    public string? IssuingAuthority { get; set; }
+    public DateOnly? IssueDate { get; set; }
+    public DateOnly? ExpiryDate { get; set; }
+    public int? CertificateImageId { get; set; }
+    public string? Description { get; set; }
+    public int SortOrder { get; set; }
+    public bool Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// 创建企业资质DTO
+/// </summary>
+public class CreateCompanyQualificationDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string? CertificateNumber { get; set; }
+    public string? IssuingAuthority { get; set; }
+    public DateOnly? IssueDate { get; set; }
+    public DateOnly? ExpiryDate { get; set; }
+    public int? CertificateImageId { get; set; }
+    public string? Description { get; set; }
+    public int SortOrder { get; set; } = 0;
+    public bool Status { get; set; } = true;
+}
+
+/// <summary>
+/// 更新企业资质DTO
+/// </summary>
+public class UpdateCompanyQualificationDto
+{
+    public string? Name { get; set; }
+    public string? CertificateNumber { get; set; }
+    public string? IssuingAuthority { get; set; }
+    public DateOnly? IssueDate { get; set; }
+    public DateOnly? ExpiryDate { get; set; }
+    public int? CertificateImageId { get; set; }
+    public string? Description { get; set; }
+    public int? SortOrder { get; set; }
+    public bool? Status { get; set; }
+}

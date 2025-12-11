@@ -6,7 +6,10 @@
       </el-icon>
       
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/home' }">
+          <img src="@/assets/hailong.ico" alt="首页" class="breadcrumb-icon" />
+          首页
+        </el-breadcrumb-item>
         <el-breadcrumb-item v-if="breadcrumbs.length > 0">
           {{ breadcrumbs[breadcrumbs.length - 1] }}
         </el-breadcrumb-item>
@@ -129,6 +132,13 @@ const handleCommand = async (command) => {
   display: flex;
   align-items: center;
   gap: 20px;
+}
+
+.breadcrumb-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
 .collapse-icon {

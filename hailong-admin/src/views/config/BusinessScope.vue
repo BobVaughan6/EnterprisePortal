@@ -16,8 +16,8 @@
         <el-table-column prop="sortOrder" label="排序" width="100" align="center" />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? '启用' : '禁用' }}
+            <el-tag :type="row.status ? 'success' : 'danger'">
+              {{ row.status ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -36,28 +36,28 @@
     <el-dialog
       v-model="dialogVisible"
       :title="isEdit ? '编辑业务范围' : '新增业务范围'"
-      width="600px"
+      width="800px"
       destroy-on-close
       :close-on-click-modal="false"
     >
-      <el-form 
-        ref="formRef" 
-        :model="formData" 
-        :rules="formRules" 
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
         label-width="100px"
       >
         <el-form-item label="业务名称" prop="name">
-          <el-input 
-            v-model="formData.name" 
-            placeholder="请输入业务名称（最多100个字符）" 
+          <el-input
+            v-model="formData.name"
+            placeholder="请输入业务名称（最多100个字符）"
             maxlength="100"
             show-word-limit
           />
         </el-form-item>
         
         <el-form-item label="业务描述" prop="description">
-          <el-input 
-            v-model="formData.description" 
+          <el-input
+            v-model="formData.description"
             type="textarea"
             :rows="4"
             placeholder="请输入业务描述（最多500个字符）"
@@ -66,9 +66,54 @@
           />
         </el-form-item>
         
+        <el-form-item label="详细内容" prop="content">
+          <RichEditor
+            v-model="formData.content"
+            :height="300"
+            placeholder="请输入详细内容..."
+          />
+        </el-form-item>
+        
+        <el-form-item label="业务特点" prop="features">
+          <el-tag
+            v-for="(feature, index) in formData.features"
+            :key="index"
+            closable
+            @close="removeFeature(index)"
+            style="margin-right: 8px; margin-bottom: 8px;"
+          >
+            {{ feature }}
+          </el-tag>
+          <el-input
+            v-if="featureInputVisible"
+            ref="featureInputRef"
+            v-model="featureInputValue"
+            size="small"
+            style="width: 200px;"
+            @keyup.enter="handleFeatureInputConfirm"
+            @blur="handleFeatureInputConfirm"
+          />
+          <el-button
+            v-else
+            size="small"
+            @click="showFeatureInput"
+          >
+            + 添加特点
+          </el-button>
+        </el-form-item>
+        
+        <el-form-item label="业务图片" prop="imageId">
+          <FileUpload
+            v-model="formData.imageId"
+            :limit="1"
+            accept="image/*"
+            list-type="picture-card"
+          />
+        </el-form-item>
+        
         <el-form-item label="排序" prop="sortOrder">
-          <el-input-number 
-            v-model="formData.sortOrder" 
+          <el-input-number
+            v-model="formData.sortOrder"
             :min="1"
             :max="999"
             placeholder="数字越小越靠前"
@@ -77,8 +122,8 @@
         
         <el-form-item label="状态">
           <el-radio-group v-model="formData.status">
-            <el-radio :label="1">启用</el-radio>
-            <el-radio :label="0">禁用</el-radio>
+            <el-radio :value="true">启用</el-radio>
+            <el-radio :value="false">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -92,9 +137,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { systemConfigApi } from '@/api'
+import FileUpload from '@/components/FileUpload.vue'
+import RichEditor from '@/components/RichEditor.vue'
 
 // 表格数据
 const tableData = ref([])
@@ -106,13 +153,21 @@ const isEdit = ref(false)
 const submitting = ref(false)
 const formRef = ref(null)
 
+// 业务特点输入
+const featureInputVisible = ref(false)
+const featureInputValue = ref('')
+const featureInputRef = ref(null)
+
 // 表单数据
 const formData = reactive({
   id: null,
   name: '',
   description: '',
+  content: '',
+  features: [],
+  imageId: null,
   sortOrder: 1,
-  status: 1
+  status: true
 })
 
 // 表单验证规则
@@ -159,8 +214,11 @@ const handleAdd = () => {
     id: null,
     name: '',
     description: '',
+    content: '',
+    features: [],
+    imageId: null,
     sortOrder: tableData.value.length + 1,
-    status: 1
+    status: true
   })
   dialogVisible.value = true
 }
@@ -177,6 +235,9 @@ const handleEdit = async (row) => {
         id: res.data.id,
         name: res.data.name,
         description: res.data.description || '',
+        content: res.data.content || '',
+        features: res.data.features || [],
+        imageId: res.data.imageId || null,
         sortOrder: res.data.sortOrder,
         status: res.data.status
       })
@@ -239,6 +300,28 @@ const handleSort = async (row, direction) => {
 }
 
 /**
+ * 添加业务特点
+ */
+const showFeatureInput = () => {
+  featureInputVisible.value = true
+  nextTick(() => {
+    featureInputRef.value?.focus()
+  })
+}
+
+const handleFeatureInputConfirm = () => {
+  if (featureInputValue.value) {
+    formData.features.push(featureInputValue.value)
+    featureInputValue.value = ''
+  }
+  featureInputVisible.value = false
+}
+
+const removeFeature = (index) => {
+  formData.features.splice(index, 1)
+}
+
+/**
  * 提交表单
  */
 const handleSubmit = async () => {
@@ -256,6 +339,9 @@ const handleSubmit = async () => {
     const submitData = {
       name: formData.name,
       description: formData.description || null,
+      content: formData.content || null,
+      features: formData.features.length > 0 ? formData.features : null,
+      imageId: formData.imageId || null,
       sortOrder: formData.sortOrder,
       status: formData.status
     }

@@ -30,6 +30,20 @@ public interface IConfigService
     Task<CompanyHonorDto?> GetHonorByIdAsync(int id);
     Task<CompanyHonorDto> CreateHonorAsync(CreateCompanyHonorDto dto);
     Task<bool> UpdateHonorAsync(int id, UpdateCompanyHonorDto dto);
+    // 业务范围
+    Task<IEnumerable<BusinessScopeDto>> GetAllBusinessScopesAsync();
+    Task<BusinessScopeDto?> GetBusinessScopeByIdAsync(int id);
+    Task<BusinessScopeDto> CreateBusinessScopeAsync(CreateBusinessScopeDto dto);
+    Task<bool> UpdateBusinessScopeAsync(int id, UpdateBusinessScopeDto dto);
+    Task<bool> DeleteBusinessScopeAsync(int id);
+
+    // 企业资质
+    Task<IEnumerable<CompanyQualificationDto>> GetAllQualificationsAsync();
+    Task<CompanyQualificationDto?> GetQualificationByIdAsync(int id);
+    Task<CompanyQualificationDto> CreateQualificationAsync(CreateCompanyQualificationDto dto);
+    Task<bool> UpdateQualificationAsync(int id, UpdateCompanyQualificationDto dto);
+    Task<bool> DeleteQualificationAsync(int id);
+
     Task<bool> DeleteHonorAsync(int id);
 
     // 友情链接

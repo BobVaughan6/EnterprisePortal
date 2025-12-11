@@ -544,5 +544,222 @@ public class ConfigController : ControllerBase
         }
     }
 
+    #region 业务范围管理
+
+    /// <summary>
+    /// 获取所有业务范围
+    /// </summary>
+    [HttpGet("business-scope")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<BusinessScopeDto>>>> GetBusinessScopes()
+    {
+        try
+        {
+            var scopes = await _configService.GetAllBusinessScopesAsync();
+            return Ok(ApiResponse<IEnumerable<BusinessScopeDto>>.SuccessResult(scopes, "获取业务范围列表成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取业务范围列表失败");
+            return StatusCode(500, ApiResponse<IEnumerable<BusinessScopeDto>>.FailResult("获取业务范围列表失败"));
+        }
+    }
+
+    /// <summary>
+    /// 根据ID获取业务范围
+    /// </summary>
+    [HttpGet("business-scope/{id}")]
+    public async Task<ActionResult<ApiResponse<BusinessScopeDto>>> GetBusinessScope(int id)
+    {
+        try
+        {
+            var scope = await _configService.GetBusinessScopeByIdAsync(id);
+            if (scope == null)
+            {
+                return NotFound(ApiResponse<BusinessScopeDto>.FailResult("业务范围不存在"));
+            }
+            return Ok(ApiResponse<BusinessScopeDto>.SuccessResult(scope, "获取业务范围成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取业务范围失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<BusinessScopeDto>.FailResult("获取业务范围失败"));
+        }
+    }
+
+    /// <summary>
+    /// 创建业务范围
+    /// </summary>
+    [HttpPost("business-scope")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<BusinessScopeDto>>> CreateBusinessScope([FromBody] CreateBusinessScopeDto dto)
+    {
+        try
+        {
+            var scope = await _configService.CreateBusinessScopeAsync(dto);
+            return Ok(ApiResponse<BusinessScopeDto>.SuccessResult(scope, "创建业务范围成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "创建业务范围失败");
+            return StatusCode(500, ApiResponse<BusinessScopeDto>.FailResult("创建业务范围失败"));
+        }
+    }
+
+    /// <summary>
+    /// 更新业务范围
+    /// </summary>
+    [HttpPut("business-scope/{id}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<bool>>> UpdateBusinessScope(int id, [FromBody] UpdateBusinessScopeDto dto)
+    {
+        try
+        {
+            var result = await _configService.UpdateBusinessScopeAsync(id, dto);
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailResult("业务范围不存在"));
+            }
+            return Ok(ApiResponse<bool>.SuccessResult(true, "更新业务范围成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "更新业务范围失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<bool>.FailResult("更新业务范围失败"));
+        }
+    }
+
+    /// <summary>
+    /// 删除业务范围
+    /// </summary>
+    [HttpDelete("business-scope/{id}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteBusinessScope(int id)
+    {
+        try
+        {
+            var result = await _configService.DeleteBusinessScopeAsync(id);
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailResult("业务范围不存在"));
+            }
+            return Ok(ApiResponse<bool>.SuccessResult(true, "删除业务范围成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "删除业务范围失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<bool>.FailResult("删除业务范围失败"));
+        }
+    }
+
+    #endregion
+
+    #region 企业资质管理
+
+    /// <summary>
+    /// 获取所有企业资质
+    /// </summary>
+    [HttpGet("qualifications")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CompanyQualificationDto>>>> GetQualifications()
+    {
+        try
+        {
+            var qualifications = await _configService.GetAllQualificationsAsync();
+            return Ok(ApiResponse<IEnumerable<CompanyQualificationDto>>.SuccessResult(qualifications, "获取企业资质列表成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取企业资质列表失败");
+            return StatusCode(500, ApiResponse<IEnumerable<CompanyQualificationDto>>.FailResult("获取企业资质列表失败"));
+        }
+    }
+
+    /// <summary>
+    /// 根据ID获取企业资质
+    /// </summary>
+    [HttpGet("qualifications/{id}")]
+    public async Task<ActionResult<ApiResponse<CompanyQualificationDto>>> GetQualification(int id)
+    {
+        try
+        {
+            var qualification = await _configService.GetQualificationByIdAsync(id);
+            if (qualification == null)
+            {
+                return NotFound(ApiResponse<CompanyQualificationDto>.FailResult("企业资质不存在"));
+            }
+            return Ok(ApiResponse<CompanyQualificationDto>.SuccessResult(qualification, "获取企业资质成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取企业资质失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<CompanyQualificationDto>.FailResult("获取企业资质失败"));
+        }
+    }
+
+    /// <summary>
+    /// 创建企业资质
+    /// </summary>
+    [HttpPost("qualifications")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<CompanyQualificationDto>>> CreateQualification([FromBody] CreateCompanyQualificationDto dto)
+    {
+        try
+        {
+            var qualification = await _configService.CreateQualificationAsync(dto);
+            return Ok(ApiResponse<CompanyQualificationDto>.SuccessResult(qualification, "创建企业资质成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "创建企业资质失败");
+            return StatusCode(500, ApiResponse<CompanyQualificationDto>.FailResult("创建企业资质失败"));
+        }
+    }
+
+    /// <summary>
+    /// 更新企业资质
+    /// </summary>
+    [HttpPut("qualifications/{id}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<bool>>> UpdateQualification(int id, [FromBody] UpdateCompanyQualificationDto dto)
+    {
+        try
+        {
+            var result = await _configService.UpdateQualificationAsync(id, dto);
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailResult("企业资质不存在"));
+            }
+            return Ok(ApiResponse<bool>.SuccessResult(true, "更新企业资质成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "更新企业资质失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<bool>.FailResult("更新企业资质失败"));
+        }
+    }
+
+    /// <summary>
+    /// 删除企业资质
+    /// </summary>
+    [HttpDelete("qualifications/{id}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteQualification(int id)
+    {
+        try
+        {
+            var result = await _configService.DeleteQualificationAsync(id);
+            if (!result)
+            {
+                return NotFound(ApiResponse<bool>.FailResult("企业资质不存在"));
+            }
+            return Ok(ApiResponse<bool>.SuccessResult(true, "删除企业资质成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "删除企业资质失败，ID: {Id}", id);
+            return StatusCode(500, ApiResponse<bool>.FailResult("删除企业资质失败"));
+        }
+    }
+
+    #endregion
     #endregion
 }

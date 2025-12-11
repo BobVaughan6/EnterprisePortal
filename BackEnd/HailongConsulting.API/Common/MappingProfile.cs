@@ -74,6 +74,37 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+        // 业务范围
+        CreateMap<BusinessScope, BusinessScopeDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1))
+            .ForMember(dest => dest.Features, opt => opt.MapFrom(src => DeserializeStringList(src.Features)));
+        
+        CreateMap<CreateBusinessScopeDto, BusinessScope>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)))
+            .ForMember(dest => dest.Features, opt => opt.MapFrom(src => SerializeStringList(src.Features)));
+        
+        CreateMap<UpdateBusinessScopeDto, BusinessScope>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForMember(dest => dest.Features, opt => opt.MapFrom(src => SerializeStringList(src.Features)))
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+        // 企业资质
+        CreateMap<CompanyQualification, CompanyQualificationDto>()
+            .ForMember(dest => dest.CertificateNumber, opt => opt.MapFrom(src => src.CertificateNo))
+            .ForMember(dest => dest.CertificateImageId, opt => opt.MapFrom(src => src.ImageId))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == 1));
+        
+        CreateMap<CreateCompanyQualificationDto, CompanyQualification>()
+            .ForMember(dest => dest.CertificateNo, opt => opt.MapFrom(src => src.CertificateNumber))
+            .ForMember(dest => dest.ImageId, opt => opt.MapFrom(src => src.CertificateImageId))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (sbyte)(src.Status ? 1 : 0)));
+        
+        CreateMap<UpdateCompanyQualificationDto, CompanyQualification>()
+            .ForMember(dest => dest.CertificateNo, opt => opt.MapFrom(src => src.CertificateNumber))
+            .ForMember(dest => dest.ImageId, opt => opt.MapFrom(src => src.CertificateImageId))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (sbyte)(src.Status.Value ? 1 : 0) : (sbyte?)null))
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
         // 附件映射
         CreateMap<Attachment, AttachmentDto>();
         CreateMap<UploadAttachmentDto, Attachment>();

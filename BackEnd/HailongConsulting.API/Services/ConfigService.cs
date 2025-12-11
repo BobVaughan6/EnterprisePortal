@@ -253,6 +253,97 @@ public class ConfigService : IConfigService
 
         await _repository.RecordVisitAsync(statistic);
     }
+    #region 业务范围
+
+    public async Task<IEnumerable<BusinessScopeDto>> GetAllBusinessScopesAsync()
+    {
+        var scopes = await _repository.GetAllBusinessScopesAsync();
+        return _mapper.Map<IEnumerable<BusinessScopeDto>>(scopes);
+    }
+
+    public async Task<BusinessScopeDto?> GetBusinessScopeByIdAsync(int id)
+    {
+        var scope = await _repository.GetBusinessScopeByIdAsync(id);
+        return scope == null ? null : _mapper.Map<BusinessScopeDto>(scope);
+    }
+
+    public async Task<BusinessScopeDto> CreateBusinessScopeAsync(CreateBusinessScopeDto dto)
+    {
+        var scope = _mapper.Map<BusinessScope>(dto);
+        var created = await _repository.AddBusinessScopeAsync(scope);
+        return _mapper.Map<BusinessScopeDto>(created);
+    }
+
+    public async Task<bool> UpdateBusinessScopeAsync(int id, UpdateBusinessScopeDto dto)
+    {
+        var scope = await _repository.GetBusinessScopeByIdAsync(id);
+        if (scope == null) return false;
+
+        // 只更新非null的字段
+        if (dto.Name != null) scope.Name = dto.Name;
+        if (dto.Description != null) scope.Description = dto.Description;
+        if (dto.Content != null) scope.Content = dto.Content;
+        if (dto.Features != null) scope.Features = System.Text.Json.JsonSerializer.Serialize(dto.Features);
+        if (dto.ImageId.HasValue) scope.ImageId = dto.ImageId;
+        if (dto.SortOrder.HasValue) scope.SortOrder = dto.SortOrder.Value;
+        if (dto.Status.HasValue) scope.Status = (sbyte)(dto.Status.Value ? 1 : 0);
+
+        return await _repository.UpdateBusinessScopeAsync(scope);
+    }
+
+    public async Task<bool> DeleteBusinessScopeAsync(int id)
+    {
+        return await _repository.DeleteBusinessScopeAsync(id);
+    }
+
+    #endregion
+
+    #region 企业资质
+
+    public async Task<IEnumerable<CompanyQualificationDto>> GetAllQualificationsAsync()
+    {
+        var qualifications = await _repository.GetAllQualificationsAsync();
+        return _mapper.Map<IEnumerable<CompanyQualificationDto>>(qualifications);
+    }
+
+    public async Task<CompanyQualificationDto?> GetQualificationByIdAsync(int id)
+    {
+        var qualification = await _repository.GetQualificationByIdAsync(id);
+        return qualification == null ? null : _mapper.Map<CompanyQualificationDto>(qualification);
+    }
+
+    public async Task<CompanyQualificationDto> CreateQualificationAsync(CreateCompanyQualificationDto dto)
+    {
+        var qualification = _mapper.Map<CompanyQualification>(dto);
+        var created = await _repository.AddQualificationAsync(qualification);
+        return _mapper.Map<CompanyQualificationDto>(created);
+    }
+
+    public async Task<bool> UpdateQualificationAsync(int id, UpdateCompanyQualificationDto dto)
+    {
+        var qualification = await _repository.GetQualificationByIdAsync(id);
+        if (qualification == null) return false;
+
+        // 只更新非null的字段
+        if (dto.Name != null) qualification.Name = dto.Name;
+        if (dto.Description != null) qualification.Description = dto.Description;
+        if (dto.CertificateImageId.HasValue) qualification.ImageId = dto.CertificateImageId;
+        if (dto.CertificateNumber != null) qualification.CertificateNo = dto.CertificateNumber;
+        if (dto.IssuingAuthority != null) qualification.IssuingAuthority = dto.IssuingAuthority;
+        if (dto.IssueDate.HasValue) qualification.IssueDate = dto.IssueDate;
+        if (dto.ExpiryDate.HasValue) qualification.ExpiryDate = dto.ExpiryDate;
+        if (dto.SortOrder.HasValue) qualification.SortOrder = dto.SortOrder.Value;
+        if (dto.Status.HasValue) qualification.Status = (sbyte)(dto.Status.Value ? 1 : 0);
+
+        return await _repository.UpdateQualificationAsync(qualification);
+    }
+
+    public async Task<bool> DeleteQualificationAsync(int id)
+    {
+        return await _repository.DeleteQualificationAsync(id);
+    }
+
+    #endregion
 
     #endregion
 }

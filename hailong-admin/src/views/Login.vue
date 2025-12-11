@@ -2,6 +2,7 @@
   <div class="login-container">
     <div class="login-box">
       <div class="login-header">
+        <img src="@/assets/logo.png" alt="海隆咨询" class="login-logo" />
         <h1>海隆咨询后台管理系统</h1>
         <p>Hailong Consulting Management System</p>
       </div>
@@ -132,6 +133,13 @@ const handleLogin = async () => {
 .login-header {
   text-align: center;
   margin-bottom: 30px;
+}
+
+.login-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 20px;
+  object-fit: contain;
 }
 
 .login-header h1 {

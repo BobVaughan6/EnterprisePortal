@@ -2,8 +2,9 @@
   <div class="sidebar-container">
     <!-- Logo区域 -->
     <div class="logo-container">
+      <img v-if="!isCollapse" src="@/assets/logo.png" alt="海隆咨询" class="logo-img" />
+      <img v-else src="@/assets/hailong.ico" alt="HL" class="logo-img-mini" />
       <h2 v-if="!isCollapse" class="logo-title">海隆咨询</h2>
-      <h2 v-else class="logo-title-mini">HL</h2>
     </div>
     
     <!-- 菜单 -->
@@ -114,21 +115,29 @@ const activeMenu = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   background-color: #2b3a4b;
+  padding: 0 15px;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-img-mini {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
 }
 
 .logo-title {
   color: #fff;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   margin: 0;
-}
-
-.logo-title-mini {
-  color: #fff;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 0;
+  white-space: nowrap;
 }
 
 .el-menu {

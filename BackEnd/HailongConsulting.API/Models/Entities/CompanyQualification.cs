@@ -44,6 +44,13 @@ public class CompanyQualification
     public string? CertificateNo { get; set; }
 
     /// <summary>
+    /// 颁发机构
+    /// </summary>
+    [Column("issuing_authority")]
+    [MaxLength(200)]
+    public string? IssuingAuthority { get; set; }
+
+    /// <summary>
     /// 颁发日期
     /// </summary>
     [Column("issue_date")]
