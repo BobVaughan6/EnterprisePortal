@@ -48,7 +48,26 @@ builder.Services.AddControllers()
 // 配置数据库
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mySqlOptions =>
+    {
+        // 启用连接弹性（自动重试）
+        mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+        
+        // 设置命令超时时间
+        mySqlOptions.CommandTimeout(30);
+    });
+    
+    // 在开发环境启用详细错误信息
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+    }
+});
 
 // 配置JWT认证
 var jwtSettings = builder.Configuration.GetSection("Jwt");
