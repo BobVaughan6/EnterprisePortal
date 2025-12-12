@@ -76,12 +76,13 @@
                   {{ item.title }}
                 </h3>
                 <span
+                  v-if="item.category"
                   :class="[
                     'ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap',
-                    getTypeStyle(item.type)
+                    getTypeStyle(item.category)
                   ]"
                 >
-                  {{ item.type }}
+                  {{ item.category }}
                 </span>
               </div>
 
@@ -97,14 +98,14 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    {{ item.publishDate }}
+                    {{ formatDate(item.publishTime) }}
                   </span>
                   <span class="flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
-                    {{ item.views || 0 }} 次浏览
+                    {{ item.viewCount || 0 }} 次浏览
                   </span>
                 </div>
                 <span class="text-hailong-primary text-sm font-medium hover:underline">
@@ -173,6 +174,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import { getCompanyNewsList } from '@/api/infoPublication'
 
 const router = useRouter()
 
@@ -233,15 +235,20 @@ const displayPages = computed(() => {
 const loadItems = async () => {
   loading.value = true
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    const response = await getCompanyNewsList({
+      keyword: keyword.value,
+      pageNumber: currentPage.value,
+      pageSize: pageSize.value
+    })
     
-    const mockData = generateMockData()
-    items.value = mockData.slice(
-      (currentPage.value - 1) * pageSize.value,
-      currentPage.value * pageSize.value
-    )
-    total.value = mockData.length
+    if (response.success) {
+      items.value = response.data.items
+      total.value = response.data.totalCount
+    } else {
+      console.error('加载列表失败:', response.message)
+      items.value = []
+      total.value = 0
+    }
   } catch (error) {
     console.error('加载列表失败:', error)
     items.value = []
@@ -251,62 +258,15 @@ const loadItems = async () => {
   }
 }
 
-// 生成模拟数据
-const generateMockData = () => {
-  const data = []
-  const types = ['企业动态', '通知公告', '人事任免', '制度文件']
-  
-  const titles = {
-    '企业动态': [
-      '海隆咨询荣获"2024年度优秀咨询企业"称号',
-      '公司成功中标某市重大基础设施项目咨询服务',
-      '海隆咨询与某高新区签署战略合作协议',
-      '公司参加全国工程咨询行业年度峰会',
-      '海隆咨询助力某市智慧城市建设项目顺利验收',
-      '公司荣获"AAA级信用企业"称号',
-      '海隆咨询成功举办工程咨询行业交流会'
-    ],
-    '通知公告': [
-      '关于2025年元旦放假安排的通知',
-      '关于开展年度安全生产检查的通知',
-      '关于召开2024年度工作总结会议的通知',
-      '关于加强项目质量管理的通知',
-      '关于规范公文处理流程的通知',
-      '关于开展员工培训的通知'
-    ],
-    '人事任免': [
-      '关于任命张三为市场部经理的通知',
-      '关于李四同志职务调整的通知',
-      '关于王五同志退休的通知',
-      '关于聘任赵六为技术顾问的通知',
-      '关于表彰2024年度优秀员工的决定'
-    ],
-    '制度文件': [
-      '海隆咨询项目管理制度（2024年修订版）',
-      '员工考勤管理办法',
-      '差旅费报销管理规定',
-      '合同管理实施细则',
-      '保密管理制度'
-    ]
-  }
-  
-  let id = 1
-  for (const type of types) {
-    const typeTitle = titles[type]
-    for (let i = 0; i < typeTitle.length; i++) {
-      data.push({
-        id: id++,
-        title: typeTitle[i],
-        type: type,
-        summary: '这是一条新闻摘要，简要介绍新闻的主要内容和重点信息...',
-        publishDate: `2024-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
-        views: Math.floor(Math.random() * 500) + 50,
-        isTop: id <= 3
-      })
-    }
-  }
-  
-  return data
+// 格式化日期
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).replace(/\//g, '-')
 }
 
 // 搜索
@@ -330,19 +290,14 @@ const handlePageChange = (page) => {
 }
 
 // 获取类型样式
-const getTypeStyle = (type) => {
-  switch (type) {
-    case '企业动态':
-      return 'bg-blue-100 text-blue-700 border border-blue-200'
-    case '通知公告':
-      return 'bg-green-100 text-green-700 border border-green-200'
-    case '人事任免':
-      return 'bg-purple-100 text-purple-700 border border-purple-200'
-    case '制度文件':
-      return 'bg-orange-100 text-orange-700 border border-orange-200'
-    default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200'
+const getTypeStyle = (category) => {
+  const styles = {
+    '企业动态': 'bg-blue-100 text-blue-700 border border-blue-200',
+    '通知公告': 'bg-green-100 text-green-700 border border-green-200',
+    '人事任免': 'bg-purple-100 text-purple-700 border border-purple-200',
+    '制度文件': 'bg-orange-100 text-orange-700 border border-orange-200'
   }
+  return styles[category] || 'bg-gray-100 text-gray-800 border border-gray-200'
 }
 
 // 查看详情

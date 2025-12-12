@@ -316,7 +316,7 @@ const initMap = () => {
               padding-bottom: 8px;
               border-bottom: 2px solid #667eea;
             ">
-              🏢 ${contactInfo.value.address.building.split('号')[0]}号
+              🏢 ${contactInfo.value.address.building.split('号')[0]}号楼
             </h3>
             <div style="margin: 8px 0; display: flex; align-items: center;">
               <span style="color: #667eea; font-size: 14px; margin-right: 6px;">📞</span>

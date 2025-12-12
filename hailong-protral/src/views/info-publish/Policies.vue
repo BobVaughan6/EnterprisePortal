@@ -75,7 +75,10 @@
                   <span v-if="item.isTop" class="inline-block px-2 py-0.5 bg-red-500 text-white text-xs rounded mr-2">置顶</span>
                   {{ item.title }}
                 </h3>
-                <span class="ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap bg-blue-100 text-blue-700 border border-blue-200">
+                <span 
+                  v-if="item.category"
+                  class="ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap bg-blue-100 text-blue-700 border border-blue-200"
+                >
                   {{ item.category }}
                 </span>
               </div>
@@ -92,20 +95,20 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    {{ item.publishDate }}
+                    {{ formatDate(item.publishTime) }}
                   </span>
                   <span class="flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
-                    {{ item.views || 0 }} 次浏览
+                    {{ item.viewCount || 0 }} 次浏览
                   </span>
-                  <span v-if="item.downloads" class="flex items-center gap-1">
+                  <span v-if="item.attachments && item.attachments.length > 0" class="flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                    {{ item.downloads }} 次下载
+                    {{ item.attachments.length }} 个附件
                   </span>
                 </div>
                 <span class="text-hailong-primary text-sm font-medium hover:underline">
@@ -174,6 +177,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import { getPolicyRegulationsList } from '@/api/infoPublication'
 
 const router = useRouter()
 
@@ -234,15 +238,20 @@ const displayPages = computed(() => {
 const loadItems = async () => {
   loading.value = true
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    const response = await getPolicyRegulationsList({
+      keyword: keyword.value,
+      pageNumber: currentPage.value,
+      pageSize: pageSize.value
+    })
     
-    const mockData = generateMockData()
-    items.value = mockData.slice(
-      (currentPage.value - 1) * pageSize.value,
-      currentPage.value * pageSize.value
-    )
-    total.value = mockData.length
+    if (response.success) {
+      items.value = response.data.items
+      total.value = response.data.totalCount
+    } else {
+      console.error('加载列表失败:', response.message)
+      items.value = []
+      total.value = 0
+    }
   } catch (error) {
     console.error('加载列表失败:', error)
     items.value = []
@@ -252,48 +261,15 @@ const loadItems = async () => {
   }
 }
 
-// 生成模拟数据
-const generateMockData = () => {
-  const data = []
-  const categories = ['法律法规', '部门规章', '行政法规', '地方法规', '规范性文件']
-  
-  const titles = [
-    '中华人民共和国政府采购法（2024年修订）',
-    '中华人民共和国招标投标法实施条例',
-    '政府采购货物和服务招标投标管理办法',
-    '工程建设项目招标范围和规模标准规定',
-    '建设工程质量管理条例',
-    '工程造价咨询企业管理办法',
-    '招标公告和公示信息发布管理办法',
-    '政府采购非招标采购方式管理办法',
-    '建设工程监理规范',
-    '工程建设项目施工招标投标办法',
-    '政府采购评审专家管理办法',
-    '建设工程安全生产管理条例',
-    '招标代理服务收费管理暂行办法',
-    '政府采购供应商投诉处理办法',
-    '建设工程勘察设计管理条例',
-    '工程建设标准强制性条文',
-    '政府采购信息公告管理办法',
-    '建筑法实施细则',
-    '工程造价管理规定',
-    '政府采购合同管理办法'
-  ]
-  
-  for (let i = 1; i <= 20; i++) {
-    data.push({
-      id: i,
-      title: titles[i - 1],
-      category: categories[(i - 1) % 5],
-      summary: '本法规旨在规范相关行为，保障各方合法权益，促进行业健康发展...',
-      publishDate: `2024-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
-      views: Math.floor(Math.random() * 2000) + 500,
-      downloads: Math.floor(Math.random() * 500) + 100,
-      isTop: i <= 2
-    })
-  }
-  
-  return data
+// 格式化日期
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).replace(/\//g, '-')
 }
 
 // 搜索

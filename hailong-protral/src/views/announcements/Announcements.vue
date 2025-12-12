@@ -261,46 +261,102 @@
             announcement.businessType === 'CONSTRUCTION' ? 'border-hailong-secondary' : 'border-hailong-primary'
           ]"
         >
-          <!-- 标题和类型 -->
-          <div class="flex items-start justify-between mb-3">
-            <h3 class="text-lg font-bold text-gray-900 flex-1 hover:text-hailong-primary transition-colors line-clamp-2">
-              {{ announcement.title }}
-            </h3>
+          <!-- 业务类型和采购类型标签 -->
+          <div class="flex items-center gap-2 mb-3">
             <span
               :class="[
-                'ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1',
-                getTypeStyle(announcement.noticeTypeName)
+                'px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap',
+                announcement.businessType === 'GOV_PROCUREMENT'
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                  : announcement.businessType === 'CONSTRUCTION'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                  : 'bg-gray-500 text-white'
               ]"
             >
-              <svg v-if="announcement.noticeType === 'bidding'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              {{ announcement.businessType === 'GOV_PROCUREMENT' ? '政府采购' :
+                 announcement.businessType === 'CONSTRUCTION' ? '建设工程' : '其他' }}
+            </span>
+            
+            <!-- 采购类型 - 仅政府采购显示 -->
+            <span
+              v-if="announcement.businessType === 'GOV_PROCUREMENT' && announcement.procurementType"
+              :class="[
+                'px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap',
+                'bg-blue-50 text-blue-700 border border-blue-200'
+              ]"
+            >
+              {{ announcement.procurementType === 'goods' ? '货物' :
+                 announcement.procurementType === 'service' ? '服务' :
+                 announcement.procurementType === 'project' ? '工程' : announcement.procurementType }}
+            </span>
+
+            <!-- 公告类型 - 优化样式 -->
+            <span
+              :class="[
+                'ml-auto px-4 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap flex items-center gap-1.5 shadow-sm',
+                announcement.noticeType === 'bidding'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
+                  : announcement.noticeType === 'result'
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                  : announcement.noticeType === 'correction'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white'
+                  : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+              ]"
+            >
+              <svg v-if="announcement.noticeType === 'bidding'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
               </svg>
-              <svg v-else-if="announcement.noticeType === 'result'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-else-if="announcement.noticeType === 'result'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
-              <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-else-if="announcement.noticeType === 'correction'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
               </svg>
               {{ announcement.noticeTypeName }}
             </span>
           </div>
 
-          <!-- 详细信息 -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div v-if="announcement.bidder">
+          <!-- 标题 -->
+          <h3 class="text-lg font-bold text-gray-900 mb-4 hover:text-hailong-primary transition-colors line-clamp-2">
+            {{ announcement.title }}
+          </h3>
+
+          <!-- 中标人信息 - 显眼位置 -->
+          <div v-if="announcement.winner" class="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-lg">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-sm text-gray-600 font-medium">中标人：</span>
+              <span class="text-base text-gray-900 font-bold">{{ announcement.winner }}</span>
+            </div>
+          </div>
+
+          <!-- 其他详细信息 -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+            <div v-if="announcement.bidder" class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
               <span class="text-gray-500">招标人：</span>
-              <span class="text-gray-700 font-medium">{{ announcement.bidder }}</span>
+              <span class="text-gray-700 font-medium truncate">{{ announcement.bidder }}</span>
             </div>
-            <div v-if="announcement.winner">
-              <span class="text-gray-500">中标人：</span>
-              <span class="text-gray-700 font-medium">{{ announcement.winner }}</span>
-            </div>
-            <div v-if="announcement.projectRegion">
+            <div v-if="announcement.projectRegion" class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
               <span class="text-gray-500">项目区域：</span>
               <span class="text-gray-700 font-medium">{{ announcement.projectRegion }}</span>
             </div>
-            <div v-if="announcement.publishTime">
+            <div v-if="announcement.publishTime" class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               <span class="text-gray-500">发布时间：</span>
               <span class="text-gray-700 font-medium">{{ formatDate(announcement.publishTime) }}</span>
             </div>

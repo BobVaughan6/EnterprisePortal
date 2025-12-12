@@ -57,7 +57,7 @@
           <div class="form-tip">企业亮点将显示在首页企业简介区域，建议4-8个，每个不超过20字</div>
         </el-form-item>
         
-        <el-form-item label="联系电话">
+        <!-- <el-form-item label="联系电话">
           <el-input v-model="formData.contactPhone" placeholder="请输入联系电话" maxlength="50" />
         </el-form-item>
         
@@ -67,7 +67,7 @@
         
         <el-form-item label="公司地址">
           <el-input v-model="formData.address" placeholder="请输入公司地址" maxlength="200" />
-        </el-form-item>
+        </el-form-item> -->
         
         <el-form-item label="状态">
           <el-switch
