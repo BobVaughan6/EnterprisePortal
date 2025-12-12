@@ -34,14 +34,6 @@ export const getTransportation = () => {
 }
 
 /**
- * 获取业务范围
- * @returns {Array} 业务范围列表
- */
-export const getBusinessScope = () => {
-  return siteConfig.businessScope
-}
-
-/**
  * 获取导航配置
  * @returns {Object} 导航配置
  */
@@ -55,67 +47,6 @@ export const getNavigation = () => {
  */
 export const getFAQs = () => {
   return siteConfig.faqs
-}
-
-/**
- * 获取SEO配置
- * @returns {Object} SEO配置
- */
-export const getSEOConfig = () => {
-  return siteConfig.seo
-}
-
-/**
- * 获取主题配置
- * @returns {Object} 主题配置
- */
-export const getThemeConfig = () => {
-  return siteConfig.theme
-}
-
-/**
- * 获取API配置
- * @returns {Object} API配置
- */
-export const getAPIConfig = () => {
-  const env = import.meta.env.MODE
-  return {
-    baseUrl: siteConfig.api.baseUrl[env] || siteConfig.api.baseUrl.development,
-    timeout: siteConfig.api.timeout,
-    retryAttempts: siteConfig.api.retryAttempts
-  }
-}
-
-/**
- * 获取功能开关
- * @returns {Object} 功能开关配置
- */
-export const getFeatures = () => {
-  return siteConfig.features
-}
-
-/**
- * 获取上传配置
- * @returns {Object} 上传配置
- */
-export const getUploadConfig = () => {
-  return siteConfig.upload
-}
-
-/**
- * 获取分页配置
- * @returns {Object} 分页配置
- */
-export const getPaginationConfig = () => {
-  return siteConfig.pagination
-}
-
-/**
- * 获取缓存配置
- * @returns {Object} 缓存配置
- */
-export const getCacheConfig = () => {
-  return siteConfig.cache
 }
 
 // 导出默认配置
