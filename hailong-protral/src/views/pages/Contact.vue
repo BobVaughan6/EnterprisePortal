@@ -30,7 +30,7 @@
               </div>
               <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors">联系电话
               </h3>
-              <p class="text-gray-600 mb-4">{{ contactInfo.workingHours.description }}</p>
+              <p class="text-gray-600 mb-4">{{ contactInfo.workingHours.weekdays }}</p>
               <a :href="`tel:${contactInfo.phone}`"
                 class="text-xl font-bold text-hailong-primary hover:text-hailong-secondary transition-colors">
                 {{ contactInfo.phone }}
