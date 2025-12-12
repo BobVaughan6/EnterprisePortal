@@ -89,6 +89,11 @@ public class RecentAnnouncementDto
     public string NoticeType { get; set; } = string.Empty;
 
     /// <summary>
+    /// 公告类型中文名称
+    /// </summary>
+    public string NoticeTypeName { get; set; } = string.Empty;
+
+    /// <summary>
     /// 项目区域
     /// </summary>
     public string ProjectRegion { get; set; } = string.Empty;

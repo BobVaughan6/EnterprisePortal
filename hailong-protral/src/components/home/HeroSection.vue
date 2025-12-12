@@ -36,9 +36,7 @@
       <div v-else class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
           <div class="lg:col-span-2">
-            <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
-              {{ profileContent }}
-            </p>
+            <div class="text-gray-700 text-lg leading-relaxed prose prose-lg max-w-none" v-html="profileContent"></div>
           </div>
           <div v-if="profileHighlights.length > 0" class="grid grid-cols-2 gap-4">
             <div v-for="highlight in profileHighlights" :key="highlight"
@@ -81,7 +79,7 @@
               @click="$emit('announcement-click', announcement.id)"
               class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-primary">
               <div class="flex justify-between items-start mb-3">
-                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ announcement.noticeType }}</span>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ announcement.noticeTypeName }}</span>
                 <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>
@@ -106,7 +104,7 @@
               @click="$emit('announcement-click', announcement.id)"
               class="p-6 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border-l-4 border-hailong-secondary">
               <div class="flex justify-between items-start mb-3">
-                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.noticeType }}</span>
+                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ announcement.noticeTypeName }}</span>
                 <span class="text-xs text-gray-500">{{ formatDate(announcement.publishTime) }}</span>
               </div>
               <h4 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ announcement.title }}</h4>

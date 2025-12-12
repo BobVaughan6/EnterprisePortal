@@ -165,15 +165,6 @@ public class HomeService : IHomeService
             .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
             .OrderByDescending(x => x.PublishTime)
             .Take(5)
-            .Select(x => new RecentAnnouncementDto
-            {
-                Id = (int)x.Id,
-                Title = x.Title,
-                NoticeType = x.NoticeType,
-                ProjectRegion = x.ProjectRegion,
-                PublishTime = x.PublishTime,
-                SourceType = "政府采购"
-            })
             .ToListAsync();
 
         // 获取最新5条建设工程公告
@@ -181,20 +172,30 @@ public class HomeService : IHomeService
             .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION")
             .OrderByDescending(x => x.PublishTime)
             .Take(5)
+            .ToListAsync();
+
+        // 合并并转换为DTO
+        var allAnnouncements = govAnnouncements
             .Select(x => new RecentAnnouncementDto
             {
                 Id = (int)x.Id,
                 Title = x.Title,
                 NoticeType = x.NoticeType,
+                NoticeTypeName = GetNoticeTypeName(x.NoticeType, x.BusinessType),
+                ProjectRegion = x.ProjectRegion,
+                PublishTime = x.PublishTime,
+                SourceType = "政府采购"
+            })
+            .Concat(constructionAnnouncements.Select(x => new RecentAnnouncementDto
+            {
+                Id = (int)x.Id,
+                Title = x.Title,
+                NoticeType = x.NoticeType,
+                NoticeTypeName = GetNoticeTypeName(x.NoticeType, x.BusinessType),
                 ProjectRegion = x.ProjectRegion,
                 PublishTime = x.PublishTime,
                 SourceType = "建设工程"
-            })
-            .ToListAsync();
-
-        // 合并并按发布时间排序
-        var allAnnouncements = govAnnouncements
-            .Concat(constructionAnnouncements)
+            }))
             .OrderByDescending(x => x.PublishTime)
             .Take(10)
             .ToList();
@@ -225,5 +226,39 @@ public class HomeService : IHomeService
             .ToListAsync();
 
         return achievements;
+    }
+
+    /// <summary>
+    /// 获取公告类型中文名称
+    /// </summary>
+    private static string GetNoticeTypeName(string? noticeType, string? businessType)
+    {
+        if (string.IsNullOrEmpty(noticeType))
+            return string.Empty;
+
+        // 政府采购
+        if (businessType == "GOV_PROCUREMENT")
+        {
+            return noticeType switch
+            {
+                "bidding" => "招标公告",
+                "correction" => "更正公告",
+                "result" => "结果公告",
+                _ => noticeType
+            };
+        }
+        // 建设工程
+        else if (businessType == "CONSTRUCTION")
+        {
+            return noticeType switch
+            {
+                "bidding" => "采购公告",
+                "correction" => "更正公告",
+                "result" => "结果公告",
+                _ => noticeType
+            };
+        }
+
+        return noticeType;
     }
 }
