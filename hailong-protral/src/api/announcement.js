@@ -1,39 +1,11 @@
-import axios from 'axios'
-
-// 创建axios实例
-const request = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
-  timeout: 10000
-})
-
-// 请求拦截器
-request.interceptors.request.use(
-  config => {
-    // 可以在这里添加token等
-    return config
-  },
-  error => {
-    return Promise.reject(error)
-  }
-)
-
-// 响应拦截器
-request.interceptors.response.use(
-  response => {
-    return response.data
-  },
-  error => {
-    console.error('API请求错误:', error)
-    return Promise.reject(error)
-  }
-)
+import request from './request'
 
 /**
  * 获取公告列表
  * @param {Object} params - 查询参数
- * @param {string} params.category - 公告类别 (GOV_PROCUREMENT: 政府采购, CONSTRUCTION: 建设工程)
+ * @param {string} params.businessType - 业务类型 (GOV_PROCUREMENT: 政府采购, CONSTRUCTION: 建设工程)
  * @param {string} params.keyword - 关键词搜索
- * @param {string} params.type - 公告类型
+ * @param {string} params.noticeType - 公告类型
  * @param {Array} params.regions - 项目区域数组
  * @param {string} params.startDate - 开始日期 (YYYY-MM-DD)
  * @param {string} params.endDate - 结束日期 (YYYY-MM-DD)
@@ -43,7 +15,7 @@ request.interceptors.response.use(
  */
 export function getAnnouncementList(params) {
   return request({
-    url: '/announcements',
+    url: '/api/announcements',
     method: 'get',
     params
   })
@@ -56,43 +28,43 @@ export function getAnnouncementList(params) {
  */
 export function getAnnouncementDetail(id) {
   return request({
-    url: `/announcements/${id}`,
+    url: `/api/announcements/${id}`,
     method: 'get'
   })
 }
 
 /**
- * 获取公告类型枚举
- * @param {string} category - 公告类别
+ * 获取政府采购公告列表
+ * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getAnnouncementTypes(category) {
+export function getGovProcurementList(params) {
   return request({
-    url: '/announcements/types',
+    url: '/api/announcements/gov-procurement',
     method: 'get',
-    params: { category }
+    params
   })
 }
 
 /**
- * 获取项目区域列表
+ * 获取建设工程公告列表
+ * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-export function getRegions() {
+export function getConstructionList(params) {
   return request({
-    url: '/announcements/regions',
-    method: 'get'
+    url: '/api/announcements/construction',
+    method: 'get',
+    params
   })
 }
 
 /**
- * 增加公告访问量
+ * 增加公告访问量（已在后端getById接口中自动处理）
  * @param {number} id - 公告ID
  * @returns {Promise}
  */
 export function incrementViews(id) {
-  return request({
-    url: `/announcements/${id}/views`,
-    method: 'post'
-  })
+  // 注意：访问量已在获取详情时自动增加，此接口保留用于兼容
+  return Promise.resolve({ success: true })
 }

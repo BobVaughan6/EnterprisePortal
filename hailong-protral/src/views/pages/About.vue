@@ -60,7 +60,17 @@
         <!-- 业务范围 -->
         <div v-show="activeTab === 'business'" class="animate-fade-in">
           <h2 class="text-4xl font-bold text-hailong-dark mb-8 text-center font-tech">业务范围</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div v-if="loadingBusiness" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
+            <p class="mt-4 text-gray-600">加载中...</p>
+          </div>
+          <div v-else-if="businessError" class="text-center py-12">
+            <p class="text-red-600">{{ businessError }}</p>
+            <button @click="fetchBusinessScope" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
+              重新加载
+            </button>
+          </div>
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="business in businessScope" :key="business.id"
               @click="handleBusinessClick(business.id)"
               class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
@@ -87,7 +97,17 @@
         <!-- 企业资质 -->
         <div v-show="activeTab === 'qualifications'" class="animate-fade-in">
           <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">企业资质</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div v-if="loadingQualifications" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
+            <p class="mt-4 text-gray-600">加载中...</p>
+          </div>
+          <div v-else-if="qualificationsError" class="text-center py-12">
+            <p class="text-red-600">{{ qualificationsError }}</p>
+            <button @click="fetchQualifications" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
+              重新加载
+            </button>
+          </div>
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div v-for="qualification in qualifications" :key="qualification.id"
               @click="handleQualificationClick(qualification.id)"
               class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
@@ -118,7 +138,17 @@
           <div class="max-w-6xl mx-auto">
             <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">企业荣誉</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div v-if="loadingAchievements" class="text-center py-12">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
+              <p class="mt-4 text-gray-600">加载中...</p>
+            </div>
+            <div v-else-if="achievementsError" class="text-center py-12">
+              <p class="text-red-600">{{ achievementsError }}</p>
+              <button @click="fetchAchievements" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
+                重新加载
+              </button>
+            </div>
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div v-for="achievement in achievements" :key="achievement.id"
                 @click="openImagePreview(achievement.imageUrl)"
                 class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
@@ -162,9 +192,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { businessScope, companyProfile as staticCompanyProfile } from '@/config/data.js'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import {
+  getCompanyProfile,
+  getBusinessScope,
+  getCompanyQualifications,
+  getCompanyHonors
+} from '@/api/config'
 
 const router = useRouter()
 
@@ -178,127 +213,156 @@ const tabs = [
 
 const activeTab = ref('intro')
 
-// 企业简介数据（使用静态数据）
+// 企业简介数据
 const companyProfile = ref({
-  id: 1,
-  title: staticCompanyProfile.title,
-  content: staticCompanyProfile.content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>'),
-  imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=600&fit=crop'
+  id: 0,
+  title: '',
+  content: '',
+  imageUrl: ''
 })
 const loading = ref(false)
 const error = ref('')
 
-// 企业资质列表（带图片）
-const qualifications = [
-  {
-    id: 1,
-    name: '政府采购代理机构资格证书',
-    image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop',
-    description: '具备政府采购代理资质，为政府机关提供专业采购服务'
-  },
-  {
-    id: 2,
-    name: '工程招标代理机构资格证书',
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop',
-    description: '拥有工程招标代理资质，提供全流程招标代理服务'
-  },
-  {
-    id: 3,
-    name: '工程造价咨询企业资质证书',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop',
-    description: '专业工程造价咨询资质，提供精准造价分析'
-  },
-  {
-    id: 4,
-    name: '工程监理企业资质证书',
-    image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=600&fit=crop',
-    description: '工程监理资质认证，确保工程质量与安全'
-  },
-  {
-    id: 5,
-    name: 'ISO9001质量管理体系认证',
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=600&fit=crop',
-    description: '国际质量管理体系认证，保障服务质量'
-  },
-  {
-    id: 6,
-    name: 'ISO14001环境管理体系认证',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
-    description: '环境管理体系认证，践行绿色发展理念'
-  },
-  {
-    id: 7,
-    name: 'OHSAS18001职业健康安全管理体系认证',
-    image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop',
-    description: '职业健康安全管理认证，保障员工安全'
-  },
-  {
-    id: 8,
-    name: 'AAA级信用企业',
-    image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=600&fit=crop',
-    description: '最高信用等级认证，诚信经营典范'
-  }
-]
+// 业务范围数据
+const businessScope = ref([])
+const loadingBusiness = ref(false)
+const businessError = ref('')
 
-// 企业荣誉数据（证书列表）
-const achievements = ref([
-  {
-    id: 1,
-    name: '河南省建设工程招标代理诚实守信单位',
-    imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop'
-  },
-  {
-    id: 2,
-    name: '企业信用评价AAA级信用企业',
-    imageUrl: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=300&fit=crop'
-  },
-  {
-    id: 3,
-    name: '全国重合同守信用优秀企业',
-    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop'
-  },
-  {
-    id: 4,
-    name: '质量·服务·诚信AAA企业',
-    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=300&fit=crop'
-  },
-  {
-    id: 5,
-    name: 'ISO9001质量管理体系认证',
-    imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop'
-  },
-  {
-    id: 6,
-    name: 'ISO14001环境管理体系认证',
-    imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'
-  },
-  {
-    id: 7,
-    name: 'ISO45001职业健康安全管理体系认证',
-    imageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400&h=300&fit=crop'
-  },
-  {
-    id: 8,
-    name: '河南省工程咨询协会会员单位',
-    imageUrl: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop'
-  }
-])
+// 企业资质数据
+const qualifications = ref([])
+const loadingQualifications = ref(false)
+const qualificationsError = ref('')
+
+// 企业荣誉数据
+const achievements = ref([])
 const loadingAchievements = ref(false)
 const achievementsError = ref('')
 
 // API基础URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 
-// 获取企业简介（已使用静态数据，保留函数以便将来切换）
+// 获取企业简介
 const fetchCompanyProfile = async () => {
-  // 使用静态数据，无需API调用
-  console.log('使用静态企业简介数据')
+  loading.value = true
+  error.value = ''
+  try {
+    const response = await getCompanyProfile()
+    if (response.success && response.data) {
+      const data = response.data
+      companyProfile.value = {
+        id: data.id,
+        title: data.title || '企业简介',
+        content: data.content || '',
+        imageUrl: data.imageUrls && data.imageUrls.length > 0
+          ? `${API_BASE_URL}${data.imageUrls[0]}`
+          : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=600&fit=crop'
+      }
+    } else {
+      error.value = response.message || '获取企业简介失败'
+    }
+  } catch (err) {
+    console.error('获取企业简介失败:', err)
+    error.value = '获取企业简介失败，请稍后重试'
+  } finally {
+    loading.value = false
+  }
 }
 
-// 获取企业荣誉（已使用静态数据，保留函数以便将来切换）
+// 获取业务范围
+const fetchBusinessScope = async () => {
+  loadingBusiness.value = true
+  businessError.value = ''
+  try {
+    const response = await getBusinessScope()
+    if (response.success && response.data) {
+      businessScope.value = response.data
+        .filter(item => item.status)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.description || '',
+          content: item.content || '',
+          features: item.features || [],
+          image: item.imageUrl
+            ? `${API_BASE_URL}${item.imageUrl}`
+            : 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop'
+        }))
+    } else {
+      businessError.value = response.message || '获取业务范围失败'
+    }
+  } catch (err) {
+    console.error('获取业务范围失败:', err)
+    businessError.value = '获取业务范围失败，请稍后重试'
+  } finally {
+    loadingBusiness.value = false
+  }
+}
+
+// 获取企业资质
+const fetchQualifications = async () => {
+  loadingQualifications.value = true
+  qualificationsError.value = ''
+  try {
+    const response = await getCompanyQualifications()
+    if (response.success && response.data) {
+      qualifications.value = response.data
+        .filter(item => item.status)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.description || '',
+          certificateNumber: item.certificateNumber || '',
+          issuingAuthority: item.issuingAuthority || '',
+          issueDate: item.issueDate || '',
+          expiryDate: item.expiryDate || '',
+          image: item.certificateImageId
+            ? `${API_BASE_URL}/api/attachment/${item.certificateImageId}`
+            : 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop'
+        }))
+    } else {
+      qualificationsError.value = response.message || '获取企业资质失败'
+    }
+  } catch (err) {
+    console.error('获取企业资质失败:', err)
+    qualificationsError.value = '获取企业资质失败，请稍后重试'
+  } finally {
+    loadingQualifications.value = false
+  }
+}
+
+// 获取企业荣誉
 const fetchAchievements = async () => {
-  // 使用静态数据，无需API调用
-  console.log('使用静态企业荣誉数据')
+  loadingAchievements.value = true
+  achievementsError.value = ''
+  try {
+    const response = await getCompanyHonors()
+    if (response.success && response.data) {
+      achievements.value = response.data
+        .filter(item => item.status)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.description || '',
+          awardOrganization: item.awardOrganization || '',
+          awardDate: item.awardDate || '',
+          certificateNo: item.certificateNo || '',
+          honorLevel: item.honorLevel || '',
+          imageUrl: item.imageId
+            ? `${API_BASE_URL}/api/attachment/${item.imageId}`
+            : 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop'
+        }))
+    } else {
+      achievementsError.value = response.message || '获取企业荣誉失败'
+    }
+  } catch (err) {
+    console.error('获取企业荣誉失败:', err)
+    achievementsError.value = '获取企业荣誉失败，请稍后重试'
+  } finally {
+    loadingAchievements.value = false
+  }
 }
 
 // 格式化日期
@@ -347,6 +411,8 @@ const handleQualificationClick = (id) => {
 
 onMounted(() => {
   fetchCompanyProfile()
+  fetchBusinessScope()
+  fetchQualifications()
   fetchAchievements()
 })
 </script>
