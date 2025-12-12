@@ -18,7 +18,7 @@
       "fullAddress": "郑州市郑东新区金水东路85号雅宝·东方国际广场2号楼13层"
     },
     "workingHours": {
-      "weekdays": "工作日 9:00-18:00",
+      "weekdays": "工作日 9:00-17:20",
       "weekend": "休息"
     },
     "map": {
@@ -33,27 +33,29 @@
       "enabled": true,
       "lines": [
         {
-          "line": "地铁1号线",
-          "station": "会展中心站",
-          "exit": "D口",
-          "walkingDistance": "约500米"
+          "line": "地铁5号线",
+          "station": "金水东路站",
+          "exit": "A口",
+          "walkingDistance": "约100米"
         }
       ]
     },
     "bus": {
       "enabled": true,
-      "routes": ["26路", "43路", "47路", "115路"],
-      "station": "金水东路站",
-      "description": "金水东路站下车即到"
+      "routes": ["115路", "326路", "G29路", "S606路", "园博园市区6号线"],
+      "station": "金水东路中兴路站",
+      "description": "金水东路中兴路站下车即到"
     },
     "driving": {
       "enabled": true,
-      "navigation": "雅宝东方国际广场",
-      "parking": "大厦配有地下停车场"
+      "navigation": "海隆工程咨询有限公司",
+      "parking": "外来车辆可停负二层"
     },
     "landmarks": [
-      "郑州国际会展中心",
-      "河南省体育中心"
+      "郑州东站",
+      "郑东万象城",
+      "绿地360广场",
+      "弘坊"
     ]
   },
   "navigation": {

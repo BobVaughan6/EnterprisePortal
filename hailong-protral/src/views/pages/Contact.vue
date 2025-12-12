@@ -8,7 +8,7 @@
         class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
         联系我们
       </h1>
-      <p class="text-xl text-gray-200">期待与您的合作，共创美好未来</p>
+      <p class="text-xl text-gray-200">期待与您的合作,共创美好未来</p>
     </div>
 
     <!-- 内容区域 -->
@@ -181,9 +181,11 @@
                     </div>
                     <h4 class="text-base font-bold text-gray-900">周边地标</h4>
                   </div>
-                  <ul class="space-y-1 text-sm text-gray-700 ml-10">
-                    <li v-for="landmark in transportation.landmarks" :key="landmark">{{ landmark }}</li>
-                  </ul>
+                  <div class="grid grid-cols-2 gap-2 ml-10">
+                    <div v-for="landmark in transportation.landmarks" :key="landmark" class="text-sm text-gray-700">
+                      • {{ landmark }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -202,7 +204,7 @@
                 <h3 class="text-2xl font-bold text-gray-900">公司位置</h3>
               </div>
 
-              <div id="map-container" class="h-96 bg-gray-100 rounded-xl overflow-hidden mb-4"></div>
+              <div id="map-container" class="h-[500px] bg-gray-100 rounded-xl overflow-hidden mb-4"></div>
               <div class="p-4 bg-gray-50 rounded-lg">
                 <p class="text-sm text-gray-600 flex items-start">
                   <svg class="w-4 h-4 mr-2 text-hailong-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
