@@ -8,7 +8,7 @@
       <h1 class="text-6xl font-bold mb-4 font-tech bg-gradient-to-r from-white via-hailong-cyan to-white bg-clip-text text-transparent animate-fade-in">
         关于海隆
       </h1>
-      <p class="text-xl text-gray-200">海纳百川，才望兼隆</p>
+      <p class="text-xl text-gray-200">{{ companyInfo.slogan }}</p>
     </div>
 
     <!-- Tab导航 -->
@@ -198,10 +198,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import { getCompanyInfo } from '@/utils/config'
 import {
   getCompanyProfile,
   getBusinessScope,
@@ -210,6 +211,9 @@ import {
 } from '@/api/config'
 
 const router = useRouter()
+
+// 获取公司信息
+const companyInfo = computed(() => getCompanyInfo())
 
 // Tab配置
 const tabs = [
