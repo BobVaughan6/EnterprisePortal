@@ -36,7 +36,16 @@
       <div v-else class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-200">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
           <div class="lg:col-span-2">
-            <div class="text-gray-700 text-lg leading-relaxed prose prose-lg max-w-none" v-html="profileContent"></div>
+            <div class="text-gray-700 text-base leading-relaxed prose prose-lg max-w-none" v-html="profileContent"></div>
+            <div class="mt-6">
+              <router-link to="/about"
+                class="inline-flex items-center text-hailong-primary hover:text-hailong-secondary font-medium transition-colors group">
+                <span>查看完整介绍</span>
+                <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+              </router-link>
+            </div>
           </div>
           <div v-if="profileHighlights.length > 0" class="grid grid-cols-2 gap-4">
             <div v-for="highlight in profileHighlights" :key="highlight"
@@ -139,13 +148,59 @@ const loading = ref(false)
 const govProcurementList = ref([])
 const constructionList = ref([])
 
+// 提取HTML内容的纯文本摘要
+const extractSummary = (htmlContent, maxLength = 300) => {
+  if (!htmlContent) return ''
+  
+  // 创建临时div来解析HTML
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = htmlContent
+  
+  // 获取纯文本
+  const text = tempDiv.textContent || tempDiv.innerText || ''
+  
+  // 截取指定长度
+  if (text.length <= maxLength) {
+    return text
+  }
+  
+  // 截取并添加省略号
+  return text.substring(0, maxLength).trim() + '...'
+}
+
+// 提取HTML内容的前几个段落
+const extractFirstParagraphs = (htmlContent, count = 2) => {
+  if (!htmlContent) return ''
+  
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = htmlContent
+  
+  // 获取所有p标签
+  const paragraphs = tempDiv.querySelectorAll('p')
+  
+  if (paragraphs.length === 0) {
+    // 如果没有p标签，返回摘要
+    return extractSummary(htmlContent, 300)
+  }
+  
+  // 提取前N个段落
+  let result = ''
+  for (let i = 0; i < Math.min(count, paragraphs.length); i++) {
+    result += paragraphs[i].outerHTML
+  }
+  
+  return result
+}
+
 // 加载企业简介
 const loadCompanyProfile = async () => {
   profileLoading.value = true
   try {
     const response = await getCompanyProfile()
     if (response.success && response.data) {
-      profileContent.value = response.data.content || ''
+      // 只显示前2个段落作为摘要
+      const fullContent = response.data.content || ''
+      profileContent.value = extractFirstParagraphs(fullContent, 2)
       profileHighlights.value = response.data.highlights || []
     }
   } catch (error) {

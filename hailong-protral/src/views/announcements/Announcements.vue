@@ -54,7 +54,7 @@
             <button
               v-for="type in businessTypes"
               :key="type.value"
-              @click="searchParams.businessType = type.value"
+              @click="handleBusinessTypeChange(type.value)"
               :class="[
                 'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
                 searchParams.businessType === type.value
@@ -91,10 +91,10 @@
               <button
                 v-for="type in currentAnnouncementTypes"
                 :key="type.value"
-                @click="searchParams.type = type.value"
+                @click="searchParams.noticeType = type.value"
                 :class="[
                   'px-5 py-1.5 rounded-lg text-sm font-medium transition-all',
-                  searchParams.type === type.value
+                  searchParams.noticeType === type.value
                     ? 'bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 ]"
@@ -122,8 +122,8 @@
                   style="min-width: 120px;"
                 >
                   <option value="">全部省份</option>
-                  <option v-for="province in provinces" :key="province.code" :value="province.code">
-                    {{ province.name }}
+                  <option v-for="province in provinces" :key="province.regionCode" :value="province.regionName">
+                    {{ province.regionName }}
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,8 +143,8 @@
                   style="min-width: 120px;"
                 >
                   <option value="">全部城市</option>
-                  <option v-for="city in cities" :key="city.code" :value="city.code">
-                    {{ city.name }}
+                  <option v-for="city in cities" :key="city.regionCode" :value="city.regionName">
+                    {{ city.regionName }}
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,8 +163,8 @@
                   style="min-width: 120px;"
                 >
                   <option value="">全部区县</option>
-                  <option v-for="district in districts" :key="district.code" :value="district.code">
-                    {{ district.name }}
+                  <option v-for="district in districts" :key="district.regionCode" :value="district.regionName">
+                    {{ district.regionName }}
                   </option>
                 </select>
                 <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,8 +257,8 @@
           @click="handleViewDetail(announcement.id)"
           :class="[
             'bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer border-l-4',
-            searchParams.businessType === 'GOV_PROCUREMENT' ? 'border-hailong-primary' :
-            searchParams.businessType === 'CONSTRUCTION' ? 'border-hailong-secondary' : 'border-hailong-primary'
+            announcement.businessType === 'GOV_PROCUREMENT' ? 'border-hailong-primary' :
+            announcement.businessType === 'CONSTRUCTION' ? 'border-hailong-secondary' : 'border-hailong-primary'
           ]"
         >
           <!-- 标题和类型 -->
@@ -269,20 +269,20 @@
             <span
               :class="[
                 'ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1',
-                getTypeStyle(announcement.type)
+                getTypeStyle(announcement.noticeTypeName)
               ]"
             >
-              <svg v-if="announcement.type === '招标公告' || announcement.type === '采购公告'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-if="announcement.noticeType === 'bidding'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
               </svg>
-              <svg v-else-if="announcement.type === '结果公告'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-else-if="announcement.noticeType === 'result'" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
               <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
               </svg>
-              {{ announcement.type }}
+              {{ announcement.noticeTypeName }}
             </span>
           </div>
 
@@ -296,13 +296,13 @@
               <span class="text-gray-500">中标人：</span>
               <span class="text-gray-700 font-medium">{{ announcement.winner }}</span>
             </div>
-            <div v-if="announcement.region">
+            <div v-if="announcement.projectRegion">
               <span class="text-gray-500">项目区域：</span>
-              <span class="text-gray-700 font-medium">{{ announcement.region }}</span>
+              <span class="text-gray-700 font-medium">{{ announcement.projectRegion }}</span>
             </div>
-            <div>
+            <div v-if="announcement.publishTime">
               <span class="text-gray-500">发布时间：</span>
-              <span class="text-gray-700 font-medium">{{ announcement.publishDate }}</span>
+              <span class="text-gray-700 font-medium">{{ formatDate(announcement.publishTime) }}</span>
             </div>
           </div>
 
@@ -314,7 +314,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                {{ announcement.views || 0 }} 次浏览
+                {{ announcement.viewCount || 0 }} 次浏览
               </span>
             </div>
             <span class="text-hailong-primary text-sm font-medium hover:underline">
@@ -379,12 +379,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import { getAnnouncementList, getAnnouncementTypes, getRegions, incrementViews } from '@/api/announcement.js'
-import cityData from '@/assets/city.json'
+import { getAnnouncementList } from '@/api/announcement.js'
+import { getProvinceList, getCityList, getDistrictList } from '@/api/region.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -440,9 +440,11 @@ const currentAnnouncementTypes = computed(() => {
 })
 
 // 省市区数据
-const provinces = ref(cityData.provinces)
+const provinces = ref([])
 const cities = ref([])
 const districts = ref([])
+const selectedProvinceCode = ref('')
+const selectedCityCode = ref('')
 
 // 时间范围选项
 const timeRanges = [
@@ -456,131 +458,149 @@ const timeRanges = [
 // 搜索参数
 const searchParams = ref({
   businessType: '',
-  type: '',
+  noticeType: '',
   procurementType: '',
   province: '',
   city: '',
   district: '',
-  region: '',
   timeRange: '',
   startDate: '',
   endDate: '',
   keyword: ''
 })
 
+// 其他状态
+const showCustomDatePicker = ref(false)
+const loading = ref(false)
+const announcements = ref([])
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+// 加载省份列表
+const loadProvinces = async () => {
+  try {
+    const res = await getProvinceList()
+    if (res.success && res.data) {
+      provinces.value = res.data
+    }
+  } catch (error) {
+    console.error('加载省份列表失败:', error)
+  }
+}
+
+// 加载城市列表
+const loadCities = async (provinceCode) => {
+  if (!provinceCode) {
+    cities.value = []
+    return
+  }
+  
+  try {
+    const res = await getCityList(provinceCode)
+    if (res.success && res.data) {
+      cities.value = res.data
+    }
+  } catch (error) {
+    console.error('加载城市列表失败:', error)
+  }
+}
+
+// 加载区县列表
+const loadDistricts = async (cityCode) => {
+  if (!cityCode) {
+    districts.value = []
+    return
+  }
+  
+  try {
+    const res = await getDistrictList(cityCode)
+    if (res.success && res.data) {
+      districts.value = res.data
+    }
+  } catch (error) {
+    console.error('加载区县列表失败:', error)
+  }
+}
+
 // 省份变化处理
-const onProvinceChange = () => {
-  // 重置城市和区县
+const onProvinceChange = async () => {
   searchParams.value.city = ''
   searchParams.value.district = ''
+  cities.value = []
   districts.value = []
   
   if (searchParams.value.province) {
-    // 查找选中的省份
-    const selectedProvince = provinces.value.find(p => p.code === searchParams.value.province)
-    if (selectedProvince) {
-      cities.value = selectedProvince.cities || []
+    // 根据省份名称找到省份代码
+    const province = provinces.value.find(p => p.regionName === searchParams.value.province)
+    if (province) {
+      selectedProvinceCode.value = province.regionCode
+      await loadCities(province.regionCode)
     }
   } else {
-    cities.value = []
+    selectedProvinceCode.value = ''
   }
 }
 
 // 城市变化处理
-const onCityChange = () => {
-  // 重置区县
+const onCityChange = async () => {
   searchParams.value.district = ''
+  districts.value = []
   
   if (searchParams.value.city) {
-    // 查找选中的城市
-    const selectedCity = cities.value.find(c => c.code === searchParams.value.city)
-    if (selectedCity) {
-      districts.value = selectedCity.districts || []
+    // 根据城市名称找到城市代码
+    const city = cities.value.find(c => c.regionName === searchParams.value.city)
+    if (city) {
+      selectedCityCode.value = city.regionCode
+      await loadDistricts(city.regionCode)
     }
   } else {
-    districts.value = []
+    selectedCityCode.value = ''
   }
 }
 
-// 自定义日期选择器显示状态
-const showCustomDatePicker = ref(false)
-
-// 公告列表
-const announcements = ref([])
-
-// 加载状态
-const loading = ref(false)
-
-// 分页参数
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
-
-// 总页数
-const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
-
-// 显示的页码
-const displayPages = computed(() => {
-  const pages = []
-  const maxDisplay = 7
-  
-  if (totalPages.value <= maxDisplay) {
-    for (let i = 1; i <= totalPages.value; i++) {
-      pages.push(i)
-    }
-  } else {
-    if (currentPage.value <= 4) {
-      for (let i = 1; i <= 5; i++) {
-        pages.push(i)
-      }
-      pages.push('...')
-      pages.push(totalPages.value)
-    } else if (currentPage.value >= totalPages.value - 3) {
-      pages.push(1)
-      pages.push('...')
-      for (let i = totalPages.value - 4; i <= totalPages.value; i++) {
-        pages.push(i)
-      }
-    } else {
-      pages.push(1)
-      pages.push('...')
-      for (let i = currentPage.value - 1; i <= currentPage.value + 1; i++) {
-        pages.push(i)
-      }
-      pages.push('...')
-      pages.push(totalPages.value)
-    }
+// 业务类型变化处理
+const handleBusinessTypeChange = (value) => {
+  searchParams.value.businessType = value
+  // 如果不是政府采购，清空采购类型
+  if (value !== 'GOV_PROCUREMENT') {
+    searchParams.value.procurementType = ''
   }
-  
-  return pages
-})
+}
 
-// 选择时间范围
+// 时间范围选择
 const selectTimeRange = (value) => {
   searchParams.value.timeRange = value
   showCustomDatePicker.value = false
   
   const today = new Date()
-  const endDate = today.toISOString().split('T')[0]
   let startDate = ''
   
   switch (value) {
     case 'today':
-      startDate = endDate
+      startDate = today.toISOString().split('T')[0]
+      searchParams.value.startDate = startDate
+      searchParams.value.endDate = startDate
       break
     case '3days':
-      startDate = new Date(today.setDate(today.getDate() - 3)).toISOString().split('T')[0]
+      startDate = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      searchParams.value.startDate = startDate
+      searchParams.value.endDate = today.toISOString().split('T')[0]
       break
     case 'week':
-      startDate = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0]
+      startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      searchParams.value.startDate = startDate
+      searchParams.value.endDate = today.toISOString().split('T')[0]
       break
     case 'month':
-      startDate = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0]
+      startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      searchParams.value.startDate = startDate
+      searchParams.value.endDate = today.toISOString().split('T')[0]
       break
+    default:
+      searchParams.value.startDate = ''
+      searchParams.value.endDate = ''
   }
-  
-  searchParams.value.startDate = startDate
-  searchParams.value.endDate = endDate
 }
 
 // 自定义日期变化
@@ -592,273 +612,185 @@ const onCustomDateChange = () => {
 const loadAnnouncements = async () => {
   loading.value = true
   try {
-    // 构建区域参数
-    let regionParam = ''
-    if (searchParams.value.district) {
-      const district = districts.value.find(d => d.code === searchParams.value.district)
-      regionParam = district ? district.name : ''
-    } else if (searchParams.value.city) {
-      const city = cities.value.find(c => c.code === searchParams.value.city)
-      regionParam = city ? city.name : ''
-    } else if (searchParams.value.province) {
-      const province = provinces.value.find(p => p.code === searchParams.value.province)
-      regionParam = province ? province.name : ''
-    }
-    
+    // 构建查询参数，只传递有值的参数
     const params = {
-      businessType: searchParams.value.businessType,
-      keyword: searchParams.value.keyword,
-      type: searchParams.value.type,
-      region: regionParam,
-      startDate: searchParams.value.startDate,
-      endDate: searchParams.value.endDate,
-      page: currentPage.value,
+      pageNumber: currentPage.value,
       pageSize: pageSize.value
     }
     
-    // 模拟API调用 - 实际项目中替换为真实API
-    // const response = await getAnnouncementList(params)
-    // announcements.value = response.data.list
-    // total.value = response.data.total
+    // 只添加非空参数
+    if (searchParams.value.businessType) {
+      params.businessType = searchParams.value.businessType
+    }
+    if (searchParams.value.noticeType) {
+      params.noticeType = searchParams.value.noticeType
+    }
+    // 只有选择政府采购时，才传递采购类型
+    if (searchParams.value.businessType === 'GOV_PROCUREMENT' && searchParams.value.procurementType) {
+      params.procurementType = searchParams.value.procurementType
+    }
     
-    // 模拟数据
-    await new Promise(resolve => setTimeout(resolve, 500))
+    // 传递地区regionCode（数据库存储的是regionCode）
+    if (selectedProvinceCode.value) {
+      params.province = selectedProvinceCode.value
+    }
+    if (selectedCityCode.value) {
+      params.city = selectedCityCode.value
+    }
+    if (searchParams.value.district) {
+      // 根据区县名称找到区县代码
+      const district = districts.value.find(d => d.regionName === searchParams.value.district)
+      if (district) {
+        params.district = district.regionCode
+      }
+    }
     
-    const mockData = generateMockData(searchParams.value.businessType)
-    announcements.value = mockData.slice(
-      (currentPage.value - 1) * pageSize.value,
-      currentPage.value * pageSize.value
-    )
-    total.value = mockData.length
+    if (searchParams.value.keyword) {
+      params.keyword = searchParams.value.keyword
+    }
+    if (searchParams.value.startDate) {
+      params.startDate = searchParams.value.startDate
+    }
+    if (searchParams.value.endDate) {
+      params.endDate = searchParams.value.endDate
+    }
+    
+    console.log('查询参数:', params) // 调试日志
+    
+    const res = await getAnnouncementList(params)
+    
+    if (res.success && res.data) {
+      announcements.value = res.data.items || []
+      total.value = res.data.totalCount || 0
+    }
   } catch (error) {
     console.error('加载公告列表失败:', error)
-    announcements.value = []
-    total.value = 0
   } finally {
     loading.value = false
   }
 }
 
-// 生成模拟数据
-const generateMockData = (businessType) => {
-  const data = []
-  const count = 25
-  const types = ['bidding', 'correction', 'result']
-  
-  for (let i = 1; i <= count; i++) {
-    const typeIndex = i % 3
-    const typeValue = types[typeIndex]
-    
-    // 根据业务类型生成不同的标题和类型名称
-    let title = ''
-    let typeName = ''
-    const category = businessType || (i % 2 === 0 ? 'GOV_PROCUREMENT' : 'CONSTRUCTION')
-    
-    if (category === 'GOV_PROCUREMENT') {
-      // 政府采购
-      const dept = ['教育局', '卫生局', '交通局', '财政局'][i % 4]
-      const item = ['办公设备', '医疗器械', '教学设备', '车辆'][i % 4]
-      if (typeValue === 'bidding') {
-        title = `某市${dept}${item}采购项目招标公告`
-        typeName = '招标公告'
-      } else if (typeValue === 'result') {
-        title = `某市${dept}${item}采购项目中标公示`
-        typeName = '结果公告'
-      } else {
-        title = `某市${dept}${item}采购项目更正公告`
-        typeName = '更正公告'
-      }
-    } else {
-      // 建设工程
-      const project = ['道路', '桥梁', '学校', '医院'][i % 4]
-      const action = ['改造', '建设', '维修', '扩建'][i % 4]
-      if (typeValue === 'bidding') {
-        title = `某市${project}${action}工程施工采购公告`
-        typeName = '采购公告'
-      } else if (typeValue === 'result') {
-        title = `某市${project}${action}工程施工中标公示`
-        typeName = '结果公告'
-      } else {
-        title = `某市${project}${action}工程施工更正公告`
-        typeName = '更正公告'
-      }
-    }
-    
-    data.push({
-      id: i,
-      title: title,
-      type: typeName,
-      businessType: category,
-      bidder: `某市${['建设局', '交通局', '教育局', '卫生局'][i % 4]}`,
-      // 只有结果公告才有中标人
-      winner: typeValue === 'result' ? `某${['建设', '科技', '工程', '实业'][i % 4]}有限公司` : null,
-      region: ['郑州市', '开封市', '洛阳市', '平顶山市', '安阳市', '鹤壁市', '新乡市', '焦作市', '濮阳市', '许昌市', '漯河市', '三门峡市', '南阳市', '商丘市', '信阳市', '周口市', '驻马店市', '济源市'][i % 18],
-      publishDate: `2025-${String(11 + (i % 2)).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
-      views: Math.floor(Math.random() * 1000) + 100
-    })
-  }
-  
-  return data
-}
-
 // 搜索
-const handleSearch = async () => {
+const handleSearch = () => {
   currentPage.value = 1
-  await loadAnnouncements()
-  
-  // 更新URL参数
-  updateUrlParams()
+  loadAnnouncements()
 }
 
 // 重置
 const handleReset = () => {
   searchParams.value = {
     businessType: '',
-    type: '',
+    noticeType: '',
     procurementType: '',
     province: '',
     city: '',
     district: '',
-    region: '',
     timeRange: '',
     startDate: '',
     endDate: '',
     keyword: ''
   }
+  showCustomDatePicker.value = false
   cities.value = []
   districts.value = []
-  showCustomDatePicker.value = false
-  
-  selectTimeRange('')
-  handleSearch()
-}
-
-// 页码变化
-const handlePageChange = (page) => {
-  if (page < 1 || page > totalPages.value) return
-  currentPage.value = page
+  selectedProvinceCode.value = ''
+  selectedCityCode.value = ''
+  currentPage.value = 1
   loadAnnouncements()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-// 获取类型样式
-const getTypeStyle = (type) => {
-  switch (type) {
-    case '招标公告':
-    case '采购公告':
-      return 'bg-hailong-primary/10 text-hailong-primary border border-hailong-primary/20'
-    case '结果公告':
-      return 'bg-hailong-secondary/10 text-hailong-secondary border border-hailong-secondary/20'
-    case '更正公告':
-      return 'bg-hailong-cyan/10 text-hailong-cyan border border-hailong-cyan/20'
-    default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200'
-  }
 }
 
 // 查看详情
-const handleViewDetail = async (id) => {
-  try {
-    // 增加访问量
-    // await incrementViews(id)
-    
-    // 跳转到详情页
-    router.push(`/detail/announcement/${id}`)
-  } catch (error) {
-    console.error('查看详情失败:', error)
-  }
+const handleViewDetail = (id) => {
+  router.push(`/announcements/${id}`)
 }
 
-// 更新URL参数
-const updateUrlParams = () => {
-  const query = {}
-  
-  if (searchParams.value.businessType) query.businessType = searchParams.value.businessType
-  if (searchParams.value.type) query.type = searchParams.value.type
-  if (searchParams.value.province) query.province = searchParams.value.province
-  if (searchParams.value.city) query.city = searchParams.value.city
-  if (searchParams.value.district) query.district = searchParams.value.district
-  if (searchParams.value.timeRange) query.timeRange = searchParams.value.timeRange
-  if (searchParams.value.startDate) query.startDate = searchParams.value.startDate
-  if (searchParams.value.endDate) query.endDate = searchParams.value.endDate
-  if (searchParams.value.keyword) query.keyword = searchParams.value.keyword
-  
-  router.replace({ query })
+// 分页变化
+const handlePageChange = (page) => {
+  currentPage.value = page
+  loadAnnouncements()
+  // 滚动到顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// 从URL参数恢复筛选条件
-const restoreFiltersFromUrl = () => {
-  const query = route.query
+// 计算总页数
+const totalPages = computed(() => {
+  return Math.ceil(total.value / pageSize.value)
+})
+
+// 计算显示的页码
+const displayPages = computed(() => {
+  const pages = []
+  const total = totalPages.value
+  const current = currentPage.value
   
-  if (query.businessType) searchParams.value.businessType = query.businessType
-  if (query.type) searchParams.value.type = query.type
-  if (query.keyword) searchParams.value.keyword = query.keyword
-  
-  // 恢复省市区选择
-  if (query.province) {
-    searchParams.value.province = query.province
-    onProvinceChange()
-    
-    if (query.city) {
-      searchParams.value.city = query.city
-      onCityChange()
-      
-      if (query.district) {
-        searchParams.value.district = query.district
-      }
-    }
-  }
-  
-  if (query.timeRange) {
-    searchParams.value.timeRange = query.timeRange
-    if (query.timeRange === 'custom') {
-      showCustomDatePicker.value = true
-      if (query.startDate) searchParams.value.startDate = query.startDate
-      if (query.endDate) searchParams.value.endDate = query.endDate
-    } else {
-      selectTimeRange(query.timeRange)
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) {
+      pages.push(i)
     }
   } else {
-    selectTimeRange('')
+    if (current <= 4) {
+      for (let i = 1; i <= 5; i++) {
+        pages.push(i)
+      }
+      pages.push('...')
+      pages.push(total)
+    } else if (current >= total - 3) {
+      pages.push(1)
+      pages.push('...')
+      for (let i = total - 4; i <= total; i++) {
+        pages.push(i)
+      }
+    } else {
+      pages.push(1)
+      pages.push('...')
+      for (let i = current - 1; i <= current + 1; i++) {
+        pages.push(i)
+      }
+      pages.push('...')
+      pages.push(total)
+    }
   }
+  
+  return pages
+})
+
+// 格式化日期
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('zh-CN')
 }
 
-// 组件挂载时加载数据
-onMounted(() => {
-  // 从URL恢复筛选条件
-  restoreFiltersFromUrl()
-  
-  // 获取数据
-  loadAnnouncements()
+// 获取类型样式
+const getTypeStyle = (typeName) => {
+  if (typeName?.includes('招标') || typeName?.includes('采购')) {
+    return 'bg-blue-50 text-blue-600'
+  } else if (typeName?.includes('结果') || typeName?.includes('中标')) {
+    return 'bg-green-50 text-green-600'
+  } else if (typeName?.includes('更正') || typeName?.includes('变更')) {
+    return 'bg-orange-50 text-orange-600'
+  }
+  return 'bg-gray-50 text-gray-600'
+}
+
+// 初始化
+onMounted(async () => {
+  await loadProvinces()
+  await loadAnnouncements()
 })
 </script>
 
 <style scoped>
+.container-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-.expand-enter-from,
-.expand-leave-to {
-  max-height: 0;
-  opacity: 0;
 }
 </style>

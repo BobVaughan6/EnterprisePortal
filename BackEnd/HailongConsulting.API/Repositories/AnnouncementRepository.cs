@@ -55,7 +55,10 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
         string? district,
         string? keyword,
         int pageIndex,
-        int pageSize)
+        int pageSize,
+        string? procurementType = null,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
     {
         var query = _dbSet.Where(a => a.IsDeleted == 0);
 
@@ -64,6 +67,9 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
 
         if (!string.IsNullOrEmpty(noticeType))
             query = query.Where(a => a.NoticeType == noticeType);
+
+        if (!string.IsNullOrEmpty(procurementType))
+            query = query.Where(a => a.ProcurementType == procurementType);
 
         if (!string.IsNullOrEmpty(province))
             query = query.Where(a => a.Province == province);
@@ -80,6 +86,19 @@ public class AnnouncementRepository : Repository<Announcement>, IAnnouncementRep
                 a.Title.Contains(keyword) ||
                 (a.Bidder != null && a.Bidder.Contains(keyword)) ||
                 (a.Winner != null && a.Winner.Contains(keyword)));
+        }
+
+        // 日期筛选
+        if (startDate.HasValue)
+        {
+            query = query.Where(a => a.PublishTime >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            // 将结束日期设置为当天的23:59:59
+            var endDateTime = endDate.Value.Date.AddDays(1).AddTicks(-1);
+            query = query.Where(a => a.PublishTime <= endDateTime);
         }
 
         var totalCount = await query.CountAsync();

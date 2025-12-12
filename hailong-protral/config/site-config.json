@@ -65,44 +65,6 @@
       "河南省体育中心"
     ]
   },
-  "businessScope": [
-    {
-      "id": "gov-procurement",
-      "name": "政府采购代理",
-      "icon": "📋",
-      "order": 1
-    },
-    {
-      "id": "construction-bidding",
-      "name": "工程招标代理",
-      "icon": "🏗️",
-      "order": 2
-    },
-    {
-      "id": "cost-consulting",
-      "name": "造价咨询",
-      "icon": "💰",
-      "order": 3
-    },
-    {
-      "id": "project-management",
-      "name": "项目管理",
-      "icon": "📊",
-      "order": 4
-    },
-    {
-      "id": "consulting-service",
-      "name": "咨询服务",
-      "icon": "💡",
-      "order": 5
-    },
-    {
-      "id": "training-service",
-      "name": "培训服务",
-      "icon": "📚",
-      "order": 6
-    }
-  ],
   "navigation": {
     "header": [
       {

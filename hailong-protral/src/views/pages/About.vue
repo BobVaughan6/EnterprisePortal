@@ -12,12 +12,12 @@
     </div>
 
     <!-- Tab导航 -->
-    <div class="bg-white/10 backdrop-blur-md sticky top-20 z-40 border-b border-white/20">
+    <div class="bg-white backdrop-blur-md sticky top-20 z-40 border-b border-gray-200 shadow-sm">
       <div class="container-wide">
         <div class="flex space-x-8 overflow-x-auto">
           <button v-for="tab in tabs" :key="tab.id"
             @click="activeTab = tab.id"
-            class="px-6 py-4 text-white font-medium whitespace-nowrap transition-all border-b-2"
+            class="px-6 py-4 text-gray-700 font-medium whitespace-nowrap transition-all border-b-2"
             :class="activeTab === tab.id ? 'border-hailong-cyan text-hailong-cyan' : 'border-transparent hover:text-hailong-cyan'">
             {{ tab.name }}
           </button>
@@ -44,12 +44,20 @@
               </div>
               <div v-else>
                 <div v-if="companyProfile.imageUrl" class="h-96 overflow-hidden">
-                  <img :src="companyProfile.imageUrl" :alt="companyProfile.title"
+                  <img :src="companyProfile.imageUrl" alt="关于海隆"
                     @click="openImagePreview(companyProfile.imageUrl)"
                     class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div class="p-12">
-                  <h2 class="text-4xl font-bold text-hailong-dark mb-8 font-tech">{{ companyProfile.title }}</h2>
+                  <div class="mb-8">
+                    <h2 class="text-2xl md:text-3xl font-semibold mb-3 text-hailong-dark tracking-wide">
+                      关于海隆
+                    </h2>
+                    <div class="w-16 h-0.5 bg-gradient-to-r from-hailong-primary to-hailong-secondary mb-4"></div>
+                    <h3 v-if="companyProfile.title" class="text-xl md:text-2xl font-medium text-gray-700 mb-4">
+                      {{ companyProfile.title }}
+                    </h3>
+                  </div>
                   <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed" v-html="companyProfile.content"></div>
                 </div>
               </div>
@@ -249,13 +257,22 @@ const fetchCompanyProfile = async () => {
     const response = await getCompanyProfile()
     if (response.success && response.data) {
       const data = response.data
+      // 处理图片URL - 如果imageUrls存在且有值，使用第一张图片
+      let imageUrl = ''
+      if (data.imageUrls && data.imageUrls.length > 0) {
+        // 检查是否已经是完整URL（包含http或https）
+        const firstImage = data.imageUrls[0]
+        imageUrl = firstImage.startsWith('http') ? firstImage : `${API_BASE_URL}${firstImage}`
+      } else if (data.imageIds && data.imageIds.length > 0) {
+        // 如果只有imageIds，使用附件API
+        imageUrl = `${API_BASE_URL}/api/attachment/${data.imageIds[0]}`
+      }
+      
       companyProfile.value = {
         id: data.id,
         title: data.title || '企业简介',
         content: data.content || '',
-        imageUrl: data.imageUrls && data.imageUrls.length > 0
-          ? `${API_BASE_URL}${data.imageUrls[0]}`
-          : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=600&fit=crop'
+        imageUrl: imageUrl
       }
     } else {
       error.value = response.message || '获取企业简介失败'
@@ -284,9 +301,8 @@ const fetchBusinessScope = async () => {
           description: item.description || '',
           content: item.content || '',
           features: item.features || [],
-          image: item.imageUrl
-            ? `${API_BASE_URL}${item.imageUrl}`
-            : 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop'
+          // 后端返回的 imageUrl 已经是完整URL，直接使用
+          image: item.imageUrl || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop'
         }))
     } else {
       businessError.value = response.message || '获取业务范围失败'

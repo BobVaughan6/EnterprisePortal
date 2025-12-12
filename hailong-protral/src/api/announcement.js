@@ -5,11 +5,14 @@ import request from './request'
  * @param {Object} params - 查询参数
  * @param {string} params.businessType - 业务类型 (GOV_PROCUREMENT: 政府采购, CONSTRUCTION: 建设工程)
  * @param {string} params.keyword - 关键词搜索
- * @param {string} params.noticeType - 公告类型
- * @param {Array} params.regions - 项目区域数组
+ * @param {string} params.noticeType - 公告类型 (bidding: 招标/采购公告, correction: 更正公告, result: 结果公告)
+ * @param {string} params.procurementType - 采购类型 (goods: 货物, service: 服务, project: 工程)
+ * @param {string} params.province - 省份
+ * @param {string} params.city - 城市
+ * @param {string} params.district - 区县
  * @param {string} params.startDate - 开始日期 (YYYY-MM-DD)
  * @param {string} params.endDate - 结束日期 (YYYY-MM-DD)
- * @param {number} params.page - 页码 (从1开始)
+ * @param {number} params.pageNumber - 页码 (从1开始)
  * @param {number} params.pageSize - 每页数量
  * @returns {Promise}
  */
@@ -17,7 +20,19 @@ export function getAnnouncementList(params) {
   return request({
     url: '/api/announcements',
     method: 'get',
-    params
+    params: {
+      businessType: params.businessType,
+      noticeType: params.noticeType,
+      procurementType: params.procurementType,
+      province: params.province,
+      city: params.city,
+      district: params.district,
+      keyword: params.keyword,
+      startDate: params.startDate,
+      endDate: params.endDate,
+      pageNumber: params.pageNumber || 1,
+      pageSize: params.pageSize || 10
+    }
   })
 }
 
@@ -42,7 +57,18 @@ export function getGovProcurementList(params) {
   return request({
     url: '/api/announcements/gov-procurement',
     method: 'get',
-    params
+    params: {
+      noticeType: params.noticeType,
+      procurementType: params.procurementType,
+      province: params.province,
+      city: params.city,
+      district: params.district,
+      keyword: params.keyword,
+      startDate: params.startDate,
+      endDate: params.endDate,
+      pageNumber: params.pageNumber || 1,
+      pageSize: params.pageSize || 10
+    }
   })
 }
 
@@ -55,16 +81,16 @@ export function getConstructionList(params) {
   return request({
     url: '/api/announcements/construction',
     method: 'get',
-    params
+    params: {
+      noticeType: params.noticeType,
+      province: params.province,
+      city: params.city,
+      district: params.district,
+      keyword: params.keyword,
+      startDate: params.startDate,
+      endDate: params.endDate,
+      pageNumber: params.pageNumber || 1,
+      pageSize: params.pageSize || 10
+    }
   })
-}
-
-/**
- * 增加公告访问量（已在后端getById接口中自动处理）
- * @param {number} id - 公告ID
- * @returns {Promise}
- */
-export function incrementViews(id) {
-  // 注意：访问量已在获取详情时自动增加，此接口保留用于兼容
-  return Promise.resolve({ success: true })
 }

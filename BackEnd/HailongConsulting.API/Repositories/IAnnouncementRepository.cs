@@ -33,7 +33,10 @@ public interface IAnnouncementRepository : IRepository<Announcement>
         string? district,
         string? keyword,
         int pageIndex,
-        int pageSize);
+        int pageSize,
+        string? procurementType = null,
+        DateTime? startDate = null,
+        DateTime? endDate = null);
     
     /// <summary>
     /// 软删除公告

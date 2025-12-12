@@ -85,7 +85,10 @@ public class AnnouncementService : IAnnouncementService
             queryDto.District,
             queryDto.Keyword,
             queryDto.PageNumber,
-            queryDto.PageSize);
+            queryDto.PageSize,
+            queryDto.ProcurementType,
+            queryDto.StartDate,
+            queryDto.EndDate);
 
         var dtos = _mapper.Map<List<AnnouncementDto>>(items);
 
