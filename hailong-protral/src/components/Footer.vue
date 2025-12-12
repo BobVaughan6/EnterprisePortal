@@ -3,7 +3,7 @@
     <div class="container-wide">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
-          <h3 class="text-xl font-bold mb-4 text-hailong-cyan font-tech">{{ companyInfo.shortName }}</h3>
+          <h3 class="text-xl font-bold mb-4 text-hailong-cyan font-tech">{{ companyInfo.fullName }}</h3>
           <p class="text-sm text-gray-400">{{ companyInfo.slogan }}</p>
         </div>
         <div v-for="section in footerSections" :key="section.title">

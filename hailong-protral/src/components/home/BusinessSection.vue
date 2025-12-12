@@ -84,11 +84,8 @@ const qualificationsList = ref([])
 
 // 获取业务图片
 const getBusinessImage = (business) => {
-  // 如果有imageId，构建图片URL
-  if (business.imageId) {
-    return `${import.meta.env.VITE_API_BASE_URL}/attachments/${business.imageId}`
-  }
-  return null
+  // 后端已经填充了完整的图片URL
+  return business.imageUrl || null
 }
 
 // 加载业务范围

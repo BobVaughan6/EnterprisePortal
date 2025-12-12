@@ -113,7 +113,9 @@ public class MappingProfile : Profile
         CreateMap<Announcement, AnnouncementDto>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => src.IsTop == 1))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
-            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)));
+            .ForMember(dest => dest.AttachmentIds, opt => opt.MapFrom(src => DeserializeintList(src.AttachmentIds)))
+            .ForMember(dest => dest.NoticeTypeName, opt => opt.MapFrom(src => GetNoticeTypeName(src.NoticeType, src.BusinessType)))
+            .ForMember(dest => dest.ProcurementTypeName, opt => opt.MapFrom(src => GetProcurementTypeName(src.ProcurementType)));
         
         CreateMap<CreateAnnouncementDto, Announcement>()
             .ForMember(dest => dest.IsTop, opt => opt.MapFrom(src => (sbyte)(src.IsTop ? 1 : 0)))
@@ -178,5 +180,52 @@ public class MappingProfile : Profile
         if (string.IsNullOrEmpty(json))
             return null;
         return System.Text.Json.JsonSerializer.Deserialize<List<string>>(json);
+    }
+
+    // 公告类型映射（根据业务类型返回不同的中文名称）
+    private static string GetNoticeTypeName(string? noticeType, string? businessType)
+    {
+        if (string.IsNullOrEmpty(noticeType))
+            return string.Empty;
+
+        // 政府采购
+        if (businessType == "GOV_PROCUREMENT")
+        {
+            return noticeType switch
+            {
+                "bidding" => "招标公告",
+                "correction" => "更正公告",
+                "result" => "结果公告",
+                _ => noticeType
+            };
+        }
+        // 建设工程
+        else if (businessType == "CONSTRUCTION")
+        {
+            return noticeType switch
+            {
+                "bidding" => "采购公告",
+                "correction" => "更正公告",
+                "result" => "结果公告",
+                _ => noticeType
+            };
+        }
+
+        return noticeType;
+    }
+
+    // 采购类型映射
+    private static string? GetProcurementTypeName(string? procurementType)
+    {
+        if (string.IsNullOrEmpty(procurementType))
+            return null;
+
+        return procurementType switch
+        {
+            "goods" => "货物",
+            "service" => "服务",
+            "project" => "工程",
+            _ => procurementType
+        };
     }
 }

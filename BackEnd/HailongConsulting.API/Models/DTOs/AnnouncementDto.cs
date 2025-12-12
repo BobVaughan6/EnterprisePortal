@@ -26,9 +26,19 @@ public class AnnouncementDto
     public string NoticeType { get; set; } = string.Empty;
 
     /// <summary>
+    /// 公告类型中文名称
+    /// </summary>
+    public string NoticeTypeName { get; set; } = string.Empty;
+
+    /// <summary>
     /// 采购类型（仅政府采购）：goods-货物, service-服务, project-工程
     /// </summary>
     public string? ProcurementType { get; set; }
+
+    /// <summary>
+    /// 采购类型中文名称
+    /// </summary>
+    public string? ProcurementTypeName { get; set; }
 
     /// <summary>
     /// 招标人

@@ -5,7 +5,7 @@
         <div class="flex items-center space-x-3">
           <img :src="logoUrl" alt="海隆咨询" class="h-12 w-auto" />
           <div class="text-3xl font-bold font-tech bg-gradient-to-r from-hailong-primary to-hailong-secondary bg-clip-text text-transparent">
-            海隆咨询
+            海隆工程咨询有限公司
           </div>
         </div>
         <div class="hidden md:flex items-center space-x-8">

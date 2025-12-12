@@ -294,13 +294,42 @@ public class ConfigService : IConfigService
     public async Task<IEnumerable<BusinessScopeDto>> GetAllBusinessScopesAsync()
     {
         var scopes = await _repository.GetAllBusinessScopesAsync();
-        return _mapper.Map<IEnumerable<BusinessScopeDto>>(scopes);
+        var dtos = _mapper.Map<IEnumerable<BusinessScopeDto>>(scopes).ToList();
+        
+        // 填充图片URL
+        foreach (var dto in dtos)
+        {
+            if (dto.ImageId.HasValue)
+            {
+                var attachment = await _attachmentService.GetByIdAsync(dto.ImageId.Value);
+                if (attachment != null)
+                {
+                    dto.ImageUrl = attachment.FileUrl;
+                }
+            }
+        }
+        
+        return dtos;
     }
 
     public async Task<BusinessScopeDto?> GetBusinessScopeByIdAsync(int id)
     {
         var scope = await _repository.GetBusinessScopeByIdAsync(id);
-        return scope == null ? null : _mapper.Map<BusinessScopeDto>(scope);
+        if (scope == null) return null;
+        
+        var dto = _mapper.Map<BusinessScopeDto>(scope);
+        
+        // 填充图片URL
+        if (dto.ImageId.HasValue)
+        {
+            var attachment = await _attachmentService.GetByIdAsync(dto.ImageId.Value);
+            if (attachment != null)
+            {
+                dto.ImageUrl = attachment.FileUrl;
+            }
+        }
+        
+        return dto;
     }
 
     public async Task<BusinessScopeDto> CreateBusinessScopeAsync(CreateBusinessScopeDto dto)
