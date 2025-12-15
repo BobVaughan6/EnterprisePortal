@@ -4,12 +4,12 @@
     <el-select
       v-model="selectedProvince"
       placeholder="请选择省份"
-      clearable
       filterable
       :disabled="disabled"
       @change="handleProvinceChange"
       :style="{ width: provinceWidth }"
     >
+      <el-option label="全部省份" value="all" />
       <el-option
         v-for="province in provinces"
         :key="province.regionCode"
@@ -18,17 +18,17 @@
       />
     </el-select>
 
-    <!-- 城市选择 -->
+    <!-- 城市选择 - 只有选择了省份才显示 -->
     <el-select
-      v-if="showCity"
+      v-if="showCity && selectedProvince && selectedProvince !== 'all'"
       v-model="selectedCity"
       placeholder="请选择城市"
-      clearable
       filterable
-      :disabled="disabled || !selectedProvince"
+      :disabled="disabled"
       @change="handleCityChange"
       :style="{ width: cityWidth, marginLeft: '10px' }"
     >
+      <el-option label="全部城市" value="all" />
       <el-option
         v-for="city in cities"
         :key="city.regionCode"
@@ -37,17 +37,17 @@
       />
     </el-select>
 
-    <!-- 区县选择 -->
+    <!-- 区县选择 - 只有选择了城市才显示 -->
     <el-select
-      v-if="showDistrict"
+      v-if="showDistrict && selectedCity && selectedCity !== 'all'"
       v-model="selectedDistrict"
       placeholder="请选择区县"
-      clearable
       filterable
-      :disabled="disabled || !selectedCity"
+      :disabled="disabled"
       @change="handleDistrictChange"
       :style="{ width: districtWidth, marginLeft: '10px' }"
     >
+      <el-option label="全部区县" value="all" />
       <el-option
         v-for="district in districts"
         :key="district.regionCode"
@@ -82,17 +82,17 @@ const props = defineProps({
   // 省份宽度
   provinceWidth: {
     type: String,
-    default: '150px'
+    default: '120px'
   },
   // 城市宽度
   cityWidth: {
     type: String,
-    default: '150px'
+    default: '120px'
   },
   // 区县宽度
   districtWidth: {
     type: String,
-    default: '150px'
+    default: '120px'
   },
   // 初始省份代码
   provinceCode: {
@@ -117,9 +117,9 @@ const provinces = ref([])
 const cities = ref([])
 const districts = ref([])
 
-const selectedProvince = ref('')
-const selectedCity = ref('')
-const selectedDistrict = ref('')
+const selectedProvince = ref('all')
+const selectedCity = ref('all')
+const selectedDistrict = ref('all')
 
 // 加载省份列表
 const loadProvinces = async () => {
@@ -136,7 +136,7 @@ const loadProvinces = async () => {
 
 // 加载城市列表
 const loadCities = async (provinceCode) => {
-  if (!provinceCode) {
+  if (!provinceCode || provinceCode === 'all') {
     cities.value = []
     return
   }
@@ -154,7 +154,7 @@ const loadCities = async (provinceCode) => {
 
 // 加载区县列表
 const loadDistricts = async (cityCode) => {
-  if (!cityCode) {
+  if (!cityCode || cityCode === 'all') {
     districts.value = []
     return
   }
@@ -170,14 +170,16 @@ const loadDistricts = async (cityCode) => {
   }
 }
 
-// 省份变化
+// 省份变化 - 参考前台逻辑
 const handleProvinceChange = async (value) => {
-  selectedCity.value = ''
-  selectedDistrict.value = ''
+  // 清空城市和区县
+  selectedCity.value = 'all'
+  selectedDistrict.value = 'all'
   cities.value = []
   districts.value = []
 
-  if (value && props.showCity) {
+  // 如果选择了具体省份，加载城市列表
+  if (value && value !== 'all' && props.showCity) {
     await loadCities(value)
   }
 
@@ -185,12 +187,14 @@ const handleProvinceChange = async (value) => {
   emit('province-change', value)
 }
 
-// 城市变化
+// 城市变化 - 参考前台逻辑
 const handleCityChange = async (value) => {
-  selectedDistrict.value = ''
+  // 清空区县
+  selectedDistrict.value = 'all'
   districts.value = []
 
-  if (value && props.showDistrict) {
+  // 如果选择了具体城市，加载区县列表
+  if (value && value !== 'all' && props.showDistrict) {
     await loadDistricts(value)
   }
 
@@ -204,18 +208,18 @@ const handleDistrictChange = (value) => {
   emit('district-change', value)
 }
 
-// 触发change事件
+// 触发change事件 - 传递regionCode，'all' 转换为空字符串
 const emitChange = () => {
   const province = provinces.value.find(p => p.regionCode === selectedProvince.value)
   const city = cities.value.find(c => c.regionCode === selectedCity.value)
   const district = districts.value.find(d => d.regionCode === selectedDistrict.value)
 
   emit('change', {
-    provinceCode: selectedProvince.value,
+    provinceCode: selectedProvince.value === 'all' ? '' : selectedProvince.value,
     provinceName: province?.regionName || '',
-    cityCode: selectedCity.value,
+    cityCode: selectedCity.value === 'all' ? '' : selectedCity.value,
     cityName: city?.regionName || '',
-    districtCode: selectedDistrict.value,
+    districtCode: selectedDistrict.value === 'all' ? '' : selectedDistrict.value,
     districtName: district?.regionName || ''
   })
 }
@@ -245,42 +249,45 @@ const init = async () => {
 
 // 监听props变化
 watch(() => props.provinceCode, async (newVal) => {
-  if (newVal !== selectedProvince.value) {
-    selectedProvince.value = newVal
-    if (newVal && props.showCity) {
-      await loadCities(newVal)
+  const value = newVal || 'all'
+  if (value !== selectedProvince.value) {
+    selectedProvince.value = value
+    if (value && value !== 'all' && props.showCity) {
+      await loadCities(value)
     }
   }
 })
 
 watch(() => props.cityCode, async (newVal) => {
-  if (newVal !== selectedCity.value) {
-    selectedCity.value = newVal
-    if (newVal && props.showDistrict) {
-      await loadDistricts(newVal)
+  const value = newVal || 'all'
+  if (value !== selectedCity.value) {
+    selectedCity.value = value
+    if (value && value !== 'all' && props.showDistrict) {
+      await loadDistricts(value)
     }
   }
 })
 
 watch(() => props.districtCode, (newVal) => {
-  if (newVal !== selectedDistrict.value) {
-    selectedDistrict.value = newVal
+  const value = newVal || 'all'
+  if (value !== selectedDistrict.value) {
+    selectedDistrict.value = value
   }
 })
 
 // 暴露方法供父组件调用
 defineExpose({
   reset: () => {
-    selectedProvince.value = ''
-    selectedCity.value = ''
-    selectedDistrict.value = ''
+    selectedProvince.value = 'all'
+    selectedCity.value = 'all'
+    selectedDistrict.value = 'all'
     cities.value = []
     districts.value = []
   },
   getSelectedRegion: () => ({
-    provinceCode: selectedProvince.value,
-    cityCode: selectedCity.value,
-    districtCode: selectedDistrict.value
+    provinceCode: selectedProvince.value === 'all' ? '' : selectedProvince.value,
+    cityCode: selectedCity.value === 'all' ? '' : selectedCity.value,
+    districtCode: selectedDistrict.value === 'all' ? '' : selectedDistrict.value
   })
 })
 

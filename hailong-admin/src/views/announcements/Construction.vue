@@ -20,16 +20,14 @@
         </el-form-item>
         <el-form-item label="公告类型">
           <el-select v-model="searchForm.type" placeholder="请选择" clearable style="width: 150px;">
-            <el-option label="招标公告" value="招标公告" />
-            <el-option label="中标公告" value="中标公告" />
-            <el-option label="变更公告" value="变更公告" />
+            <el-option label="招标公告" value="bidding" />
+            <el-option label="中标公告" value="result" />
+            <el-option label="变更公告" value="correction" />
           </el-select>
         </el-form-item>
         <el-form-item label="项目区域">
           <RegionSelector
-            :show-city="false"
-            :show-district="false"
-            province-width="150px"
+            ref="searchRegionSelectorRef"
             @change="handleRegionChange"
           />
         </el-form-item>
@@ -241,8 +239,9 @@ const dateRange = ref([])
 const searchForm = reactive({
   keyword: '',
   type: '',
-  regionPath: [],
-  region: '',
+  provinceCode: '',
+  cityCode: '',
+  districtCode: '',
   startDate: '',
   endDate: ''
 })
@@ -264,6 +263,7 @@ const isEdit = ref(false)
 const submitting = ref(false)
 const formRef = ref(null)
 const regionCascaderRef = ref(null)
+const searchRegionSelectorRef = ref(null)
 
 // 表单数据
 const formData = reactive({
@@ -331,7 +331,9 @@ const loadData = async () => {
       keyword: searchForm.keyword || undefined,
       businessType: 'CONSTRUCTION', // 固定为建设工程
       noticeType: searchForm.type || undefined,
-      projectRegion: searchForm.region || undefined,
+      province: searchForm.provinceCode || undefined,
+      city: searchForm.cityCode || undefined,
+      district: searchForm.districtCode || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined,
       page: pagination.pageIndex,
@@ -358,7 +360,10 @@ const loadData = async () => {
  * 搜索区域变化
  */
 const handleRegionChange = (regionInfo) => {
-  searchForm.region = regionInfo.provinceName || ''
+  // 根据选择的级别设置对应的区域代码
+  searchForm.provinceCode = regionInfo.provinceCode || ''
+  searchForm.cityCode = regionInfo.cityCode || ''
+  searchForm.districtCode = regionInfo.districtCode || ''
 }
 
 /**
@@ -387,8 +392,14 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.keyword = ''
   searchForm.type = ''
-  searchForm.region = ''
+  searchForm.provinceCode = ''
+  searchForm.cityCode = ''
+  searchForm.districtCode = ''
   dateRange.value = []
+  // 重置区域选择器
+  if (searchRegionSelectorRef.value) {
+    searchRegionSelectorRef.value.reset()
+  }
   handleSearch()
 }
 

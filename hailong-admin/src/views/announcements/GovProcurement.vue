@@ -13,24 +13,21 @@
         <el-form-item label="关键词">
           <el-input
             v-model="searchForm.keyword"
-            placeholder="搜索标题、招标人、中标人"
+            placeholder="搜索标题、采购人、中标人"
             clearable
             style="width: 220px;"
           />
         </el-form-item>
         <el-form-item label="公告类型">
           <el-select v-model="searchForm.type" placeholder="请选择" clearable style="width: 150px;">
-            <el-option label="采购公告" value="采购公告" />
-            <el-option label="更正公告" value="更正公告" />
-            <el-option label="结果公告" value="结果公告" />
+            <el-option label="采购公告" value="bidding" />
+            <el-option label="更正公告" value="correction" />
+            <el-option label="结果公告" value="result" />
           </el-select>
         </el-form-item>
         <el-form-item label="项目区域">
-          <RegionCascader
-            v-model="searchForm.regionPath"
-            :max-level="1"
-            placeholder="请选择省份"
-            :width="'150px'"
+          <RegionSelector
+            ref="searchRegionSelectorRef"
             @change="handleRegionChange"
           />
         </el-form-item>
@@ -60,7 +57,7 @@
             {{ formatNoticeType(row.noticeType) }}
           </template>
         </el-table-column>
-        <el-table-column prop="bidder" label="招标人" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="bidder" label="采购人" min-width="150" show-overflow-tooltip />
         <el-table-column prop="winner" label="中标人" min-width="150" show-overflow-tooltip />
         <el-table-column prop="projectRegion" label="项目区域" width="180" align="center" show-overflow-tooltip />
         <el-table-column prop="publishTime" label="发布时间" width="110" align="center">
@@ -116,7 +113,7 @@
           <el-col :span="12">
             <el-form-item label="公告类型" prop="noticeType">
               <el-select v-model="formData.noticeType" placeholder="请选择公告类型" style="width: 100%;">
-                <el-option label="招标公告" value="bidding" />
+                <el-option label="采购公告" value="bidding" />
                 <el-option label="更正公告" value="correction" />
                 <el-option label="结果公告" value="result" />
               </el-select>
@@ -147,10 +144,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="招标人" prop="bidder">
+            <el-form-item label="采购人" prop="bidder">
               <el-input
                 v-model="formData.bidder"
-                placeholder="请输入招标人名称（最多255个字符）"
+                placeholder="请输入采购人名称（最多255个字符）"
                 maxlength="255"
               />
             </el-form-item>
@@ -237,11 +234,12 @@ import { announcementApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 import FileUpload from '@/components/FileUpload.vue'
 import RegionCascader from '@/components/RegionCascader.vue'
+import RegionSelector from '@/components/RegionSelector.vue'
 import { formatDate } from '@/utils/date'
 
 // 公告类型映射
 const noticeTypeMap = {
-  'bidding': '招标公告',
+  'bidding': '采购公告',
   'result': '结果公告',
   'correction': '更正公告'
 }
@@ -253,8 +251,9 @@ const dateRange = ref([])
 const searchForm = reactive({
   keyword: '',
   type: '',
-  regionPath: [],
-  region: '',
+  provinceCode: '',
+  cityCode: '',
+  districtCode: '',
   startDate: '',
   endDate: ''
 })
@@ -276,6 +275,7 @@ const isEdit = ref(false)
 const submitting = ref(false)
 const formRef = ref(null)
 const regionCascaderRef = ref(null)
+const searchRegionSelectorRef = ref(null)
 
 // 表单数据
 const formData = reactive({
@@ -347,7 +347,9 @@ const loadData = async () => {
       keyword: searchForm.keyword || undefined,
       businessType: 'GOV_PROCUREMENT', // 固定为政府采购
       noticeType: searchForm.type || undefined,
-      projectRegion: searchForm.region || undefined,
+      province: searchForm.provinceCode || undefined,
+      city: searchForm.cityCode || undefined,
+      district: searchForm.districtCode || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined,
       page: pagination.pageIndex,
@@ -371,6 +373,16 @@ const loadData = async () => {
 }
 
 /**
+ * 搜索区域变化
+ */
+const handleRegionChange = (regionInfo) => {
+  // 根据选择的级别设置对应的区域代码
+  searchForm.provinceCode = regionInfo.provinceCode || ''
+  searchForm.cityCode = regionInfo.cityCode || ''
+  searchForm.districtCode = regionInfo.districtCode || ''
+}
+
+/**
  * 搜索
  */
 const handleSearch = () => {
@@ -384,9 +396,14 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.keyword = ''
   searchForm.type = ''
-  searchForm.region = ''
-  searchForm.regionPath = []
+  searchForm.provinceCode = ''
+  searchForm.cityCode = ''
+  searchForm.districtCode = ''
   dateRange.value = []
+  // 重置区域选择器
+  if (searchRegionSelectorRef.value) {
+    searchRegionSelectorRef.value.reset()
+  }
   handleSearch()
 }
 
@@ -596,13 +613,6 @@ const handleSubmit = async () => {
   } finally {
     submitting.value = false
   }
-}
-
-/**
- * 搜索区域变化
- */
-const handleRegionChange = (regionInfo) => {
-  searchForm.region = regionInfo.provinceName || ''
 }
 
 /**
