@@ -50,15 +50,16 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
 
         if (!string.IsNullOrEmpty(keyword))
         {
-            query = query.Where(i => 
-                i.Title.Contains(keyword) || 
+            query = query.Where(i =>
+                i.Title.Contains(keyword) ||
                 (i.Summary != null && i.Summary.Contains(keyword)));
         }
 
         var totalCount = await query.CountAsync();
 
         var items = await query
-            .OrderByDescending(i => i.PublishTime)
+            .OrderByDescending(i => i.IsTop)  // 置顶优先
+            .ThenByDescending(i => i.PublishTime)  // 然后按发布时间排序
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -84,5 +85,40 @@ public class InfoPublicationRepository : Repository<InfoPublication>, IInfoPubli
             publication.ViewCount++;
             publication.UpdatedAt = DateTime.UtcNow;
         }
+    }
+
+    public async Task<(IEnumerable<InfoPublication> Items, int TotalCount)> GetPagedPublicationsForPortalAsync(
+        string? type,
+        string? category,
+        string? keyword,
+        int pageIndex,
+        int pageSize)
+    {
+        // 门户查询：只返回启用状态的数据
+        var query = _dbSet.Where(i => i.IsDeleted == 0 && i.Status == 1);
+
+        if (!string.IsNullOrEmpty(type))
+            query = query.Where(i => i.Type == type);
+
+        if (!string.IsNullOrEmpty(category))
+            query = query.Where(i => i.Category == category);
+
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            query = query.Where(i =>
+                i.Title.Contains(keyword) ||
+                (i.Summary != null && i.Summary.Contains(keyword)));
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(i => i.IsTop)  // 置顶优先
+            .ThenByDescending(i => i.PublishTime)  // 然后按发布时间排序
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
     }
 }

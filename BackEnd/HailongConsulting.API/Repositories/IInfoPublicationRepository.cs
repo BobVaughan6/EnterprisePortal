@@ -27,6 +27,13 @@ public interface IInfoPublicationRepository : IRepository<InfoPublication>
         int pageIndex,
         int pageSize);
     
+    Task<(IEnumerable<InfoPublication> Items, int TotalCount)> GetPagedPublicationsForPortalAsync(
+        string? type,
+        string? category,
+        string? keyword,
+        int pageIndex,
+        int pageSize);
+    
     /// <summary>
     /// 软删除信息发布
     /// </summary>

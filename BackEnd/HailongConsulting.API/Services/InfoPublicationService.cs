@@ -127,4 +127,24 @@ public class InfoPublicationService : IInfoPublicationService
             _logger.LogError(ex, "增加浏览次数失败，ID: {Id}", id);
         }
     }
+
+    public async Task<PagedResult<InfoPublicationDto>> GetPagedForPortalAsync(InfoPublicationQueryDto queryDto)
+    {
+        var (items, totalCount) = await _unitOfWork.InfoPublications.GetPagedPublicationsForPortalAsync(
+            queryDto.Type,
+            queryDto.Category,
+            queryDto.Keyword,
+            queryDto.PageNumber,
+            queryDto.PageSize);
+
+        var dtos = _mapper.Map<List<InfoPublicationDto>>(items);
+
+        return new PagedResult<InfoPublicationDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            PageIndex = queryDto.PageNumber,
+            PageSize = queryDto.PageSize
+        };
+    }
 }

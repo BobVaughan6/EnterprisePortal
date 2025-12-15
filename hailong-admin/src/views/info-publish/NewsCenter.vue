@@ -175,7 +175,8 @@
           />
         </el-form-item>
         
-        <el-form-item label="封面图片" prop="coverImageId">
+        <!-- 封面图片 - 暂时注释 -->
+        <!-- <el-form-item label="封面图片" prop="coverImageId">
           <FileUpload
             v-model="coverImageIds"
             file-type="image"
@@ -184,7 +185,7 @@
             return-type="id"
             @change="handleCoverImageChange"
           />
-        </el-form-item>
+        </el-form-item> -->
         
         <el-form-item label="新闻内容" prop="content">
           <RichEditor v-model="formData.content" />

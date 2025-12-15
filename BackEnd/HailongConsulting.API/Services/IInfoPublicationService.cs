@@ -27,6 +27,7 @@ public interface IInfoPublicationService
     /// 分页查询信息发布
     /// </summary>
     Task<PagedResult<InfoPublicationDto>> GetPagedAsync(InfoPublicationQueryDto queryDto);
+    Task<PagedResult<InfoPublicationDto>> GetPagedForPortalAsync(InfoPublicationQueryDto queryDto);
     
     /// <summary>
     /// 删除信息发布

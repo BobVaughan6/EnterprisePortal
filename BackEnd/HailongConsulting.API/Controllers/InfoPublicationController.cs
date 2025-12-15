@@ -145,7 +145,7 @@ public class InfoPublicationController : ControllerBase
     #region 公司公告专用接口
 
     /// <summary>
-    /// 获取公司公告列表
+    /// 获取公司公告列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("company-news")]
     public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetCompanyNews([FromQuery] InfoPublicationQueryDto query)
@@ -153,7 +153,7 @@ public class InfoPublicationController : ControllerBase
         try
         {
             query.Type = "COMPANY_NEWS";
-            var result = await _infoPublicationService.GetPagedAsync(query);
+            var result = await _infoPublicationService.GetPagedForPortalAsync(query);
             return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取公司公告列表成功"));
         }
         catch (Exception ex)
@@ -168,7 +168,7 @@ public class InfoPublicationController : ControllerBase
     #region 政策法规专用接口
 
     /// <summary>
-    /// 获取政策法规列表
+    /// 获取政策法规列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("policy-regulations")]
     public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetPolicyRegulations([FromQuery] InfoPublicationQueryDto query)
@@ -176,7 +176,7 @@ public class InfoPublicationController : ControllerBase
         try
         {
             query.Type = "POLICY_REGULATION";
-            var result = await _infoPublicationService.GetPagedAsync(query);
+            var result = await _infoPublicationService.GetPagedForPortalAsync(query);
             return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取政策法规列表成功"));
         }
         catch (Exception ex)
@@ -191,7 +191,7 @@ public class InfoPublicationController : ControllerBase
     #region 政策信息专用接口
 
     /// <summary>
-    /// 获取政策信息列表
+    /// 获取政策信息列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("policy-info")]
     public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetPolicyInfo([FromQuery] InfoPublicationQueryDto query)
@@ -199,7 +199,7 @@ public class InfoPublicationController : ControllerBase
         try
         {
             query.Type = "POLICY_INFO";
-            var result = await _infoPublicationService.GetPagedAsync(query);
+            var result = await _infoPublicationService.GetPagedForPortalAsync(query);
             return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取政策信息列表成功"));
         }
         catch (Exception ex)
@@ -214,7 +214,7 @@ public class InfoPublicationController : ControllerBase
     #region 通知公告专用接口
 
     /// <summary>
-    /// 获取通知公告列表
+    /// 获取通知公告列表（门户专用，只返回启用状态）
     /// </summary>
     [HttpGet("notices")]
     public async Task<ActionResult<ApiResponse<PagedResult<InfoPublicationDto>>>> GetNotices([FromQuery] InfoPublicationQueryDto query)
@@ -222,7 +222,7 @@ public class InfoPublicationController : ControllerBase
         try
         {
             query.Type = "NOTICE";
-            var result = await _infoPublicationService.GetPagedAsync(query);
+            var result = await _infoPublicationService.GetPagedForPortalAsync(query);
             return Ok(ApiResponse<PagedResult<InfoPublicationDto>>.SuccessResult(result, "获取通知公告列表成功"));
         }
         catch (Exception ex)
