@@ -110,7 +110,7 @@ public class HomeService : IHomeService
             }
         }
 
-        // 统计地区排行（政府采购）- 包含项目数量和金额
+        // 统计地区排行（政府采购）- 包含项目数量和所有金额
         var govRegionStats = await _context.Announcements
             .Where(x => x.IsDeleted == 0 && x.BusinessType == "GOV_PROCUREMENT")
             .GroupBy(x => x.ProjectRegion)
@@ -118,12 +118,12 @@ public class HomeService : IHomeService
             {
                 Region = g.Key,
                 Count = g.Count(),
-                Amount = g.Where(x => x.NoticeType == "result" && x.BudgetAmount.HasValue)
+                Amount = g.Where(x => x.BudgetAmount.HasValue)
                          .Sum(x => x.BudgetAmount.Value)
             })
             .ToListAsync();
 
-        // 统计地区排行（建设工程）- 包含项目数量和金额
+        // 统计地区排行（建设工程）- 包含项目数量和所有金额
         var constructionRegionStats = await _context.Announcements
             .Where(x => x.IsDeleted == 0 && x.BusinessType == "CONSTRUCTION")
             .GroupBy(x => x.ProjectRegion)
@@ -131,7 +131,7 @@ public class HomeService : IHomeService
             {
                 Region = g.Key,
                 Count = g.Count(),
-                Amount = g.Where(x => x.NoticeType == "result" && x.BudgetAmount.HasValue)
+                Amount = g.Where(x => x.BudgetAmount.HasValue)
                          .Sum(x => x.BudgetAmount.Value)
             })
             .ToListAsync();
