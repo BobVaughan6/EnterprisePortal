@@ -197,6 +197,8 @@
             :limit="10"
             list-type="text"
             return-type="id"
+            related-type="info_publication"
+            :related-id="formData.id"
           />
         </el-form-item>
         

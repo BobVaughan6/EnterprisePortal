@@ -69,6 +69,9 @@
             file-type="image"
             :limit="1"
             list-type="picture-card"
+            return-type="id"
+            related-type="config"
+            :related-id="formData.id"
           />
           <div class="form-tip">建议尺寸：1920x600px，支持jpg、png格式</div>
         </el-form-item>

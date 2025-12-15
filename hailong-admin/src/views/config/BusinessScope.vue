@@ -109,6 +109,8 @@
             :limit="1"
             list-type="picture-card"
             return-type="id"
+            related-type="config"
+            :related-id="formData.id"
           />
         </el-form-item>
         

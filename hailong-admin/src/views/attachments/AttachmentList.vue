@@ -15,7 +15,7 @@
             <el-option label="公告" value="announcement" />
             <el-option label="信息发布" value="info_publication" />
             <el-option label="企业简介" value="company_profile" />
-            <el-option label="轮播图" value="carousel_banner" />
+            <!-- <el-option label="轮播图" value="carousel_banner" /> -->
             <el-option label="业务范围" value="business_scope" />
             <el-option label="企业荣誉" value="company_honor" />
             <el-option label="企业资质" value="company_qualification" />
@@ -130,7 +130,7 @@
             <el-option label="公告" value="announcement" />
             <el-option label="信息发布" value="info_publication" />
             <el-option label="企业简介" value="company_profile" />
-            <el-option label="轮播图" value="carousel_banner" />
+            <!-- <el-option label="轮播图" value="carousel_banner" /> -->
             <el-option label="业务范围" value="business_scope" />
             <el-option label="企业荣誉" value="company_honor" />
             <el-option label="企业资质" value="company_qualification" />
@@ -474,7 +474,7 @@ const getRelatedTypeLabel = (relatedType) => {
     announcement: '公告',
     info_publication: '信息发布',
     company_profile: '企业简介',
-    carousel_banner: '轮播图',
+    // carousel_banner: '轮播图',
     business_scope: '业务范围',
     company_honor: '企业荣誉',
     company_qualification: '企业资质',

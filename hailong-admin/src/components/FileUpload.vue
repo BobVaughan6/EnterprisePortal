@@ -5,6 +5,7 @@
       v-model:file-list="fileList"
       :action="uploadUrl"
       :headers="uploadHeaders"
+      :data="uploadData"
       :on-success="handleSuccess"
       :on-error="handleError"
       :on-remove="handleRemove"
@@ -126,6 +127,18 @@ const uploadUrl = computed(() => `${API_CONFIG.baseURL}/api/attachments/upload`)
 const uploadHeaders = computed(() => {
   const token = tokenUtils.getToken()
   return token ? { Authorization: `Bearer ${token}` } : {}
+})
+
+// 上传附加数据（包含关联类型和关联ID）
+const uploadData = computed(() => {
+  const data = {}
+  if (props.relatedType) {
+    data.relatedType = props.relatedType
+  }
+  if (props.relatedId) {
+    data.relatedId = props.relatedId
+  }
+  return data
 })
 
 // 文件类型文本

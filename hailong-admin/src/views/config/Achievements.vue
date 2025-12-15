@@ -100,6 +100,8 @@
             :multiple="false"
             list-type="picture-card"
             return-type="id"
+            related-type="config"
+            :related-id="formData.id"
           />
           <div class="form-tip">建议尺寸：800x600，仅支持上传1张图片</div>
         </el-form-item>

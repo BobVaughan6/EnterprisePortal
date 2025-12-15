@@ -88,6 +88,9 @@
             file-type="image"
             :limit="1"
             list-type="picture-card"
+            return-type="id"
+            related-type="config"
+            :related-id="formData.id"
           />
           <div style="margin-top: 8px; color: #909399; font-size: 12px;">
             建议尺寸：200x100px，支持 JPG、PNG 格式

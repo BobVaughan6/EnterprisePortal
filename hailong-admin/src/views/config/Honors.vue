@@ -130,6 +130,8 @@
             :limit="1"
             list-type="picture-card"
             return-type="id"
+            related-type="config"
+            :related-id="formData.id"
           />
           <div class="form-tip">建议上传荣誉证书或奖牌照片</div>
         </el-form-item>

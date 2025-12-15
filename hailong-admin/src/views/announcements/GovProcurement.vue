@@ -213,6 +213,9 @@
             v-model="formData.attachmentIds"
             :limit="10"
             list-type="text"
+            return-type="id"
+            related-type="announcement"
+            :related-id="formData.id"
           />
           <div class="form-tip">支持上传PDF、Word、Excel等文档，最多10个附件</div>
         </el-form-item>
