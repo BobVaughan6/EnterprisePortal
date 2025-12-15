@@ -9,7 +9,7 @@
               <el-icon><View /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.totalVisits }}</div>
+              <div class="stat-value">{{ overview.totalVisits || 0 }}</div>
               <div class="stat-label">总访问量</div>
             </div>
           </div>
@@ -22,7 +22,7 @@
               <el-icon><User /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.uniqueVisitors }}</div>
+              <div class="stat-value">{{ overview.uniqueVisitors || 0 }}</div>
               <div class="stat-label">独立访客</div>
             </div>
           </div>
@@ -35,7 +35,7 @@
               <el-icon><Calendar /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.todayVisits }}</div>
+              <div class="stat-value">{{ overview.todayVisits || 0 }}</div>
               <div class="stat-label">今日访问</div>
             </div>
           </div>
@@ -45,11 +45,11 @@
         <el-card shadow="hover">
           <div class="stat-card">
             <div class="stat-icon" style="background: #f56c6c;">
-              <el-icon><TrendCharts /></el-icon>
+              <el-icon><Document /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.avgDuration }}s</div>
-              <div class="stat-label">平均停留时间</div>
+              <div class="stat-value">{{ overview.totalPages || 0 }}</div>
+              <div class="stat-label">访问页面数</div>
             </div>
           </div>
         </el-card>
@@ -71,46 +71,31 @@
       <div ref="trendChartRef" style="height: 400px;"></div>
     </el-card>
 
-    <!-- 热门页面 -->
-    <el-card>
-      <template #header>
-        <span>热门页面 TOP 10</span>
-      </template>
-      <el-table :data="hotPages" v-loading="loading" border stripe>
-        <el-table-column type="index" label="排名" width="80" align="center" />
-        <el-table-column prop="pagePath" label="页面路径" min-width="300" show-overflow-tooltip />
-        <el-table-column prop="pageTitle" label="页面标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="visitCount" label="访问次数" width="120" align="center" sortable />
-        <el-table-column prop="uniqueVisitors" label="独立访客" width="120" align="center" sortable />
-        <el-table-column prop="avgDuration" label="平均停留(秒)" width="140" align="center" sortable />
-      </el-table>
-    </el-card>
-
-    <!-- 访问来源和设备统计 -->
+    <!-- 热门页面和访问来源 -->
     <el-row :gutter="20" style="margin-top: 20px;">
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <span>热门页面 TOP 10</span>
+          </template>
+          <div ref="hotPagesChartRef" style="height: 400px;"></div>
+        </el-card>
+      </el-col>
       <el-col :span="12">
         <el-card>
           <template #header>
             <span>访问来源 TOP 10</span>
           </template>
-          <div ref="sourceChartRef" style="height: 300px;"></div>
-        </el-card>
-      </el-col>
-      <el-col :span="12">
-        <el-card>
-          <template #header>
-            <span>设备类型分布</span>
-          </template>
-          <div ref="deviceChartRef" style="height: 300px;"></div>
+          <div ref="refererChartRef" style="height: 400px;"></div>
         </el-card>
       </el-col>
     </el-row>
 
-    <!-- 访问记录 -->
+    <!-- 访问记录详情 -->
     <el-card style="margin-top: 20px;">
       <template #header>
         <div class="card-header">
-          <span>访问记录</span>
+          <span>访问记录详情</span>
           <div>
             <el-button type="success" size="small" icon="Refresh" @click="loadTableData" :loading="tableLoading">
               刷新
@@ -124,15 +109,23 @@
       
       <!-- 搜索区域 -->
       <el-form :model="searchForm" inline class="search-form">
-        <el-form-item label="页面路径">
+        <el-form-item label="页面URL">
           <el-input 
-            v-model="searchForm.pagePath" 
-            placeholder="请输入页面路径" 
+            v-model="searchForm.pageUrl" 
+            placeholder="请输入页面URL" 
             clearable 
             style="width: 200px;"
           />
         </el-form-item>
-        <el-form-item label="时间范围">
+        <el-form-item label="页面标题">
+          <el-input 
+            v-model="searchForm.pageTitle" 
+            placeholder="请输入页面标题" 
+            clearable 
+            style="width: 200px;"
+          />
+        </el-form-item>
+        <el-form-item label="访问日期">
           <el-date-picker
             v-model="dateRange"
             type="daterange"
@@ -150,13 +143,14 @@
       </el-form>
       
       <el-table :data="tableData" v-loading="tableLoading" border stripe>
-        <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="pagePath" label="页面路径" min-width="200" show-overflow-tooltip />
+        <el-table-column type="index" label="序号" width="60" align="center" />
+        <el-table-column prop="visitDate" label="访问日期" width="120" align="center" />
+        <el-table-column prop="pageUrl" label="页面URL" min-width="200" show-overflow-tooltip />
         <el-table-column prop="pageTitle" label="页面标题" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="ipAddress" label="IP地址" width="140" />
-        <el-table-column prop="userAgent" label="浏览器" width="120" show-overflow-tooltip />
-        <el-table-column prop="visitTime" label="访问时间" width="160" align="center" />
-        <el-table-column prop="duration" label="停留时间(秒)" width="120" align="center" />
+        <el-table-column prop="visitorIp" label="访问者IP" width="140" align="center" />
+        <el-table-column prop="referer" label="来源页面" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="visitCount" label="访问次数" width="100" align="center" sortable />
+        <el-table-column prop="createdAt" label="记录时间" width="160" align="center" />
       </el-table>
       
       <!-- 分页 -->
@@ -177,39 +171,36 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
-import { View, User, Calendar, TrendCharts } from '@element-plus/icons-vue'
+import { View, User, Calendar, Document } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
 import * as echarts from 'echarts'
-import { getHorizontalBarChartOption, getDoughnutChartOption } from '@/utils/chartOptions'
+import { getHorizontalBarChartOption } from '@/utils/chartOptions'
 
 // 概览数据
 const overview = reactive({
   totalVisits: 0,
   uniqueVisitors: 0,
   todayVisits: 0,
-  avgDuration: 0
+  totalPages: 0
 })
 
-// 趋势图表
+// 图表实例
 const trendChartRef = ref(null)
-const sourceChartRef = ref(null)
-const deviceChartRef = ref(null)
+const hotPagesChartRef = ref(null)
+const refererChartRef = ref(null)
 let trendChart = null
-let sourceChart = null
-let deviceChart = null
+let hotPagesChart = null
+let refererChart = null
 const trendPeriod = ref('7')
 
 // 实时数据定时器
 let realtimeTimer = null
 
-// 热门页面
-const hotPages = ref([])
-const loading = ref(false)
-
-// 访问记录
+// 搜索表单
 const dateRange = ref([])
 const searchForm = reactive({
-  pagePath: '',
+  pageUrl: '',
+  pageTitle: '',
   startDate: '',
   endDate: ''
 })
@@ -243,12 +234,33 @@ const loadOverview = async () => {
  */
 const loadTrendData = async () => {
   try {
-    const res = await statisticsApi.visit.getTrend({ days: parseInt(trendPeriod.value) })
+    const days = parseInt(trendPeriod.value)
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - days)
+    
+    const params = {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      groupBy: 'day'
+    }
+    
+    console.log('访问趋势请求参数:', params)
+    const res = await statisticsApi.visit.getTrend(params)
+    console.log('访问趋势响应:', res)
+    
     if (res.success && res.data) {
+      console.log('访问趋势数据:', res.data)
       renderTrendChart(res.data)
+    } else {
+      console.warn('访问趋势数据为空或请求失败')
+      // 渲染空图表
+      renderTrendChart([])
     }
   } catch (error) {
     console.error('加载趋势数据失败:', error)
+    // 渲染空图表
+    renderTrendChart([])
   }
 }
 
@@ -260,16 +272,38 @@ const renderTrendChart = (data) => {
     trendChart = echarts.init(trendChartRef.value)
   }
   
+  // 处理空数据情况
+  if (!data || data.length === 0) {
+    console.warn('访问趋势数据为空，显示空图表')
+    data = []
+  }
+  
+  // 后端返回的是数组格式：[{date, visitCount, uniqueVisitors}]
+  const dates = data.map(item => item.date || '')
+  const visits = data.map(item => item.visitCount || 0)
+  const uniqueVisitors = data.map(item => item.uniqueVisitors || 0)
+  
   const option = {
     tooltip: {
-      trigger: 'axis'
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross'
+      }
     },
     legend: {
       data: ['访问量', '独立访客']
     },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true
+    },
     xAxis: {
       type: 'category',
-      data: data.dates || []
+      boundaryGap: false,
+      data: dates
     },
     yAxis: {
       type: 'value'
@@ -278,16 +312,28 @@ const renderTrendChart = (data) => {
       {
         name: '访问量',
         type: 'line',
-        data: data.visits || [],
+        data: visits,
         smooth: true,
-        itemStyle: { color: '#409eff' }
+        itemStyle: { color: '#409eff' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+            { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+          ])
+        }
       },
       {
         name: '独立访客',
         type: 'line',
-        data: data.uniqueVisitors || [],
+        data: uniqueVisitors,
         smooth: true,
-        itemStyle: { color: '#67c23a' }
+        itemStyle: { color: '#67c23a' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(103, 194, 58, 0.3)' },
+            { offset: 1, color: 'rgba(103, 194, 58, 0.05)' }
+          ])
+        }
       }
     ]
   }
@@ -299,27 +345,49 @@ const renderTrendChart = (data) => {
  * 加载热门页面
  */
 const loadHotPages = async () => {
-  loading.value = true
   try {
-    const res = await statisticsApi.visit.getHotPages({ limit: 10 })
+    const res = await statisticsApi.visit.getHotPages({ limit: 10, days: 30 })
     if (res.success && res.data) {
-      hotPages.value = res.data
+      renderHotPagesChart(res.data)
     }
   } catch (error) {
     console.error('加载热门页面失败:', error)
-  } finally {
-    loading.value = false
   }
+}
+
+/**
+ * 渲染热门页面图表
+ */
+const renderHotPagesChart = (data) => {
+  if (!hotPagesChart) {
+    hotPagesChart = echarts.init(hotPagesChartRef.value)
+  }
+  
+  // 反转数组，让数值大的显示在上面
+  const chartData = data.map(item => ({
+    name: item.pageTitle || item.pageUrl || '未知页面',
+    value: item.visitCount || item.totalViews || 0
+  })).reverse()
+  
+  const option = getHorizontalBarChartOption(chartData, {
+    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+      { offset: 0, color: '#667eea' },
+      { offset: 1, color: '#764ba2' }
+    ]),
+    showLabel: true
+  })
+  
+  hotPagesChart.setOption(option)
 }
 
 /**
  * 加载访问来源统计
  */
-const loadSourceStatistics = async () => {
+const loadRefererStatistics = async () => {
   try {
     const res = await statisticsApi.visit.getSources({ limit: 10 })
     if (res.success && res.data) {
-      renderSourceChart(res.data)
+      renderRefererChart(res.data)
     }
   } catch (error) {
     console.error('加载访问来源失败:', error)
@@ -329,57 +397,26 @@ const loadSourceStatistics = async () => {
 /**
  * 渲染访问来源图表
  */
-const renderSourceChart = (data) => {
-  if (!sourceChart) {
-    sourceChart = echarts.init(sourceChartRef.value)
+const renderRefererChart = (data) => {
+  if (!refererChart) {
+    refererChart = echarts.init(refererChartRef.value)
   }
   
+  // 反转数组，让数值大的显示在上面
   const chartData = data.map(item => ({
-    name: item.source || '直接访问',
-    value: item.count
-  }))
+    name: item.referer || item.source || '直接访问',
+    value: item.count || item.visitCount || 0
+  })).reverse()
   
   const option = getHorizontalBarChartOption(chartData, {
-    color: '#67c23a',
+    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+      { offset: 0, color: '#f093fb' },
+      { offset: 1, color: '#f5576c' }
+    ]),
     showLabel: true
   })
   
-  sourceChart.setOption(option)
-}
-
-/**
- * 加载设备类型统计
- */
-const loadDeviceStatistics = async () => {
-  try {
-    const res = await statisticsApi.visit.getDevices()
-    if (res.success && res.data) {
-      renderDeviceChart(res.data)
-    }
-  } catch (error) {
-    console.error('加载设备统计失败:', error)
-  }
-}
-
-/**
- * 渲染设备类型图表
- */
-const renderDeviceChart = (data) => {
-  if (!deviceChart) {
-    deviceChart = echarts.init(deviceChartRef.value)
-  }
-  
-  const chartData = data.map(item => ({
-    name: item.deviceType,
-    value: item.count
-  }))
-  
-  const option = getDoughnutChartOption(chartData, {
-    radius: ['40%', '70%'],
-    center: ['50%', '50%']
-  })
-  
-  deviceChart.setOption(option)
+  refererChart.setOption(option)
 }
 
 /**
@@ -397,7 +434,8 @@ const loadTableData = async () => {
     }
     
     const params = {
-      pagePath: searchForm.pagePath || undefined,
+      pageUrl: searchForm.pageUrl || undefined,
+      pageTitle: searchForm.pageTitle || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined,
       page: pagination.pageIndex,
@@ -429,7 +467,8 @@ const handleSearch = () => {
  * 重置
  */
 const handleReset = () => {
-  searchForm.pagePath = ''
+  searchForm.pageUrl = ''
+  searchForm.pageTitle = ''
   dateRange.value = []
   handleSearch()
 }
@@ -446,7 +485,8 @@ const exportData = async () => {
     }
     
     const params = {
-      pagePath: searchForm.pagePath || undefined,
+      pageUrl: searchForm.pageUrl || undefined,
+      pageTitle: searchForm.pageTitle || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined
     }
@@ -480,7 +520,6 @@ const loadRealtimeData = async () => {
   try {
     const res = await statisticsApi.system.getRealtime()
     if (res.success && res.data) {
-      // 更新概览数据中的今日访问
       overview.todayVisits = res.data.todayVisits || overview.todayVisits
     }
   } catch (error) {
@@ -492,10 +531,9 @@ const loadRealtimeData = async () => {
  * 启动实时数据更新
  */
 const startRealtimeUpdate = () => {
-  // 每30秒更新一次实时数据
   realtimeTimer = setInterval(() => {
     loadRealtimeData()
-  }, 30000)
+  }, 30000) // 每30秒更新一次
 }
 
 /**
@@ -513,16 +551,15 @@ const stopRealtimeUpdate = () => {
  */
 const handleResize = () => {
   if (trendChart) trendChart.resize()
-  if (sourceChart) sourceChart.resize()
-  if (deviceChart) deviceChart.resize()
+  if (hotPagesChart) hotPagesChart.resize()
+  if (refererChart) refererChart.resize()
 }
 
 onMounted(() => {
   loadOverview()
   loadTrendData()
   loadHotPages()
-  loadSourceStatistics()
-  loadDeviceStatistics()
+  loadRefererStatistics()
   loadTableData()
   startRealtimeUpdate()
   window.addEventListener('resize', handleResize)
@@ -534,8 +571,8 @@ onBeforeUnmount(() => {
 
 onUnmounted(() => {
   if (trendChart) trendChart.dispose()
-  if (sourceChart) sourceChart.dispose()
-  if (deviceChart) deviceChart.dispose()
+  if (hotPagesChart) hotPagesChart.dispose()
+  if (refererChart) refererChart.dispose()
   window.removeEventListener('resize', handleResize)
 })
 </script>

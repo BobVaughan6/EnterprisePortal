@@ -195,4 +195,211 @@ public class AnnouncementService : IAnnouncementService
             _logger.LogError(ex, "增加浏览次数失败，ID: {Id}", id);
         }
     }
+
+    #region IAnnouncementStatisticsExtension 实现
+
+    public async Task<AnnouncementStatisticsOverviewDto> GetStatisticsOverviewAsync()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var weekStart = today.AddDays(-(int)DateTime.UtcNow.DayOfWeek);
+        var monthStart = new DateOnly(today.Year, today.Month, 1);
+
+        var allAnnouncements = await _unitOfWork.Announcements.FindAsync(a => a.IsDeleted == 0);
+        var announcementsList = allAnnouncements.ToList();
+
+        var todayAnnouncements = announcementsList.Where(a => DateOnly.FromDateTime(a.CreatedAt) == today);
+        var weekAnnouncements = announcementsList.Where(a => DateOnly.FromDateTime(a.CreatedAt) >= weekStart);
+        var monthAnnouncements = announcementsList.Where(a => DateOnly.FromDateTime(a.CreatedAt) >= monthStart);
+
+        var totalViews = announcementsList.Sum(a => a.ViewCount);
+        var avgViews = announcementsList.Any() ? (double)totalViews / announcementsList.Count : 0;
+
+        return new AnnouncementStatisticsOverviewDto
+        {
+            TotalAnnouncements = announcementsList.Count,
+            TodayAdded = todayAnnouncements.Count(),
+            WeekAdded = weekAnnouncements.Count(),
+            MonthAdded = monthAnnouncements.Count(),
+            GovProcurementCount = announcementsList.Count(a => a.BusinessType == "政府采购" || a.BusinessType == "GOV_PROCUREMENT"),
+            ConstructionCount = announcementsList.Count(a => a.BusinessType == "建设工程" || a.BusinessType == "CONSTRUCTION"),
+            TotalViews = totalViews,
+            AverageViews = avgViews
+        };
+    }
+
+    public async Task<List<AnnouncementPublishTrendDto>> GetPublishTrendAsync(DateOnly startDate, DateOnly endDate, string? businessType, string groupBy)
+    {
+        var announcements = await _unitOfWork.Announcements.FindAsync(a => a.IsDeleted == 0);
+        var filtered = announcements.Where(a =>
+        {
+            var date = DateOnly.FromDateTime(a.CreatedAt);
+            return date >= startDate && date <= endDate;
+        });
+
+        if (!string.IsNullOrEmpty(businessType))
+        {
+            // 支持中英文业务类型
+            filtered = filtered.Where(a =>
+                a.BusinessType == businessType ||
+                (businessType == "GOV_PROCUREMENT" && a.BusinessType == "政府采购") ||
+                (businessType == "CONSTRUCTION" && a.BusinessType == "建设工程") ||
+                (businessType == "政府采购" && a.BusinessType == "GOV_PROCUREMENT") ||
+                (businessType == "建设工程" && a.BusinessType == "CONSTRUCTION"));
+        }
+
+        var grouped = filtered.GroupBy(a =>
+        {
+            var date = DateOnly.FromDateTime(a.CreatedAt);
+            return groupBy.ToLower() switch
+            {
+                "month" => new DateOnly(date.Year, date.Month, 1).ToString("yyyy-MM"),
+                "week" => date.AddDays(-(int)date.DayOfWeek).ToString("yyyy-MM-dd"),
+                _ => date.ToString("yyyy-MM-dd")
+            };
+        });
+
+        return grouped.Select(g => new AnnouncementPublishTrendDto
+        {
+            Date = g.Key,
+            Count = g.Count(),
+            GovProcurementCount = g.Count(a => a.BusinessType == "政府采购" || a.BusinessType == "GOV_PROCUREMENT"),
+            ConstructionCount = g.Count(a => a.BusinessType == "建设工程" || a.BusinessType == "CONSTRUCTION")
+        }).OrderBy(x => x.Date).ToList();
+    }
+
+    public async Task<List<AnnouncementTypeDistributionDto>> GetTypeDistributionAsync()
+    {
+        var announcements = await _unitOfWork.Announcements.FindAsync(a => a.IsDeleted == 0);
+        var list = announcements.ToList();
+        var total = list.Count;
+
+        if (total == 0)
+            return new List<AnnouncementTypeDistributionDto>();
+
+        var grouped = list.GroupBy(a => a.NoticeType ?? "未分类");
+
+        // 类型名称映射
+        var typeNameMap = new Dictionary<string, string>
+        {
+            { "bidding", "招标/采购公告" },
+            { "correction", "更正公告" },
+            { "result", "结果公告" },
+            { "未分类", "未分类" }
+        };
+
+        return grouped.Select(g => new AnnouncementTypeDistributionDto
+        {
+            Type = g.Key,
+            TypeName = typeNameMap.ContainsKey(g.Key) ? typeNameMap[g.Key] : g.Key,
+            Count = g.Count(),
+            Percentage = Math.Round((double)g.Count() / total * 100, 2)
+        }).OrderByDescending(x => x.Count).ToList();
+    }
+
+    public async Task<List<AnnouncementRegionDistributionDto>> GetRegionDistributionAsync(string? businessType, int limit)
+    {
+        var announcements = await _unitOfWork.Announcements.FindAsync(a => a.IsDeleted == 0);
+        var filtered = announcements.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(businessType))
+        {
+            // 支持中英文业务类型
+            filtered = filtered.Where(a =>
+                a.BusinessType == businessType ||
+                (businessType == "GOV_PROCUREMENT" && a.BusinessType == "政府采购") ||
+                (businessType == "CONSTRUCTION" && a.BusinessType == "建设工程") ||
+                (businessType == "政府采购" && a.BusinessType == "GOV_PROCUREMENT") ||
+                (businessType == "建设工程" && a.BusinessType == "CONSTRUCTION"));
+        }
+
+        var list = filtered.ToList();
+        var total = list.Count;
+
+        if (total == 0)
+            return new List<AnnouncementRegionDistributionDto>();
+
+        var grouped = list
+            .Where(a => !string.IsNullOrEmpty(a.Province))
+            .GroupBy(a => a.Province!);
+
+        var result = new List<AnnouncementRegionDistributionDto>();
+        foreach (var g in grouped)
+        {
+            var region = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(g.Key);
+            result.Add(new AnnouncementRegionDistributionDto
+            {
+                Region = region?.RegionName ?? g.Key,
+                Count = g.Count(),
+                Percentage = Math.Round((double)g.Count() / total * 100, 2)
+            });
+        }
+
+        return result.OrderByDescending(x => x.Count).Take(limit).ToList();
+    }
+
+    public async Task<List<PopularAnnouncementDto>> GetPopularAnnouncementsAsync(string? businessType, int limit)
+    {
+        var announcements = await _unitOfWork.Announcements.FindAsync(a => a.IsDeleted == 0);
+        var filtered = announcements.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(businessType))
+        {
+            // 支持中英文业务类型
+            filtered = filtered.Where(a =>
+                a.BusinessType == businessType ||
+                (businessType == "GOV_PROCUREMENT" && a.BusinessType == "政府采购") ||
+                (businessType == "CONSTRUCTION" && a.BusinessType == "建设工程") ||
+                (businessType == "政府采购" && a.BusinessType == "GOV_PROCUREMENT") ||
+                (businessType == "建设工程" && a.BusinessType == "CONSTRUCTION"));
+        }
+
+        return filtered
+            .OrderByDescending(a => a.ViewCount)
+            .Take(limit)
+            .Select(a => new PopularAnnouncementDto
+            {
+                Id = a.Id,
+                Title = a.Title,
+                BusinessType = a.BusinessType,
+                ViewCount = a.ViewCount,
+                PublishDate = a.PublishTime ?? a.CreatedAt
+            }).ToList();
+    }
+
+    public async Task<List<AnnouncementStatusDistributionDto>> GetStatusDistributionAsync()
+    {
+        var announcements = await _unitOfWork.Announcements.FindAsync(a => a.IsDeleted == 0);
+        var list = announcements.ToList();
+        var total = list.Count;
+
+        if (total == 0)
+            return new List<AnnouncementStatusDistributionDto>();
+
+        var grouped = list.GroupBy(a => a.Status);
+
+        return grouped.Select(g => new AnnouncementStatusDistributionDto
+        {
+            Status = g.Key.ToString(),
+            StatusName = g.Key == 1 ? "启用" : "禁用",
+            Count = g.Count(),
+            Percentage = Math.Round((double)g.Count() / total * 100, 2)
+        }).OrderByDescending(x => x.Count).ToList();
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        var announcements = await _unitOfWork.Announcements.FindAsync(a => a.IsDeleted == 0);
+        return announcements.Count();
+    }
+
+    public async Task<int> GetTodayAddedCountAsync()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var announcements = await _unitOfWork.Announcements.FindAsync(a =>
+            a.IsDeleted == 0 &&
+            DateOnly.FromDateTime(a.CreatedAt) == today);
+        return announcements.Count();
+    }
+
+    #endregion
 }

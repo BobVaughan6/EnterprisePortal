@@ -143,4 +143,14 @@ public class AttachmentService : IAttachmentService
             return false;
         }
     }
+
+    #region IAttachmentStatisticsExtension 实现
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        var attachments = await _unitOfWork.Attachments.FindAsync(a => a.IsDeleted == 0);
+        return attachments.Count();
+    }
+
+    #endregion
 }

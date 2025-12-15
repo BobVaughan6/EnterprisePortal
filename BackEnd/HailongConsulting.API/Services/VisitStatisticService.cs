@@ -1,6 +1,9 @@
 using HailongConsulting.API.Models.Entities;
+using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Repositories;
+using HailongConsulting.API.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace HailongConsulting.API.Services;
 
@@ -13,6 +16,7 @@ public class VisitStatisticService : IVisitStatisticService
     private readonly IAnnouncementRepository _announcementRepository;
     private readonly IInfoPublicationRepository _infoPublicationRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<VisitStatisticService> _logger;
 
     public VisitStatisticService(
@@ -20,12 +24,14 @@ public class VisitStatisticService : IVisitStatisticService
         IAnnouncementRepository announcementRepository,
         IInfoPublicationRepository infoPublicationRepository,
         IUnitOfWork unitOfWork,
+        ApplicationDbContext context,
         ILogger<VisitStatisticService> logger)
     {
         _visitStatisticRepository = visitStatisticRepository;
         _announcementRepository = announcementRepository;
         _infoPublicationRepository = infoPublicationRepository;
         _unitOfWork = unitOfWork;
+        _context = context;
         _logger = logger;
     }
 
@@ -146,4 +152,199 @@ public class VisitStatisticService : IVisitStatisticService
         // 直接从连接获取
         return request.HttpContext.Connection.RemoteIpAddress?.ToString();
     }
+
+    #region IVisitStatisticsExtension 实现
+
+    public async Task<int> GetTotalVisitsAsync()
+    {
+        try
+        {
+            return await _context.VisitStatistics
+                .Where(v => v.IsDeleted == 0)
+                .SumAsync(v => v.VisitCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取总访问量失败");
+            return 0;
+        }
+    }
+
+    public async Task<int> GetVisitsByDateAsync(DateOnly date)
+    {
+        try
+        {
+            return await _context.VisitStatistics
+                .Where(v => v.VisitDate == date && v.IsDeleted == 0)
+                .SumAsync(v => v.VisitCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取指定日期访问量失败，Date: {Date}", date);
+            return 0;
+        }
+    }
+
+    public async Task<int> GetVisitsByDateRangeAsync(DateOnly startDate, DateOnly endDate)
+    {
+        try
+        {
+            return await _context.VisitStatistics
+                .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0)
+                .SumAsync(v => v.VisitCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取日期范围访问量失败，StartDate: {StartDate}, EndDate: {EndDate}", startDate, endDate);
+            return 0;
+        }
+    }
+
+    public async Task<int> GetUniqueVisitorsAsync(DateOnly startDate, DateOnly endDate)
+    {
+        try
+        {
+            return await _context.VisitStatistics
+                .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0 && !string.IsNullOrEmpty(v.VisitorIp))
+                .Select(v => v.VisitorIp)
+                .Distinct()
+                .CountAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取独立访客数失败");
+            return 0;
+        }
+    }
+
+    public async Task<List<VisitTrendDataDto>> GetVisitTrendAsync(DateOnly startDate, DateOnly endDate, string groupBy)
+    {
+        try
+        {
+            _logger.LogInformation("查询访问趋势: StartDate={StartDate}, EndDate={EndDate}, GroupBy={GroupBy}", startDate, endDate, groupBy);
+            
+            // 先查询原始数据看看有多少条
+            var totalCount = await _context.VisitStatistics
+                .Where(v => v.IsDeleted == 0)
+                .CountAsync();
+            _logger.LogInformation("数据库中总共有 {TotalCount} 条访问统计记录", totalCount);
+            
+            var dateRangeCount = await _context.VisitStatistics
+                .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0)
+                .CountAsync();
+            _logger.LogInformation("日期范围内有 {DateRangeCount} 条记录", dateRangeCount);
+            
+            // 先分组查询，不进行ToString转换
+            var groupedData = await _context.VisitStatistics
+                .Where(v => v.VisitDate >= startDate && v.VisitDate <= endDate && v.IsDeleted == 0)
+                .GroupBy(v => v.VisitDate)
+                .Select(g => new
+                {
+                    VisitDate = g.Key,
+                    VisitCount = g.Sum(v => v.VisitCount),
+                    UniqueVisitors = g.Where(v => !string.IsNullOrEmpty(v.VisitorIp)).Select(v => v.VisitorIp).Distinct().Count()
+                })
+                .OrderBy(v => v.VisitDate)
+                .ToListAsync();
+            
+            // 在内存中转换为DTO并格式化日期
+            var data = groupedData.Select(g => new VisitTrendDataDto
+            {
+                Date = g.VisitDate.ToString("yyyy-MM-dd"),
+                VisitCount = g.VisitCount,
+                UniqueVisitors = g.UniqueVisitors
+            }).ToList();
+            
+            _logger.LogInformation("返回 {DataCount} 条趋势数据", data.Count);
+            return data;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取访问趋势失败");
+            return new List<VisitTrendDataDto>();
+        }
+    }
+
+    public async Task<List<PopularPageDto>> GetPopularPagesAsync(int limit, int days)
+    {
+        try
+        {
+            var startDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-days));
+            
+            var data = await _context.VisitStatistics
+                .Where(v => v.VisitDate >= startDate && v.IsDeleted == 0)
+                .GroupBy(v => new { v.PageUrl, v.PageTitle })
+                .Select(g => new PopularPageDto
+                {
+                    PageUrl = g.Key.PageUrl ?? "",
+                    PageTitle = g.Key.PageTitle,
+                    TotalViews = g.Sum(v => v.VisitCount),
+                    UniqueVisitors = g.Where(v => !string.IsNullOrEmpty(v.VisitorIp)).Select(v => v.VisitorIp).Distinct().Count()
+                })
+                .OrderByDescending(p => p.TotalViews)
+                .Take(limit)
+                .ToListAsync();
+            
+            return data;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取热门页面失败");
+            return new List<PopularPageDto>();
+        }
+    }
+
+    public async Task<List<VisitSourceDto>> GetVisitSourcesAsync()
+    {
+        try
+        {
+            var total = await _context.VisitStatistics
+                .Where(v => v.IsDeleted == 0)
+                .CountAsync();
+            
+            if (total == 0)
+            {
+                return new List<VisitSourceDto>();
+            }
+
+            var data = await _context.VisitStatistics
+                .Where(v => v.IsDeleted == 0)
+                .GroupBy(v => string.IsNullOrEmpty(v.Referer) ? "直接访问" : v.Referer)
+                .Select(g => new VisitSourceDto
+                {
+                    Source = g.Key,
+                    Count = g.Count(),
+                    Percentage = (double)g.Count() / total * 100
+                })
+                .OrderByDescending(s => s.Count)
+                .Take(10)
+                .ToListAsync();
+            
+            return data;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取访问来源统计失败");
+            return new List<VisitSourceDto>();
+        }
+    }
+
+    public async Task<int> GetTotalPagesAsync()
+    {
+        try
+        {
+            return await _context.VisitStatistics
+                .Where(v => v.IsDeleted == 0 && !string.IsNullOrEmpty(v.PageUrl))
+                .Select(v => v.PageUrl)
+                .Distinct()
+                .CountAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取访问页面总数失败");
+            return 0;
+        }
+    }
+
+    #endregion
 }

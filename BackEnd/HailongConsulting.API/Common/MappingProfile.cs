@@ -14,6 +14,10 @@ public class MappingProfile : Profile
         // User映射
         CreateMap<User, LoginResponseDto>();
 
+        // 访问统计映射
+        CreateMap<VisitStatistic, VisitStatisticDetailDto>()
+            .ForMember(dest => dest.VisitDate, opt => opt.MapFrom(src => src.VisitDate.ToString("yyyy-MM-dd")));
+
         // 系统配置映射
         // 轮播图
         CreateMap<CarouselBanner, CarouselBannerDto>()

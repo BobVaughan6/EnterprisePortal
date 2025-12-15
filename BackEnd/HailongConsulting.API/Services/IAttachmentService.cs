@@ -6,7 +6,7 @@ namespace HailongConsulting.API.Services;
 /// <summary>
 /// 附件服务接口
 /// </summary>
-public interface IAttachmentService
+public interface IAttachmentService : IAttachmentStatisticsExtension
 {
     /// <summary>
     /// 获取分页附件列表

@@ -147,4 +147,141 @@ public class InfoPublicationService : IInfoPublicationService
             PageSize = queryDto.PageSize
         };
     }
+
+    #region IInfoPublicationStatisticsExtension 实现
+
+    public async Task<InfoPublicationStatisticsOverviewDto> GetStatisticsOverviewAsync()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var weekStart = today.AddDays(-(int)DateTime.UtcNow.DayOfWeek);
+        var monthStart = new DateOnly(today.Year, today.Month, 1);
+
+        var allPublications = await _unitOfWork.InfoPublications.FindAsync(p => p.IsDeleted == 0);
+        var publicationsList = allPublications.ToList();
+
+        var todayPublications = publicationsList.Where(p => DateOnly.FromDateTime(p.CreatedAt) == today);
+        var weekPublications = publicationsList.Where(p => DateOnly.FromDateTime(p.CreatedAt) >= weekStart);
+        var monthPublications = publicationsList.Where(p => DateOnly.FromDateTime(p.CreatedAt) >= monthStart);
+
+        var totalViews = publicationsList.Sum(p => p.ViewCount);
+        var avgViews = publicationsList.Any() ? (double)totalViews / publicationsList.Count : 0;
+
+        return new InfoPublicationStatisticsOverviewDto
+        {
+            TotalPublications = publicationsList.Count,
+            TodayAdded = todayPublications.Count(),
+            WeekAdded = weekPublications.Count(),
+            MonthAdded = monthPublications.Count(),
+            NewsCenterCount = publicationsList.Count(p => p.Type == "COMPANY_NEWS"),
+            PolicyRegulationCount = publicationsList.Count(p => p.Type == "POLICY_REGULATION"),
+            TotalViews = totalViews,
+            AverageViews = avgViews
+        };
+    }
+
+    public async Task<List<InfoPublicationPublishTrendDto>> GetPublishTrendAsync(DateOnly startDate, DateOnly endDate, string groupBy)
+    {
+        var publications = await _unitOfWork.InfoPublications.FindAsync(p => p.IsDeleted == 0);
+        var filtered = publications.Where(p =>
+        {
+            var date = DateOnly.FromDateTime(p.CreatedAt);
+            return date >= startDate && date <= endDate;
+        });
+
+        var grouped = filtered.GroupBy(p =>
+        {
+            var date = DateOnly.FromDateTime(p.CreatedAt);
+            return groupBy.ToLower() switch
+            {
+                "month" => new DateOnly(date.Year, date.Month, 1).ToString("yyyy-MM"),
+                "week" => date.AddDays(-(int)date.DayOfWeek).ToString("yyyy-MM-dd"),
+                _ => date.ToString("yyyy-MM-dd")
+            };
+        });
+
+        return grouped.Select(g => new InfoPublicationPublishTrendDto
+        {
+            Date = g.Key,
+            Count = g.Count(),
+            NewsCenterCount = g.Count(p => p.Type == "COMPANY_NEWS"),
+            PolicyRegulationCount = g.Count(p => p.Type == "POLICY_REGULATION")
+        }).OrderBy(x => x.Date).ToList();
+    }
+
+    public async Task<List<InfoPublicationTypeDistributionDto>> GetTypeDistributionAsync()
+    {
+        var publications = await _unitOfWork.InfoPublications.FindAsync(p => p.IsDeleted == 0);
+        var list = publications.ToList();
+        var total = list.Count;
+
+        if (total == 0)
+            return new List<InfoPublicationTypeDistributionDto>();
+
+        var grouped = list.GroupBy(p => p.Type);
+
+        return grouped.Select(g => new InfoPublicationTypeDistributionDto
+        {
+            Type = g.Key,
+            TypeName = g.Key == "COMPANY_NEWS" ? "新闻中心" : g.Key == "POLICY_REGULATION" ? "政策法规" : g.Key,
+            Count = g.Count(),
+            Percentage = Math.Round((double)g.Count() / total * 100, 2)
+        }).OrderByDescending(x => x.Count).ToList();
+    }
+
+    public async Task<List<PopularInfoPublicationDto>> GetPopularInfoPublicationsAsync(int limit)
+    {
+        var publications = await _unitOfWork.InfoPublications.FindAsync(p => p.IsDeleted == 0);
+
+        return publications
+            .OrderByDescending(p => p.ViewCount)
+            .Take(limit)
+            .Select(p => new PopularInfoPublicationDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Type = p.Type,
+                ViewCount = p.ViewCount,
+                PublishDate = p.PublishTime ?? p.CreatedAt
+            }).ToList();
+    }
+
+    public async Task<List<AuthorPublishStatisticDto>> GetAuthorStatisticsAsync()
+    {
+        var publications = await _unitOfWork.InfoPublications.FindAsync(p => p.IsDeleted == 0);
+        var list = publications.ToList();
+
+        var grouped = list
+            .Where(p => !string.IsNullOrEmpty(p.Author))
+            .GroupBy(p => p.Author!);
+
+        return grouped.Select(g =>
+        {
+            var totalViews = g.Sum(p => p.ViewCount);
+            var count = g.Count();
+            return new AuthorPublishStatisticDto
+            {
+                Author = g.Key,
+                PublishCount = count,
+                TotalViews = totalViews,
+                AverageViews = count > 0 ? Math.Round((double)totalViews / count, 2) : 0
+            };
+        }).OrderByDescending(x => x.PublishCount).ToList();
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        var publications = await _unitOfWork.InfoPublications.FindAsync(p => p.IsDeleted == 0);
+        return publications.Count();
+    }
+
+    public async Task<int> GetTodayAddedCountAsync()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var publications = await _unitOfWork.InfoPublications.FindAsync(p =>
+            p.IsDeleted == 0 &&
+            DateOnly.FromDateTime(p.CreatedAt) == today);
+        return publications.Count();
+    }
+
+    #endregion
 }

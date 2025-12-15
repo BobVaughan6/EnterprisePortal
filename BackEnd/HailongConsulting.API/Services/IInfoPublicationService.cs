@@ -6,7 +6,7 @@ namespace HailongConsulting.API.Services;
 /// <summary>
 /// 信息发布服务接口
 /// </summary>
-public interface IInfoPublicationService
+public interface IInfoPublicationService : IInfoPublicationStatisticsExtension
 {
     /// <summary>
     /// 创建信息发布

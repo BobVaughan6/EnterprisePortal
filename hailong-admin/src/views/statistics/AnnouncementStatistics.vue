@@ -9,7 +9,7 @@
               <el-icon><Document /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.totalCount }}</div>
+              <div class="stat-value">{{ overview.totalAnnouncements || 0 }}</div>
               <div class="stat-label">公告总数</div>
             </div>
           </div>
@@ -22,8 +22,8 @@
               <el-icon><Calendar /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.todayCount }}</div>
-              <div class="stat-label">今日发布</div>
+              <div class="stat-value">{{ overview.todayAdded || 0 }}</div>
+              <div class="stat-label">今日新增</div>
             </div>
           </div>
         </el-card>
@@ -35,7 +35,7 @@
               <el-icon><View /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.totalViews }}</div>
+              <div class="stat-value">{{ overview.totalViews || 0 }}</div>
               <div class="stat-label">总浏览量</div>
             </div>
           </div>
@@ -48,7 +48,7 @@
               <el-icon><TrendCharts /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.avgViews }}</div>
+              <div class="stat-value">{{ overview.averageViews?.toFixed(1) || 0 }}</div>
               <div class="stat-label">平均浏览量</div>
             </div>
           </div>
@@ -61,17 +61,24 @@
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>发布趋势</span>
+            <div class="card-header">
+              <span>发布趋势（最近30天）</span>
+              <el-select v-model="trendBusinessType" size="small" style="width: 120px;" @change="loadTrendData">
+                <el-option label="全部" value="" />
+                <el-option label="政府采购" value="GOV_PROCUREMENT" />
+                <el-option label="建设工程" value="CONSTRUCTION" />
+              </el-select>
+            </div>
           </template>
           <div ref="trendChartRef" style="height: 350px;"></div>
         </el-card>
       </el-col>
 
-      <!-- 类型分布 -->
+      <!-- 公告类型分布 -->
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>类型分布</span>
+            <span>公告类型分布</span>
           </template>
           <div ref="typeChartRef" style="height: 350px;"></div>
         </el-card>
@@ -79,61 +86,60 @@
     </el-row>
 
     <el-row :gutter="20" style="margin-top: 20px;">
-      <!-- 区域分布 -->
-      <el-col :span="12">
-        <el-card>
-          <template #header>
-            <span>区域分布 TOP 10</span>
-          </template>
-          <div ref="regionChartRef" style="height: 400px;"></div>
-        </el-card>
-      </el-col>
-
       <!-- 状态分布 -->
       <el-col :span="12">
         <el-card>
           <template #header>
             <span>公告状态分布</span>
           </template>
-          <div ref="statusChartRef" style="height: 400px;"></div>
+          <div ref="statusChartRef" style="height: 350px;"></div>
+        </el-card>
+      </el-col>
+
+      <!-- 区域分布 -->
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>项目区域分布 TOP 10</span>
+              <el-select v-model="regionBusinessType" size="small" style="width: 120px;" @change="loadRegionDistribution">
+                <el-option label="全部" value="" />
+                <el-option label="政府采购" value="GOV_PROCUREMENT" />
+                <el-option label="建设工程" value="CONSTRUCTION" />
+              </el-select>
+            </div>
+          </template>
+          <div ref="regionChartRef" style="height: 350px;"></div>
         </el-card>
       </el-col>
     </el-row>
-
-    <!-- 时间段分析 -->
-    <el-card style="margin-top: 20px;">
-      <template #header>
-        <span>发布时间段分析</span>
-      </template>
-      <div ref="timeChartRef" style="height: 300px;"></div>
-    </el-card>
 
     <!-- 热门公告 -->
     <el-card style="margin-top: 20px;">
       <template #header>
         <div class="card-header">
-          <span>热门公告 TOP 20</span>
-          <el-button type="primary" size="small" icon="Download" @click="exportData" :loading="exportLoading">
-            导出统计
-          </el-button>
+          <span>热门公告 TOP 10</span>
+          <el-select v-model="hotBusinessType" size="small" style="width: 120px;" @change="loadHotAnnouncements">
+            <el-option label="全部" value="" />
+            <el-option label="政府采购" value="GOV_PROCUREMENT" />
+            <el-option label="建设工程" value="CONSTRUCTION" />
+          </el-select>
         </div>
       </template>
       <el-table :data="hotAnnouncements" v-loading="loading" border stripe>
-        <el-table-column type="index" label="排名" width="80" align="center" />
+        <el-table-column type="index" label="排名" width="60" align="center" />
         <el-table-column prop="title" label="公告标题" min-width="300" show-overflow-tooltip />
-        <el-table-column prop="businessType" label="业务类型" width="120" align="center">
+        <el-table-column prop="businessType" label="业务类型" width="110" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.businessType === 'GOV_PROCUREMENT' ? 'primary' : 'success'">
-              {{ row.businessType === 'GOV_PROCUREMENT' ? '政府采购' : '建设工程' }}
+            <el-tag :type="getBusinessTypeColor(row.businessType)">
+              {{ getBusinessTypeName(row.businessType) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="noticeType" label="公告类型" width="120" align="center" />
-        <el-table-column prop="projectRegion" label="项目区域" width="120" align="center" />
         <el-table-column prop="viewCount" label="浏览量" width="100" align="center" sortable />
-        <el-table-column prop="publishTime" label="发布时间" width="110" align="center">
+        <el-table-column prop="publishDate" label="发布时间" width="180" align="center">
           <template #default="{ row }">
-            {{ formatDate(row.publishTime) }}
+            {{ formatDateTime(row.publishDate) }}
           </template>
         </el-table-column>
       </el-table>
@@ -151,36 +157,74 @@ import { getDoughnutChartOption, getHorizontalBarChartOption } from '@/utils/cha
 
 // 概览数据
 const overview = reactive({
-  totalCount: 0,
-  todayCount: 0,
+  totalAnnouncements: 0,
+  todayAdded: 0,
+  weekAdded: 0,
+  monthAdded: 0,
+  govProcurementCount: 0,
+  constructionCount: 0,
   totalViews: 0,
-  avgViews: 0
+  averageViews: 0
 })
 
 // 图表实例
 let trendChart = null
 let typeChart = null
-let regionChart = null
 let statusChart = null
-let timeChart = null
+let regionChart = null
 
 const trendChartRef = ref(null)
 const typeChartRef = ref(null)
-const regionChartRef = ref(null)
 const statusChartRef = ref(null)
-const timeChartRef = ref(null)
+const regionChartRef = ref(null)
+
+// 筛选条件
+const trendBusinessType = ref('')
+const regionBusinessType = ref('')
+const hotBusinessType = ref('')
 
 // 热门公告
 const hotAnnouncements = ref([])
 const loading = ref(false)
-const exportLoading = ref(false)
 
 /**
- * 格式化日期
+ * 获取业务类型名称
  */
-const formatDate = (dateStr) => {
+const getBusinessTypeName = (type) => {
+  const typeMap = {
+    'GOV_PROCUREMENT': '政府采购',
+    'CONSTRUCTION': '建设工程',
+    '政府采购': '政府采购',
+    '建设工程': '建设工程'
+  }
+  return typeMap[type] || type || '-'
+}
+
+/**
+ * 获取业务类型颜色
+ */
+const getBusinessTypeColor = (type) => {
+  if (type === 'GOV_PROCUREMENT' || type === '政府采购') {
+    return 'primary'
+  } else if (type === 'CONSTRUCTION' || type === '建设工程') {
+    return 'success'
+  }
+  return 'info'
+}
+
+/**
+ * 格式化日期时间
+ */
+const formatDateTime = (dateStr) => {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('zh-CN')
+  const date = new Date(dateStr)
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 /**
@@ -194,6 +238,7 @@ const loadOverview = async () => {
     }
   } catch (error) {
     console.error('加载概览数据失败:', error)
+    ElMessage.error('加载概览数据失败')
   }
 }
 
@@ -202,12 +247,23 @@ const loadOverview = async () => {
  */
 const loadTrendData = async () => {
   try {
-    const res = await statisticsApi.announcement.getTrend({ days: 30 })
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - 30)
+    
+    const params = {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      businessType: trendBusinessType.value || undefined,
+      groupBy: 'day'
+    }
+    const res = await statisticsApi.announcement.getTrend(params)
     if (res.success && res.data) {
       renderTrendChart(res.data)
     }
   } catch (error) {
     console.error('加载趋势数据失败:', error)
+    ElMessage.error('加载趋势数据失败')
   }
 }
 
@@ -219,16 +275,31 @@ const renderTrendChart = (data) => {
     trendChart = echarts.init(trendChartRef.value)
   }
   
+  const dates = data.map(item => item.date)
+  const govData = data.map(item => item.govProcurementCount)
+  const constructionData = data.map(item => item.constructionCount)
+  
   const option = {
     tooltip: {
-      trigger: 'axis'
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross'
+      }
     },
     legend: {
       data: ['政府采购', '建设工程']
     },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true
+    },
     xAxis: {
       type: 'category',
-      data: data.dates || []
+      boundaryGap: false,
+      data: dates
     },
     yAxis: {
       type: 'value'
@@ -237,16 +308,28 @@ const renderTrendChart = (data) => {
       {
         name: '政府采购',
         type: 'line',
-        data: data.govProcurement || [],
+        data: govData,
         smooth: true,
-        itemStyle: { color: '#409eff' }
+        itemStyle: { color: '#409eff' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+            { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+          ])
+        }
       },
       {
         name: '建设工程',
         type: 'line',
-        data: data.construction || [],
+        data: constructionData,
         smooth: true,
-        itemStyle: { color: '#67c23a' }
+        itemStyle: { color: '#67c23a' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(103, 194, 58, 0.3)' },
+            { offset: 1, color: 'rgba(103, 194, 58, 0.05)' }
+          ])
+        }
       }
     ]
   }
@@ -255,146 +338,38 @@ const renderTrendChart = (data) => {
 }
 
 /**
- * 加载类型分布
+ * 加载公告类型分布
  */
 const loadTypeDistribution = async () => {
   try {
     const res = await statisticsApi.announcement.getTypeDistribution()
     if (res.success && res.data) {
-      renderTypeChart(res.data)
+      const typeData = res.data.map(item => ({
+        name: item.typeName || item.type,
+        value: item.count
+      }))
+      renderTypeChart(typeData)
     }
   } catch (error) {
     console.error('加载类型分布失败:', error)
+    ElMessage.error('加载类型分布失败')
   }
 }
 
 /**
- * 渲染类型分布图表
+ * 渲染公告类型分布图表
  */
 const renderTypeChart = (data) => {
   if (!typeChart) {
     typeChart = echarts.init(typeChartRef.value)
   }
   
-  const option = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)'
-    },
-    legend: {
-      orient: 'vertical',
-      right: 10,
-      top: 'center'
-    },
-    series: [
-      {
-        name: '公告类型',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#fff',
-          borderWidth: 2
-        },
-        label: {
-          show: false,
-          position: 'center'
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 20,
-            fontWeight: 'bold'
-          }
-        },
-        labelLine: {
-          show: false
-        },
-        data: data || []
-      }
-    ]
-  }
+  const option = getDoughnutChartOption(data, {
+    radius: ['40%', '70%'],
+    center: ['50%', '50%']
+  })
   
   typeChart.setOption(option)
-}
-
-/**
- * 加载区域分布
- */
-const loadRegionDistribution = async () => {
-  try {
-    const res = await statisticsApi.announcement.getRegionDistribution({ limit: 10 })
-    if (res.success && res.data) {
-      renderRegionChart(res.data)
-    }
-  } catch (error) {
-    console.error('加载区域分布失败:', error)
-  }
-}
-
-/**
- * 渲染区域分布图表
- */
-const renderRegionChart = (data) => {
-  if (!regionChart) {
-    regionChart = echarts.init(regionChartRef.value)
-  }
-  
-  const option = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'value'
-    },
-    yAxis: {
-      type: 'category',
-      data: data.regions || []
-    },
-    series: [
-      {
-        name: '公告数量',
-        type: 'bar',
-        data: data.counts || [],
-        itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-            { offset: 0, color: '#83bff6' },
-            { offset: 0.5, color: '#188df0' },
-            { offset: 1, color: '#188df0' }
-          ])
-        }
-      }
-    ]
-  }
-  
-  regionChart.setOption(option)
-}
-
-/**
- * 加载热门公告
- */
-const loadHotAnnouncements = async () => {
-  loading.value = true
-  try {
-    const res = await statisticsApi.announcement.getHotAnnouncements({ limit: 20 })
-    if (res.success && res.data) {
-      hotAnnouncements.value = res.data
-    }
-  } catch (error) {
-    console.error('加载热门公告失败:', error)
-  } finally {
-    loading.value = false
-  }
 }
 
 /**
@@ -404,10 +379,15 @@ const loadStatusDistribution = async () => {
   try {
     const res = await statisticsApi.announcement.getStatusDistribution()
     if (res.success && res.data) {
-      renderStatusChart(res.data)
+      const statusData = res.data.map(item => ({
+        name: item.statusName || item.status,
+        value: item.count
+      }))
+      renderStatusChart(statusData)
     }
   } catch (error) {
     console.error('加载状态分布失败:', error)
+    ElMessage.error('加载状态分布失败')
   }
 }
 
@@ -419,12 +399,7 @@ const renderStatusChart = (data) => {
     statusChart = echarts.init(statusChartRef.value)
   }
   
-  const chartData = data.map(item => ({
-    name: item.status,
-    value: item.count
-  }))
-  
-  const option = getDoughnutChartOption(chartData, {
+  const option = getDoughnutChartOption(data, {
     radius: ['40%', '70%'],
     center: ['50%', '50%']
   })
@@ -433,102 +408,68 @@ const renderStatusChart = (data) => {
 }
 
 /**
- * 加载时间段分析
+ * 加载区域分布
  */
-const loadTimeAnalysis = async () => {
+const loadRegionDistribution = async () => {
   try {
-    const res = await statisticsApi.announcement.getTimeAnalysis()
+    const params = {
+      businessType: regionBusinessType.value || undefined,
+      limit: 10
+    }
+    const res = await statisticsApi.announcement.getRegionDistribution(params)
     if (res.success && res.data) {
-      renderTimeChart(res.data)
+      renderRegionChart(res.data)
     }
   } catch (error) {
-    console.error('加载时间段分析失败:', error)
+    console.error('加载区域分布失败:', error)
+    ElMessage.error('加载区域分布失败')
   }
 }
 
 /**
- * 渲染时间段分析图表
+ * 渲染区域分布图表
  */
-const renderTimeChart = (data) => {
-  if (!timeChart) {
-    timeChart = echarts.init(timeChartRef.value)
+const renderRegionChart = (data) => {
+  if (!regionChart) {
+    regionChart = echarts.init(regionChartRef.value)
   }
   
-  const hours = data.map(item => `${item.hour}:00`)
-  const counts = data.map(item => item.count)
+  const chartData = data.map(item => ({
+    name: item.region,
+    value: item.count
+  }))
   
-  const option = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      top: '10%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'category',
-      data: hours,
-      axisLabel: {
-        interval: 1,
-        rotate: 0
-      }
-    },
-    yAxis: {
-      type: 'value',
-      name: '发布数量'
-    },
-    series: [
-      {
-        name: '发布数量',
-        type: 'bar',
-        data: counts,
-        itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#83bff6' },
-            { offset: 0.5, color: '#188df0' },
-            { offset: 1, color: '#188df0' }
-          ]),
-          borderRadius: [5, 5, 0, 0]
-        },
-        barWidth: '60%'
-      }
-    ]
-  }
+  const option = getHorizontalBarChartOption(chartData, {
+    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+      { offset: 0, color: '#83bff6' },
+      { offset: 0.5, color: '#188df0' },
+      { offset: 1, color: '#188df0' }
+    ]),
+    showLabel: true
+  })
   
-  timeChart.setOption(option)
+  regionChart.setOption(option)
 }
 
 /**
- * 导出统计数据
+ * 加载热门公告
  */
-const exportData = async () => {
-  exportLoading.value = true
+const loadHotAnnouncements = async () => {
+  loading.value = true
   try {
-    const res = await statisticsApi.announcement.export()
-    
-    // 创建下载链接
-    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `公告统计_${new Date().getTime()}.xlsx`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-    
-    ElMessage.success('导出成功')
+    const params = {
+      businessType: hotBusinessType.value || undefined,
+      limit: 10
+    }
+    const res = await statisticsApi.announcement.getHotAnnouncements(params)
+    if (res.success && res.data) {
+      hotAnnouncements.value = res.data
+    }
   } catch (error) {
-    console.error('导出失败:', error)
-    ElMessage.error('导出失败')
+    console.error('加载热门公告失败:', error)
+    ElMessage.error('加载热门公告失败')
   } finally {
-    exportLoading.value = false
+    loading.value = false
   }
 }
 
@@ -538,18 +479,16 @@ const exportData = async () => {
 const handleResize = () => {
   if (trendChart) trendChart.resize()
   if (typeChart) typeChart.resize()
-  if (regionChart) regionChart.resize()
   if (statusChart) statusChart.resize()
-  if (timeChart) timeChart.resize()
+  if (regionChart) regionChart.resize()
 }
 
 onMounted(() => {
   loadOverview()
   loadTrendData()
   loadTypeDistribution()
-  loadRegionDistribution()
   loadStatusDistribution()
-  loadTimeAnalysis()
+  loadRegionDistribution()
   loadHotAnnouncements()
   window.addEventListener('resize', handleResize)
 })
@@ -557,9 +496,8 @@ onMounted(() => {
 onUnmounted(() => {
   if (trendChart) trendChart.dispose()
   if (typeChart) typeChart.dispose()
-  if (regionChart) regionChart.dispose()
   if (statusChart) statusChart.dispose()
-  if (timeChart) timeChart.dispose()
+  if (regionChart) regionChart.dispose()
   window.removeEventListener('resize', handleResize)
 })
 </script>

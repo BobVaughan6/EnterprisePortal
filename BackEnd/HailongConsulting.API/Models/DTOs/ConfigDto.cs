@@ -183,7 +183,7 @@ public class UpdateFriendlyLinkDto
 }
 
 /// <summary>
-/// 访问统计DTO
+/// 首页访问统计DTO（用于ConfigService）
 /// </summary>
 public class VisitStatisticDto
 {
@@ -191,16 +191,6 @@ public class VisitStatisticDto
     public int TodayVisits { get; set; }
     public int YesterdayVisits { get; set; }
     public int ThisMonthVisits { get; set; }
-}
-
-/// <summary>
-/// 记录访问DTO
-/// </summary>
-public class RecordVisitDto
-{
-    public string? PageUrl { get; set; }
-    public string? PageTitle { get; set; }
-    public string? Referer { get; set; }
 }
 
 /// <summary>

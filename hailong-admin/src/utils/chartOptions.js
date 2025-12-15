@@ -236,7 +236,8 @@ export const getDoughnutChartOption = (data, options = {}) => {
   const defaultOptions = {
     title: '',
     radius: ['50%', '70%'],
-    center: ['50%', '50%']
+    center: ['50%', '50%'],
+    showLabel: true
   }
   
   const config = { ...defaultOptions, ...options }
@@ -272,18 +273,19 @@ export const getDoughnutChartOption = (data, options = {}) => {
           borderWidth: 2
         },
         label: {
-          show: false,
-          position: 'center'
+          show: config.showLabel,
+          formatter: '{b}\n{d}%',
+          fontSize: 12
         },
         emphasis: {
           label: {
             show: true,
-            fontSize: 20,
+            fontSize: 14,
             fontWeight: 'bold'
           }
         },
         labelLine: {
-          show: false
+          show: config.showLabel
         },
         data: data
       }

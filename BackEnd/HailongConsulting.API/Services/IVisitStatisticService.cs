@@ -5,7 +5,7 @@ namespace HailongConsulting.API.Services;
 /// <summary>
 /// 访问统计服务接口
 /// </summary>
-public interface IVisitStatisticService
+public interface IVisitStatisticService : IVisitStatisticsExtension
 {
     /// <summary>
     /// 记录访问统计

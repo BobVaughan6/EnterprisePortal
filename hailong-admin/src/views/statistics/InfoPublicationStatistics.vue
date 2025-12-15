@@ -9,7 +9,7 @@
               <el-icon><DocumentCopy /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.totalCount }}</div>
+              <div class="stat-value">{{ overview.totalPublications || 0 }}</div>
               <div class="stat-label">信息总数</div>
             </div>
           </div>
@@ -22,8 +22,8 @@
               <el-icon><Calendar /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.todayCount }}</div>
-              <div class="stat-label">今日发布</div>
+              <div class="stat-value">{{ overview.todayAdded || 0 }}</div>
+              <div class="stat-label">今日新增</div>
             </div>
           </div>
         </el-card>
@@ -35,7 +35,7 @@
               <el-icon><View /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.totalViews }}</div>
+              <div class="stat-value">{{ overview.totalViews || 0 }}</div>
               <div class="stat-label">总浏览量</div>
             </div>
           </div>
@@ -48,7 +48,7 @@
               <el-icon><TrendCharts /></el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ overview.avgViews }}</div>
+              <div class="stat-value">{{ overview.averageViews?.toFixed(1) || 0 }}</div>
               <div class="stat-label">平均浏览量</div>
             </div>
           </div>
@@ -61,52 +61,46 @@
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>发布趋势（最近30天）</span>
+            <div class="card-header">
+              <span>发布趋势（最近30天）</span>
+            </div>
           </template>
           <div ref="trendChartRef" style="height: 350px;"></div>
         </el-card>
       </el-col>
 
-      <!-- 类型分布 -->
+      <!-- 信息类型分布 -->
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>类型分布</span>
+            <span>信息类型分布</span>
           </template>
           <div ref="typeChartRef" style="height: 350px;"></div>
         </el-card>
       </el-col>
     </el-row>
 
-    <!-- 作者发布统计 -->
-    <el-card style="margin-top: 20px;">
-      <template #header>
-        <span>作者发布统计 TOP 10</span>
-      </template>
-      <div ref="authorChartRef" style="height: 400px;"></div>
-    </el-card>
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <!-- 发布单位统计 -->
+      <el-col :span="24">
+        <el-card>
+          <template #header>
+            <span>发布单位统计 TOP 10</span>
+          </template>
+          <div ref="authorChartRef" style="height: 400px;"></div>
+        </el-card>
+      </el-col>
+    </el-row>
 
     <!-- 热门信息 -->
     <el-card style="margin-top: 20px;">
       <template #header>
         <div class="card-header">
-          <span>热门信息 TOP 20</span>
-          <div>
-            <el-radio-group v-model="hotInfoType" size="small" @change="loadHotInfo" style="margin-right: 10px;">
-              <el-radio-button label="">全部</el-radio-button>
-              <el-radio-button label="COMPANY_NEWS">公司公告</el-radio-button>
-              <el-radio-button label="POLICY_REGULATION">政策法规</el-radio-button>
-              <el-radio-button label="POLICY_INFO">政策信息</el-radio-button>
-              <el-radio-button label="NOTICE">通知公告</el-radio-button>
-            </el-radio-group>
-            <el-button type="primary" size="small" icon="Download" @click="exportData" :loading="exportLoading">
-              导出统计
-            </el-button>
-          </div>
+          <span>热门信息 TOP 10</span>
         </div>
       </template>
       <el-table :data="hotInfo" v-loading="loading" border stripe>
-        <el-table-column type="index" label="排名" width="80" align="center" />
+        <el-table-column type="index" label="排名" width="60" align="center" />
         <el-table-column prop="title" label="信息标题" min-width="300" show-overflow-tooltip />
         <el-table-column prop="type" label="信息类型" width="120" align="center">
           <template #default="{ row }">
@@ -115,11 +109,10 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="author" label="作者" width="120" align="center" />
         <el-table-column prop="viewCount" label="浏览量" width="100" align="center" sortable />
-        <el-table-column prop="publishTime" label="发布时间" width="110" align="center">
+        <el-table-column prop="publishDate" label="发布时间" width="180" align="center">
           <template #default="{ row }">
-            {{ formatDate(row.publishTime) }}
+            {{ formatDateTime(row.publishDate) }}
           </template>
         </el-table-column>
       </el-table>
@@ -133,14 +126,18 @@ import { ElMessage } from 'element-plus'
 import { DocumentCopy, Calendar, View, TrendCharts } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
 import * as echarts from 'echarts'
-import { getHorizontalBarChartOption } from '@/utils/chartOptions'
+import { getHorizontalBarChartOption, getDoughnutChartOption } from '@/utils/chartOptions'
 
 // 概览数据
 const overview = reactive({
-  totalCount: 0,
-  todayCount: 0,
+  totalPublications: 0,
+  todayAdded: 0,
+  weekAdded: 0,
+  monthAdded: 0,
+  newsCenterCount: 0,
+  policyRegulationCount: 0,
   totalViews: 0,
-  avgViews: 0
+  averageViews: 0
 })
 
 // 图表实例
@@ -155,29 +152,23 @@ const authorChartRef = ref(null)
 // 热门信息
 const hotInfo = ref([])
 const loading = ref(false)
-const hotInfoType = ref('')
-const exportLoading = ref(false)
 
 // 类型映射
 const typeNameMap = {
-  'COMPANY_NEWS': '公司公告',
-  'POLICY_REGULATION': '政策法规',
-  'POLICY_INFO': '政策信息',
-  'NOTICE': '通知公告'
+  'COMPANY_NEWS': '新闻中心',
+  'POLICY_REGULATION': '政策法规'
 }
 
 const typeColorMap = {
   'COMPANY_NEWS': 'primary',
-  'POLICY_REGULATION': 'success',
-  'POLICY_INFO': 'warning',
-  'NOTICE': 'danger'
+  'POLICY_REGULATION': 'success'
 }
 
 /**
  * 获取类型名称
  */
 const getTypeName = (type) => {
-  return typeNameMap[type] || type
+  return typeNameMap[type] || type || '-'
 }
 
 /**
@@ -188,11 +179,18 @@ const getTypeColor = (type) => {
 }
 
 /**
- * 格式化日期
+ * 格式化日期时间
  */
-const formatDate = (dateStr) => {
+const formatDateTime = (dateStr) => {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('zh-CN')
+  const date = new Date(dateStr)
+  return date.toLocaleString('zh-CN', { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 /**
@@ -206,6 +204,7 @@ const loadOverview = async () => {
     }
   } catch (error) {
     console.error('加载概览数据失败:', error)
+    ElMessage.error('加载概览数据失败')
   }
 }
 
@@ -214,12 +213,22 @@ const loadOverview = async () => {
  */
 const loadTrendData = async () => {
   try {
-    const res = await statisticsApi.infoPublication.getTrend({ days: 30 })
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - 30)
+    
+    const params = {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      groupBy: 'day'
+    }
+    const res = await statisticsApi.infoPublication.getTrend(params)
     if (res.success && res.data) {
       renderTrendChart(res.data)
     }
   } catch (error) {
     console.error('加载趋势数据失败:', error)
+    ElMessage.error('加载趋势数据失败')
   }
 }
 
@@ -231,48 +240,61 @@ const renderTrendChart = (data) => {
     trendChart = echarts.init(trendChartRef.value)
   }
   
+  const dates = data.map(item => item.date)
+  const newsData = data.map(item => item.newsCenterCount)
+  const policyData = data.map(item => item.policyRegulationCount)
+  
   const option = {
     tooltip: {
-      trigger: 'axis'
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross'
+      }
     },
     legend: {
-      data: ['公司公告', '政策法规', '政策信息', '通知公告']
+      data: ['新闻中心', '政策法规']
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true
     },
     xAxis: {
       type: 'category',
-      data: data.dates || []
+      boundaryGap: false,
+      data: dates
     },
     yAxis: {
       type: 'value'
     },
     series: [
       {
-        name: '公司公告',
+        name: '新闻中心',
         type: 'line',
-        data: data.companyNews || [],
+        data: newsData,
         smooth: true,
-        itemStyle: { color: '#409eff' }
+        itemStyle: { color: '#409eff' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+            { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+          ])
+        }
       },
       {
         name: '政策法规',
         type: 'line',
-        data: data.policyRegulation || [],
+        data: policyData,
         smooth: true,
-        itemStyle: { color: '#67c23a' }
-      },
-      {
-        name: '政策信息',
-        type: 'line',
-        data: data.policyInfo || [],
-        smooth: true,
-        itemStyle: { color: '#e6a23c' }
-      },
-      {
-        name: '通知公告',
-        type: 'line',
-        data: data.notice || [],
-        smooth: true,
-        itemStyle: { color: '#f56c6c' }
+        itemStyle: { color: '#67c23a' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(103, 194, 58, 0.3)' },
+            { offset: 1, color: 'rgba(103, 194, 58, 0.05)' }
+          ])
+        }
       }
     ]
   }
@@ -287,10 +309,15 @@ const loadTypeDistribution = async () => {
   try {
     const res = await statisticsApi.infoPublication.getTypeDistribution()
     if (res.success && res.data) {
-      renderTypeChart(res.data)
+      const typeData = res.data.map(item => ({
+        name: item.typeName || getTypeName(item.type),
+        value: item.count
+      }))
+      renderTypeChart(typeData)
     }
   } catch (error) {
     console.error('加载类型分布失败:', error)
+    ElMessage.error('加载类型分布失败')
   }
 }
 
@@ -302,68 +329,12 @@ const renderTypeChart = (data) => {
     typeChart = echarts.init(typeChartRef.value)
   }
   
-  const option = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)'
-    },
-    legend: {
-      orient: 'vertical',
-      right: 10,
-      top: 'center'
-    },
-    series: [
-      {
-        name: '信息类型',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#fff',
-          borderWidth: 2
-        },
-        label: {
-          show: false,
-          position: 'center'
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 20,
-            fontWeight: 'bold'
-          }
-        },
-        labelLine: {
-          show: false
-        },
-        data: data || []
-      }
-    ]
-  }
+  const option = getDoughnutChartOption(data, {
+    radius: ['40%', '70%'],
+    center: ['50%', '50%']
+  })
   
   typeChart.setOption(option)
-}
-
-/**
- * 加载热门信息
- */
-const loadHotInfo = async () => {
-  loading.value = true
-  try {
-    const params = {
-      type: hotInfoType.value || undefined,
-      limit: 20
-    }
-    const res = await statisticsApi.infoPublication.getHotInfo(params)
-    if (res.success && res.data) {
-      hotInfo.value = res.data
-    }
-  } catch (error) {
-    console.error('加载热门信息失败:', error)
-  } finally {
-    loading.value = false
-  }
 }
 
 /**
@@ -371,12 +342,13 @@ const loadHotInfo = async () => {
  */
 const loadAuthorStatistics = async () => {
   try {
-    const res = await statisticsApi.infoPublication.getAuthorStatistics({ limit: 10 })
+    const res = await statisticsApi.infoPublication.getAuthorStatistics()
     if (res.success && res.data) {
       renderAuthorChart(res.data)
     }
   } catch (error) {
     console.error('加载作者统计失败:', error)
+    ElMessage.error('加载作者统计失败')
   }
 }
 
@@ -388,9 +360,11 @@ const renderAuthorChart = (data) => {
     authorChart = echarts.init(authorChartRef.value)
   }
   
-  const chartData = data.map(item => ({
-    name: item.author,
-    value: item.count
+  // 取前10名
+  const top10 = data.slice(0, 10)
+  const chartData = top10.map(item => ({
+    name: item.author || '未知作者',
+    value: item.publishCount
   }))
   
   const option = getHorizontalBarChartOption(chartData, {
@@ -405,34 +379,23 @@ const renderAuthorChart = (data) => {
 }
 
 /**
- * 导出统计数据
+ * 加载热门信息
  */
-const exportData = async () => {
-  exportLoading.value = true
+const loadHotInfo = async () => {
+  loading.value = true
   try {
     const params = {
-      type: hotInfoType.value || undefined
+      limit: 10
     }
-    
-    const res = await statisticsApi.infoPublication.export(params)
-    
-    // 创建下载链接
-    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `信息发布统计_${new Date().getTime()}.xlsx`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-    
-    ElMessage.success('导出成功')
+    const res = await statisticsApi.infoPublication.getHotInfo(params)
+    if (res.success && res.data) {
+      hotInfo.value = res.data
+    }
   } catch (error) {
-    console.error('导出失败:', error)
-    ElMessage.error('导出失败')
+    console.error('加载热门信息失败:', error)
+    ElMessage.error('加载热门信息失败')
   } finally {
-    exportLoading.value = false
+    loading.value = false
   }
 }
 
