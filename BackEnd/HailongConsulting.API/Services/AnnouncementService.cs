@@ -3,6 +3,7 @@ using HailongConsulting.API.Common;
 using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Models.Entities;
 using HailongConsulting.API.Repositories;
+using System.Text.Json;
 
 namespace HailongConsulting.API.Services;
 
@@ -94,6 +95,27 @@ public class AnnouncementService : IAnnouncementService
         {
             var district = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(announcement.District);
             dto.District = district?.RegionName ?? announcement.District;
+        }
+
+        // 加载附件信息（使用JSON反序列化）
+        if (!string.IsNullOrEmpty(announcement.AttachmentIds))
+        {
+            try
+            {
+                var attachmentIds = JsonSerializer.Deserialize<List<int>>(announcement.AttachmentIds);
+                
+                if (attachmentIds != null && attachmentIds.Any())
+                {
+                    var attachments = await _unitOfWork.Attachments.FindAsync(a => 
+                        attachmentIds.Contains(a.Id) && a.IsDeleted == 0);
+                    
+                    dto.Attachments = _mapper.Map<List<AttachmentDto>>(attachments.ToList());
+                }
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "解析附件ID失败，公告ID: {Id}, AttachmentIds: {AttachmentIds}", id, announcement.AttachmentIds);
+            }
         }
 
         return dto;

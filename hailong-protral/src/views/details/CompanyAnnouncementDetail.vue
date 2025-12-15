@@ -134,6 +134,61 @@
             </div>
           </div>
 
+          <!-- 附件列表 -->
+          <div v-if="item.attachments && item.attachments.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200 flex items-center gap-2">
+              <svg class="w-6 h-6 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+              附件列表
+            </h2>
+            <div class="space-y-3">
+              <div
+                v-for="attachment in item.attachments"
+                :key="attachment.id"
+                class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+              >
+                <div class="flex items-center gap-3 flex-1">
+                  <div class="w-10 h-10 bg-hailong-primary/10 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-hailong-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-gray-900 font-medium group-hover:text-hailong-primary transition-colors">
+                      {{ attachment.fileName }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      {{ formatFileSize(attachment.fileSize) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="handlePreview(attachment)"
+                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    预览
+                  </button>
+                  <a
+                    :href="attachment.fileUrl"
+                    download
+                    class="px-4 py-2 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    下载
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 相关新闻 -->
           <div v-if="relatedItems.length > 0" class="bg-white rounded-xl shadow-sm p-8 mb-6">
             <h2 class="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200">
@@ -198,6 +253,13 @@
       </div>
     </div>
 
+    <!-- 附件预览组件 -->
+    <AttachmentPreview
+      :visible="previewVisible"
+      :attachment="currentAttachment"
+      @close="previewVisible = false"
+    />
+
     <Footer />
   </div>
 </template>
@@ -208,6 +270,7 @@ import { useRoute } from 'vue-router'
 import { getInfoPublicationDetail } from '@/api/infoPublication'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import AttachmentPreview from '@/components/AttachmentPreview.vue'
 
 const route = useRoute()
 
@@ -216,6 +279,10 @@ const item = ref(null)
 const loading = ref(true)
 const error = ref(null)
 const relatedItems = ref([])
+
+// 附件预览
+const previewVisible = ref(false)
+const currentAttachment = ref({})
 
 // 格式化日期
 const formatDate = (date) => {
@@ -268,6 +335,21 @@ const handleShare = () => {
   }
 }
 
+// 格式化文件大小
+const formatFileSize = (bytes) => {
+  if (!bytes || bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+}
+
+// 预览附件
+const handlePreview = (attachment) => {
+  currentAttachment.value = attachment
+  previewVisible.value = true
+}
+
 // 打印
 const handlePrint = () => {
   window.print()
@@ -300,8 +382,9 @@ const loadItemDetail = async () => {
         publishDate: formatDate(response.data.publishTime),
         views: response.data.viewCount || 0,
         isTop: response.data.isTop || false,
-        coverImage: coverImageUrl.value,
+        coverImage: response.data.coverImage,
         content: response.data.content || '',
+        attachments: response.data.attachments || [],
         tags: [] // 后端暂无tags字段，可以后续扩展
       }
       

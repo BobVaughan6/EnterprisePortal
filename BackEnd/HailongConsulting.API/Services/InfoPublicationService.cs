@@ -3,6 +3,7 @@ using HailongConsulting.API.Common;
 using HailongConsulting.API.Models.DTOs;
 using HailongConsulting.API.Models.Entities;
 using HailongConsulting.API.Repositories;
+using System.Text.Json;
 
 namespace HailongConsulting.API.Services;
 
@@ -72,7 +73,33 @@ public class InfoPublicationService : IInfoPublicationService
     public async Task<InfoPublicationDto?> GetByIdAsync(int id)
     {
         var publication = await _unitOfWork.InfoPublications.FirstOrDefaultAsync(p => p.Id == id && p.IsDeleted == 0);
-        return publication == null ? null : _mapper.Map<InfoPublicationDto>(publication);
+        if (publication == null)
+            return null;
+
+        var dto = _mapper.Map<InfoPublicationDto>(publication);
+
+        // 加载附件信息（使用JSON反序列化）
+        if (!string.IsNullOrEmpty(publication.AttachmentIds))
+        {
+            try
+            {
+                var attachmentIds = JsonSerializer.Deserialize<List<int>>(publication.AttachmentIds);
+                
+                if (attachmentIds != null && attachmentIds.Any())
+                {
+                    var attachments = await _unitOfWork.Attachments.FindAsync(a => 
+                        attachmentIds.Contains(a.Id) && a.IsDeleted == 0);
+                    
+                    dto.Attachments = _mapper.Map<List<AttachmentDto>>(attachments.ToList());
+                }
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "解析附件ID失败，信息发布ID: {Id}, AttachmentIds: {AttachmentIds}", id, publication.AttachmentIds);
+            }
+        }
+
+        return dto;
     }
 
     public async Task<PagedResult<InfoPublicationDto>> GetPagedAsync(InfoPublicationQueryDto queryDto)
