@@ -43,6 +43,9 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        // 配置日期时间格式：yyyy-MM-dd HH:mm:ss
+        options.JsonSerializerOptions.Converters.Add(new CustomDateTimeConverter());
+        options.JsonSerializerOptions.Converters.Add(new CustomNullableDateTimeConverter());
     });
 
 // 配置数据库

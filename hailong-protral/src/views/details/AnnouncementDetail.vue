@@ -277,21 +277,7 @@ const getRegionText = (announcement) => {
   return parts.join(' ')
 }
 
-// 格式化日期
-const formatDate = (date) => {
-  if (!date) return '-'
-  // 如果是Date对象，转换为字符串
-  if (date instanceof Date) {
-    return date.toLocaleDateString('zh-CN')
-  }
-  // 如果是字符串，尝试格式化
-  try {
-    const dateObj = new Date(date)
-    return dateObj.toLocaleDateString('zh-CN')
-  } catch (e) {
-    return date
-  }
-}
+import { formatDate } from '@/utils/date'
 
 // 格式化文件大小
 const formatFileSize = (bytes) => {

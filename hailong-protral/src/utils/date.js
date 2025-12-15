@@ -58,6 +58,32 @@ export function formatDate(date) {
 }
 
 /**
+ * 格式化日期为中文格式 yyyy年MM月dd日
+ * @param {string|Date} date - 日期字符串或Date对象
+ * @returns {string} 格式化后的日期字符串
+ */
+export function formatDateCN(date) {
+  if (!date) return '-'
+  
+  try {
+    const dateObj = date instanceof Date ? date : new Date(date)
+    
+    if (isNaN(dateObj.getTime())) {
+      return '-'
+    }
+    
+    const year = dateObj.getFullYear()
+    const month = dateObj.getMonth() + 1
+    const day = dateObj.getDate()
+    
+    return `${year}年${month}月${day}日`
+  } catch (e) {
+    console.error('日期格式化错误:', e)
+    return '-'
+  }
+}
+
+/**
  * 获取当前日期时间字符串 yyyy-MM-dd HH:mm:ss
  * @returns {string} 当前日期时间字符串
  */

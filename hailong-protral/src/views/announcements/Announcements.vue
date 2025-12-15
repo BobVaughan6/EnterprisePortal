@@ -810,12 +810,7 @@ const displayPages = computed(() => {
   return pages
 })
 
-// 格式化日期
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN')
-}
+import { formatDate } from '@/utils/date'
 
 // 获取类型样式
 const getTypeStyle = (typeName) => {

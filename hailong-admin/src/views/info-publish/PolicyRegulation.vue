@@ -13,16 +13,16 @@
         <el-form-item label="关键词">
           <el-input 
             v-model="searchForm.keyword" 
-            placeholder="搜索标题、发布人" 
+            placeholder="搜索标题、发文单位" 
             clearable 
             style="width: 220px;"
           />
         </el-form-item>
         <el-form-item label="分类">
           <el-select v-model="searchForm.category" placeholder="请选择" clearable style="width: 150px;">
-            <el-option label="法律法规" value="法律法规" />
-            <el-option label="行政法规" value="行政法规" />
+            <el-option label="国家政策" value="国家政策" />
             <el-option label="地方政策" value="地方政策" />
+            <el-option label="行业法规" value="行业法规" />
           </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
@@ -47,7 +47,7 @@
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
         <el-table-column prop="category" label="分类" width="100" align="center" />
-        <el-table-column prop="publisher" label="发布人" width="120" align="center" />
+        <el-table-column prop="publisher" label="发文单位" width="120" align="center" />
         <el-table-column prop="publishTime" label="发布时间" width="110" align="center">
           <template #default="{ row }">
             {{ formatDate(row.publishTime) }}
@@ -114,7 +114,7 @@
         <el-form-item label="标题" prop="title">
           <el-input 
             v-model="formData.title" 
-            placeholder="请输入标题（最多255个字符）" 
+            placeholder="请输入政策法规标题（最多255个字符）" 
             maxlength="255"
             show-word-limit
           />
@@ -124,32 +124,45 @@
           <el-col :span="12">
             <el-form-item label="分类" prop="category">
               <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%;">
-                <el-option label="法律法规" value="法律法规" />
-                <el-option label="行政法规" value="行政法规" />
+                <el-option label="国家政策" value="国家政策" />
                 <el-option label="地方政策" value="地方政策" />
+                <el-option label="行业法规" value="行业法规" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="发布人" prop="publisher">
+            <el-form-item label="文号" prop="documentNumber">
               <el-input
-                v-model="formData.publisher"
-                placeholder="请输入发布人"
-                maxlength="50"
+                v-model="formData.documentNumber"
+                placeholder="请输入文号"
+                maxlength="100"
               />
             </el-form-item>
           </el-col>
         </el-row>
         
-        <el-form-item label="发布时间" prop="publishTime">
-          <el-date-picker
-            v-model="formData.publishTime"
-            type="datetime"
-            placeholder="选择发布时间"
-            value-format="YYYY-MM-DD HH:mm:ss"
-            style="width: 100%;"
-          />
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="发文单位" prop="publisher">
+              <el-input
+                v-model="formData.publisher"
+                placeholder="请输入发文单位"
+                maxlength="100"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="发布时间" prop="publishTime">
+              <el-date-picker
+                v-model="formData.publishTime"
+                type="datetime"
+                placeholder="选择发布时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+                style="width: 100%;"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
         
         <el-form-item label="摘要" prop="summary">
           <el-input
@@ -162,19 +175,7 @@
           />
         </el-form-item>
         
-        <!-- 封面图片 - 暂时注释 -->
-        <!-- <el-form-item label="封面图片" prop="coverImageId">
-          <FileUpload
-            v-model="coverImageIds"
-            file-type="image"
-            :limit="1"
-            list-type="picture-card"
-            return-type="id"
-            @change="handleCoverImageChange"
-          />
-        </el-form-item> -->
-        
-        <el-form-item label="内容" prop="content">
+        <el-form-item label="正文内容" prop="content">
           <RichEditor v-model="formData.content" />
         </el-form-item>
         
@@ -220,6 +221,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { infoPublicationApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 import FileUpload from '@/components/FileUpload.vue'
+import { formatDate } from '@/utils/date'
 
 // 日期范围
 const dateRange = ref([])
@@ -257,7 +259,7 @@ const formData = reactive({
   title: '',
   summary: '',
   content: '',
-  coverImageId: null,
+  documentNumber: '',
   publisher: '',
   publishTime: '',
   attachmentIds: [],
@@ -275,20 +277,11 @@ const formRules = {
     { required: true, message: '请选择分类', trigger: 'change' }
   ],
   content: [
-    { required: true, message: '请输入内容', trigger: 'blur' }
+    { required: true, message: '请输入正文内容', trigger: 'blur' }
   ],
   publishTime: [
     { required: true, message: '请选择发布时间', trigger: 'change' }
   ]
-}
-
-/**
- * 格式化日期
- */
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN')
 }
 
 /**
@@ -362,7 +355,7 @@ const handleAdd = () => {
     title: '',
     summary: '',
     content: '',
-    coverImageId: null,
+    documentNumber: '',
     publisher: '',
     publishTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
     attachmentIds: [],
@@ -387,7 +380,7 @@ const handleEdit = async (row) => {
         title: res.data.title,
         summary: res.data.summary || '',
         content: res.data.content,
-        coverImageId: res.data.coverImageId,
+        documentNumber: res.data.documentNumber || '',
         publisher: res.data.publisher || '',
         publishTime: res.data.publishTime,
         attachmentIds: res.data.attachmentIds || [],
@@ -481,7 +474,7 @@ const handleSubmit = async () => {
       title: formData.title,
       summary: formData.summary || null,
       content: formData.content,
-      coverImageId: formData.coverImageId || null,
+      documentNumber: formData.documentNumber || null,
       publisher: formData.publisher || null,
       publishTime: formData.publishTime,
       attachmentIds: formData.attachmentIds,

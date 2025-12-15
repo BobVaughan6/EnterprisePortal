@@ -258,16 +258,7 @@ const loadItems = async () => {
   }
 }
 
-// 格式化日期
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).replace(/\//g, '-')
-}
+import { formatDate } from '@/utils/date'
 
 // 搜索
 const handleSearch = async () => {

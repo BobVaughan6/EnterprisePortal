@@ -233,6 +233,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { infoPublicationApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 import FileUpload from '@/components/FileUpload.vue'
+import { formatDate } from '@/utils/date'
 
 // 日期范围
 const dateRange = ref([])
@@ -302,15 +303,6 @@ const formRules = {
   publishTime: [
     { required: true, message: '请选择发布时间', trigger: 'change' }
   ]
-}
-
-/**
- * 格式化日期
- */
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN')
 }
 
 /**

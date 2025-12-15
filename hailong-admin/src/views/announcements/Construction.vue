@@ -223,6 +223,8 @@ import { announcementApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
 import FileUpload from '@/components/FileUpload.vue'
 import RegionCascader from '@/components/RegionCascader.vue'
+import RegionSelector from '@/components/RegionSelector.vue'
+import { formatDate } from '@/utils/date'
 
 // 公告类型映射
 const noticeTypeMap = {
@@ -300,15 +302,6 @@ const formRules = {
   publishTime: [
     { required: true, message: '请选择发布日期', trigger: 'change' }
   ]
-}
-
-/**
- * 格式化日期
- */
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN')
 }
 
 /**
@@ -403,6 +396,16 @@ const handleReset = () => {
  */
 const handleAdd = () => {
   isEdit.value = false
+  // 获取当前时间并格式化为 yyyy-MM-dd HH:mm:ss 格式
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hours = String(now.getHours()).padStart(2, '0')
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  const seconds = String(now.getSeconds()).padStart(2, '0')
+  const dateTimeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+  
   Object.assign(formData, {
     id: null,
     title: '',
@@ -416,7 +419,7 @@ const handleAdd = () => {
     city: '',
     district: '',
     projectRegion: '',
-    publishTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    publishTime: dateTimeString,
     budgetAmount: null,
     deadline: '',
     attachmentIds: []
