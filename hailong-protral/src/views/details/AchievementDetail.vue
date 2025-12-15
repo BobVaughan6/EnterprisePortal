@@ -160,7 +160,14 @@ const error = ref(null)
 
 // 返回上一页
 const goBack = () => {
-  router.back()
+  const from = route.query.from
+  const tab = route.query.tab
+  
+  if (from === 'about' && tab) {
+    router.push({ path: '/about', query: { tab } })
+  } else {
+    router.back()
+  }
 }
 
 // 格式化金额（与首页保持一致）

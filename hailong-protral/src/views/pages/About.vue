@@ -415,20 +415,35 @@ const closeImagePreview = () => {
 
 // 业务范围点击处理
 const handleBusinessClick = (id) => {
-  router.push(`/detail/business-scope/${id}`)
+  router.push({
+    path: `/detail/business-scope/${id}`,
+    query: { from: 'about', tab: 'business' }
+  })
 }
 
 // 重要业绩点击处理
 const handleAchievementClick = (id) => {
-  router.push(`/detail/achievement/${id}`)
+  router.push({
+    path: `/detail/achievement/${id}`,
+    query: { from: 'about', tab: 'honors' }
+  })
 }
 
 // 企业资质点击处理
 const handleQualificationClick = (id) => {
-  router.push(`/detail/qualification/${id}`)
+  router.push({
+    path: `/detail/qualification/${id}`,
+    query: { from: 'about', tab: 'qualifications' }
+  })
 }
 
 onMounted(() => {
+  // 检查是否有 tab 参数，如果有则切换到对应的 tab
+  const tab = router.currentRoute.value.query.tab
+  if (tab && tabs.some(t => t.id === tab)) {
+    activeTab.value = tab
+  }
+  
   fetchCompanyProfile()
   fetchBusinessScope()
   fetchQualifications()
