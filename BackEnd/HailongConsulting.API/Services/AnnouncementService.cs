@@ -72,7 +72,31 @@ public class AnnouncementService : IAnnouncementService
     public async Task<AnnouncementDto?> GetByIdAsync(int id)
     {
         var announcement = await _unitOfWork.Announcements.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == 0);
-        return announcement == null ? null : _mapper.Map<AnnouncementDto>(announcement);
+        if (announcement == null)
+            return null;
+
+        var dto = _mapper.Map<AnnouncementDto>(announcement);
+
+        // 将区域编码转换为名称
+        if (!string.IsNullOrEmpty(announcement.Province))
+        {
+            var province = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(announcement.Province);
+            dto.Province = province?.RegionName ?? announcement.Province;
+        }
+
+        if (!string.IsNullOrEmpty(announcement.City))
+        {
+            var city = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(announcement.City);
+            dto.City = city?.RegionName ?? announcement.City;
+        }
+
+        if (!string.IsNullOrEmpty(announcement.District))
+        {
+            var district = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(announcement.District);
+            dto.District = district?.RegionName ?? announcement.District;
+        }
+
+        return dto;
     }
 
     public async Task<PagedResult<AnnouncementDto>> GetPagedAsync(AnnouncementQueryDto queryDto)
@@ -91,6 +115,44 @@ public class AnnouncementService : IAnnouncementService
             queryDto.EndDate);
 
         var dtos = _mapper.Map<List<AnnouncementDto>>(items);
+
+        // 批量转换区域编码为名称
+        var regionCodes = new HashSet<string>();
+        foreach (var item in items)
+        {
+            if (!string.IsNullOrEmpty(item.Province)) regionCodes.Add(item.Province);
+            if (!string.IsNullOrEmpty(item.City)) regionCodes.Add(item.City);
+            if (!string.IsNullOrEmpty(item.District)) regionCodes.Add(item.District);
+        }
+
+        // 一次性查询所有需要的区域信息
+        var regions = new Dictionary<string, string>();
+        foreach (var code in regionCodes)
+        {
+            var region = await _unitOfWork.RegionDictionaries.GetByRegionCodeAsync(code);
+            if (region != null)
+            {
+                regions[code] = region.RegionName;
+            }
+        }
+
+        // 转换每个DTO的区域编码为名称
+        var itemsList = items.ToList();
+        for (int i = 0; i < dtos.Count; i++)
+        {
+            if (!string.IsNullOrEmpty(itemsList[i].Province) && regions.ContainsKey(itemsList[i].Province))
+            {
+                dtos[i].Province = regions[itemsList[i].Province];
+            }
+            if (!string.IsNullOrEmpty(itemsList[i].City) && regions.ContainsKey(itemsList[i].City))
+            {
+                dtos[i].City = regions[itemsList[i].City];
+            }
+            if (!string.IsNullOrEmpty(itemsList[i].District) && regions.ContainsKey(itemsList[i].District))
+            {
+                dtos[i].District = regions[itemsList[i].District];
+            }
+        }
 
         return new PagedResult<AnnouncementDto>
         {

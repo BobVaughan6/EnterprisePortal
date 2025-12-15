@@ -757,7 +757,7 @@ const handleReset = () => {
 
 // 查看详情
 const handleViewDetail = (id) => {
-  router.push(`/announcements/${id}`)
+  router.push(`/detail/announcement/${id}`)
 }
 
 // 分页变化
