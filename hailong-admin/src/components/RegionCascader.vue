@@ -14,9 +14,16 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { systemApi } from '@/api'
 import { ElMessage } from 'element-plus'
+
+// 全局缓存区域数据，避免重复加载
+const regionDataCache = {
+  data: null,
+  loading: false,
+  loadPromise: null
+}
 
 const props = defineProps({
   // 初始值（区域代码数组，如：['410000', '410100', '410122']）
@@ -69,8 +76,8 @@ const isInitializing = ref(false)
 
 // 级联选择器配置 - 不使用懒加载，改为一次性加载所有数据
 const cascaderProps = {
-  value: 'regionCode',
-  label: 'regionName',
+  value: 'code',
+  label: 'name',
   children: 'children',
   checkStrictly: false,
   emitPath: true
@@ -79,66 +86,32 @@ const cascaderProps = {
 // 构建树形结构的区域数据
 const buildRegionTree = async () => {
   try {
-    // 加载所有省份
-    const provinceRes = await systemApi.regions.getProvinces()
-    if (!provinceRes.success || !provinceRes.data) {
+    // 使用 tree 接口一次性获取所有区域数据
+    const treeRes = await systemApi.regions.getTree()
+    if (!treeRes.success || !treeRes.data) {
       return []
     }
 
-    const provinces = provinceRes.data
+    const tree = treeRes.data
 
-    // 如果只需要省级，直接返回
-    if (props.maxLevel === 1) {
-      return provinces.map(p => ({
-        regionCode: p.regionCode,
-        regionName: p.regionName
-      }))
+    // 根据 maxLevel 过滤数据
+    const filterTreeByLevel = (nodes, currentLevel = 1) => {
+      return nodes.map(node => {
+        const filtered = {
+          code: node.code,
+          name: node.name
+        }
+
+        // 如果当前级别小于最大级别，且有子节点，则递归处理
+        if (currentLevel < props.maxLevel && node.children && node.children.length > 0) {
+          filtered.children = filterTreeByLevel(node.children, currentLevel + 1)
+        }
+
+        return filtered
+      })
     }
 
-    // 加载所有省份的城市
-    const provinceWithCities = await Promise.all(
-      provinces.map(async (province) => {
-        const cityRes = await systemApi.regions.getCities(province.regionCode)
-        const cities = cityRes.success && cityRes.data ? cityRes.data : []
-
-        // 如果只需要到市级
-        if (props.maxLevel === 2) {
-          return {
-            regionCode: province.regionCode,
-            regionName: province.regionName,
-            children: cities.map(c => ({
-              regionCode: c.regionCode,
-              regionName: c.regionName
-            }))
-          }
-        }
-
-        // 需要到区县级，加载所有城市的区县
-        const citiesWithDistricts = await Promise.all(
-          cities.map(async (city) => {
-            const districtRes = await systemApi.regions.getDistricts(city.regionCode)
-            const districts = districtRes.success && districtRes.data ? districtRes.data : []
-
-            return {
-              regionCode: city.regionCode,
-              regionName: city.regionName,
-              children: districts.map(d => ({
-                regionCode: d.regionCode,
-                regionName: d.regionName
-              }))
-            }
-          })
-        )
-
-        return {
-          regionCode: province.regionCode,
-          regionName: province.regionName,
-          children: citiesWithDistricts
-        }
-      })
-    )
-
-    return provinceWithCities
+    return filterTreeByLevel(tree)
   } catch (error) {
     console.error('加载区域数据失败:', error)
     ElMessage.error('加载区域数据失败')
@@ -146,21 +119,59 @@ const buildRegionTree = async () => {
   }
 }
 
-// 初始化区域数据
+// 初始化区域数据（使用缓存）
 const initRegionData = async () => {
+  // 如果缓存中已有数据，直接使用
+  if (regionDataCache.data) {
+    regionOptions.value = regionDataCache.data
+    isInitializing.value = false
+    return
+  }
+
+  // 如果正在加载，等待加载完成
+  if (regionDataCache.loading && regionDataCache.loadPromise) {
+    isInitializing.value = true
+    await regionDataCache.loadPromise
+    regionOptions.value = regionDataCache.data || []
+    isInitializing.value = false
+    return
+  }
+
+  // 开始加载
   isInitializing.value = true
-  regionOptions.value = await buildRegionTree()
+  regionDataCache.loading = true
+  
+  regionDataCache.loadPromise = buildRegionTree()
+  const data = await regionDataCache.loadPromise
+  
+  regionDataCache.data = data
+  regionDataCache.loading = false
+  regionOptions.value = data
   isInitializing.value = false
 }
 
 // 从树形数据中查找区域名称
 const findRegionName = (code, tree) => {
   for (const node of tree) {
-    if (node.regionCode === code) {
-      return node.regionName
+    if (node.code === code) {
+      return node.name
     }
     if (node.children) {
       const found = findRegionName(code, node.children)
+      if (found) return found
+    }
+  }
+  return ''
+}
+
+// 从树形数据中根据名称查找区域代码
+const findRegionCodeByName = (name, tree) => {
+  for (const node of tree) {
+    if (node.name === name) {
+      return node.code
+    }
+    if (node.children) {
+      const found = findRegionCodeByName(name, node.children)
       if (found) return found
     }
   }
@@ -210,7 +221,9 @@ defineExpose({
   reset: () => {
     selectedRegion.value = []
   },
-  getValue: () => selectedRegion.value
+  getValue: () => selectedRegion.value,
+  findCodeByName: (name) => findRegionCodeByName(name, regionOptions.value),
+  isDataLoaded: () => regionOptions.value.length > 0
 })
 
 onMounted(async () => {

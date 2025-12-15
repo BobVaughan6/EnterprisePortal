@@ -62,7 +62,7 @@
         </el-table-column>
         <el-table-column prop="bidder" label="招标人" min-width="150" show-overflow-tooltip />
         <el-table-column prop="winner" label="中标人" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="projectRegion" label="项目区域" width="100" align="center" />
+        <el-table-column prop="projectRegion" label="项目区域" width="180" align="center" show-overflow-tooltip />
         <el-table-column prop="publishTime" label="发布时间" width="110" align="center">
           <template #default="{ row }">
             {{ formatDate(row.publishTime) }}
@@ -95,7 +95,6 @@
       v-model="dialogVisible"
       :title="isEdit ? '编辑公告' : '新增公告'"
       width="900px"
-      destroy-on-close
       :close-on-click-modal="false"
     >
       <el-form 
@@ -138,6 +137,8 @@
           <el-col :span="12">
             <el-form-item label="项目区域" prop="regionPath">
               <RegionCascader
+                v-if="dialogVisible"
+                ref="regionCascaderRef"
                 v-model="formData.regionPath"
                 placeholder="请选择省/市/区"
                 @change="handleFormRegionChange"
@@ -230,7 +231,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { announcementApi } from '@/api'
 import RichEditor from '@/components/RichEditor.vue'
@@ -274,7 +275,7 @@ const dialogVisible = ref(false)
 const isEdit = ref(false)
 const submitting = ref(false)
 const formRef = ref(null)
-const regionSelectorRef = ref(null)
+const regionCascaderRef = ref(null)
 
 // 表单数据
 const formData = reactive({
@@ -384,6 +385,7 @@ const handleReset = () => {
   searchForm.keyword = ''
   searchForm.type = ''
   searchForm.region = ''
+  searchForm.regionPath = []
   dateRange.value = []
   handleSearch()
 }
@@ -433,12 +435,7 @@ const handleEdit = async (row) => {
   try {
     const res = await announcementApi.getAnnouncementDetail(row.id)
     if (res.success && res.data) {
-      // 构建区域路径
-      const regionPath = []
-      if (res.data.province) regionPath.push(res.data.province)
-      if (res.data.city) regionPath.push(res.data.city)
-      if (res.data.district) regionPath.push(res.data.district)
-      
+      // 先设置基本表单数据（不包括 regionPath）
       Object.assign(formData, {
         id: res.data.id,
         title: res.data.title,
@@ -448,7 +445,7 @@ const handleEdit = async (row) => {
         content: res.data.content,
         bidder: res.data.bidder || '',
         winner: res.data.winner || '',
-        regionPath: regionPath,
+        regionPath: [], // 先设置为空
         province: res.data.province || '',
         city: res.data.city || '',
         district: res.data.district || '',
@@ -458,7 +455,49 @@ const handleEdit = async (row) => {
         deadline: res.data.deadline || '',
         attachmentIds: res.data.attachmentIds || []
       })
+      
+      // 打开对话框
       dialogVisible.value = true
+      
+      // 等待 RegionCascader 组件挂载并加载数据
+      await nextTick()
+      
+      // 等待区域数据加载完成
+      let retryCount = 0
+      const maxRetries = 20
+      while (retryCount < maxRetries) {
+        if (regionCascaderRef.value && regionCascaderRef.value.isDataLoaded()) {
+          break
+        }
+        await new Promise(resolve => setTimeout(resolve, 100))
+        retryCount++
+      }
+      
+      // 如果后端返回的是中文名称，需要转换为代码
+      const regionPath = []
+      if (res.data.province && regionCascaderRef.value) {
+        const provinceCode = regionCascaderRef.value.findCodeByName(res.data.province)
+        if (provinceCode) {
+          regionPath.push(provinceCode)
+          
+          if (res.data.city) {
+            const cityCode = regionCascaderRef.value.findCodeByName(res.data.city)
+            if (cityCode) {
+              regionPath.push(cityCode)
+              
+              if (res.data.district) {
+                const districtCode = regionCascaderRef.value.findCodeByName(res.data.district)
+                if (districtCode) {
+                  regionPath.push(districtCode)
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // 设置区域路径
+      formData.regionPath = regionPath
     } else {
       ElMessage.error(res.message || '获取公告详情失败')
     }
