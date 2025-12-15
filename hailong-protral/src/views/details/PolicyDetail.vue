@@ -27,6 +27,14 @@
           <p class="mt-4 text-gray-500">加载中...</p>
         </div>
 
+        <div v-else-if="error" class="text-center py-20">
+          <svg class="w-20 h-20 mx-auto text-red-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-gray-500 mb-4">{{ error }}</p>
+          <router-link to="/policies" class="text-hailong-primary hover:underline">返回列表</router-link>
+        </div>
+
         <div v-else-if="!policy" class="text-center py-20">
           <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -196,6 +204,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { getInfoPublicationDetail } from '@/api/infoPublication'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
@@ -204,7 +213,19 @@ const route = useRoute()
 // 政策法规数据
 const policy = ref(null)
 const loading = ref(true)
+const error = ref(null)
 const relatedPolicies = ref([])
+
+// 格式化日期
+const formatDate = (date) => {
+  if (!date) return '-'
+  try {
+    const dateObj = new Date(date)
+    return dateObj.toLocaleDateString('zh-CN')
+  } catch (e) {
+    return date
+  }
+}
 
 // 分享
 const handleShare = () => {
@@ -229,109 +250,42 @@ const handlePrint = () => {
 // 加载政策法规详情
 const loadPolicyDetail = async () => {
   loading.value = true
+  error.value = null
+  
   try {
     const id = route.params.id
     
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // 模拟数据
-    policy.value = {
-      id: id,
-      title: '中华人民共和国政府采购法（2024年修订）',
-      category: '法律法规',
-      source: '全国人民代表大会常务委员会',
-      publishDate: '2024-03-15',
-      effectiveDate: '2024-07-01',
-      views: 2856,
-      downloads: 1234,
-      isTop: true,
-      summary: '为了规范政府采购行为，提高政府采购资金的使用效益，维护国家利益和社会公共利益，保护政府采购当事人的合法权益，促进廉政建设，制定本法。',
-      content: `
-        <h3>第一章 总则</h3>
-        <p><strong>第一条</strong> 为了规范政府采购行为，提高政府采购资金的使用效益，维护国家利益和社会公共利益，保护政府采购当事人的合法权益，促进廉政建设，制定本法。</p>
-        
-        <p><strong>第二条</strong> 在中华人民共和国境内进行的政府采购适用本法。</p>
-        <p>本法所称政府采购，是指各级国家机关、事业单位和团体组织，使用财政性资金采购依法制定的集中采购目录以内的或者采购限额标准以上的货物、工程和服务的行为。</p>
-        
-        <p><strong>第三条</strong> 政府采购应当遵循公开透明原则、公平竞争原则、公正原则和诚实信用原则。</p>
-        
-        <h3>第二章 政府采购当事人</h3>
-        <p><strong>第四条</strong> 政府采购当事人是指在政府采购活动中享有权利和承担义务的各类主体，包括采购人、供应商和采购代理机构等。</p>
-        
-        <p><strong>第五条</strong> 采购人是指依法进行政府采购的国家机关、事业单位、团体组织。</p>
-        
-        <p><strong>第六条</strong> 供应商是指向采购人提供货物、工程或者服务的法人、其他组织或者自然人。</p>
-        
-        <h3>第三章 政府采购方式</h3>
-        <p><strong>第七条</strong> 政府采购采用以下方式：</p>
-        <ul>
-          <li>（一）公开招标；</li>
-          <li>（二）邀请招标；</li>
-          <li>（三）竞争性谈判；</li>
-          <li>（四）单一来源采购；</li>
-          <li>（五）询价；</li>
-          <li>（六）国务院政府采购监督管理部门认定的其他采购方式。</li>
-        </ul>
-        
-        <p><strong>第八条</strong> 公开招标应作为政府采购的主要采购方式。</p>
-        
-        <h3>第四章 政府采购程序</h3>
-        <p><strong>第九条</strong> 采购人应当按照本法规定的采购方式和采购程序开展政府采购活动。</p>
-        
-        <p><strong>第十条</strong> 政府采购应当采购本国货物、工程和服务。但有下列情形之一的除外：</p>
-        <ul>
-          <li>（一）需要采购的货物、工程或者服务在中国境内无法获取或者无法以合理的商业条件获取的；</li>
-          <li>（二）为在中国境外使用而进行采购的；</li>
-          <li>（三）其他法律、行政法规另有规定的。</li>
-        </ul>
-        
-        <h3>第五章 政府采购合同</h3>
-        <p><strong>第十一条</strong> 采购人与中标、成交供应商应当在中标、成交通知书发出之日起三十日内，按照采购文件确定的事项签订政府采购合同。</p>
-        
-        <p><strong>第十二条</strong> 政府采购合同应当采用书面形式。</p>
-        
-        <h3>第六章 监督检查</h3>
-        <p><strong>第十三条</strong> 各级人民政府财政部门是负责政府采购监督管理的部门，依法履行对政府采购活动的监督管理职责。</p>
-        
-        <p><strong>第十四条</strong> 政府采购监督管理部门应当加强对政府采购活动及集中采购机构的监督检查。</p>
-        
-        <h3>第七章 法律责任</h3>
-        <p><strong>第十五条</strong> 采购人、采购代理机构违反本法规定的，责令限期改正，给予警告，可以并处罚款，对直接负责的主管人员和其他直接责任人员，由其行政主管部门或者有关机关给予处分，并予通报。</p>
-        
-        <h3>第八章 附则</h3>
-        <p><strong>第十六条</strong> 本法自2024年7月1日起施行。</p>
-      `,
-      fileUrl: '#',
-      tags: ['政府采购', '招标投标', '法律法规', '2024修订']
+    if (!id) {
+      error.value = '政策法规ID不存在'
+      return
     }
-
-    // 加载相关法规
-    relatedPolicies.value = [
-      {
-        id: 2,
-        title: '中华人民共和国招标投标法实施条例',
-        category: '行政法规',
-        publishDate: '2024-01-10',
-        views: 1856
-      },
-      {
-        id: 3,
-        title: '政府采购货物和服务招标投标管理办法',
-        category: '部门规章',
-        publishDate: '2024-02-15',
-        views: 1523
-      },
-      {
-        id: 4,
-        title: '工程建设项目招标范围和规模标准规定',
-        category: '部门规章',
-        publishDate: '2023-12-20',
-        views: 1342
+    
+    // 调用API获取政策法规详情
+    const response = await getInfoPublicationDetail(id)
+    
+    if (response.success && response.data) {
+      // 映射后端字段到前端显示
+      policy.value = {
+        id: response.data.id,
+        title: response.data.title,
+        category: response.data.category || '政策法规',
+        publishDate: formatDate(response.data.publishTime),
+        views: response.data.viewCount || 0,
+        isTop: response.data.isTop || false,
+        summary: response.data.summary,
+        content: response.data.content || '',
+        tags: [] // 后端暂无tags字段，可以后续扩展
       }
-    ]
-  } catch (error) {
-    console.error('加载政策法规详情失败:', error)
+      
+      // TODO: 加载相关法规（可以后续实现）
+      relatedPolicies.value = []
+    } else {
+      error.value = response.message || '获取政策法规详情失败'
+      policy.value = null
+    }
+  } catch (err) {
+    console.error('加载政策法规详情失败:', err)
+    error.value = err.message || '加载政策法规详情失败，请稍后重试'
     policy.value = null
   } finally {
     loading.value = false

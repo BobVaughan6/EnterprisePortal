@@ -27,6 +27,14 @@
           <p class="mt-4 text-gray-500">加载中...</p>
         </div>
 
+        <div v-else-if="error" class="text-center py-20">
+          <svg class="w-20 h-20 mx-auto text-red-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-gray-500 mb-4">{{ error }}</p>
+          <router-link to="/company-announcements" class="text-hailong-primary hover:underline">返回列表</router-link>
+        </div>
+
         <div v-else-if="!item" class="text-center py-20">
           <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -103,8 +111,8 @@
           </div>
 
           <!-- 封面图片 -->
-          <div v-if="item.coverImage" class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-            <img :src="item.coverImage" :alt="item.title" class="w-full h-96 object-cover" />
+          <div v-if="coverImageUrl" class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <img :src="coverImageUrl" :alt="item.title" class="w-full h-96 object-cover" />
           </div>
 
           <!-- 文章内容 -->
@@ -195,8 +203,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { getInfoPublicationDetail } from '@/api/infoPublication'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
@@ -205,7 +214,27 @@ const route = useRoute()
 // 新闻数据
 const item = ref(null)
 const loading = ref(true)
+const error = ref(null)
 const relatedItems = ref([])
+
+// 格式化日期
+const formatDate = (date) => {
+  if (!date) return '-'
+  try {
+    const dateObj = new Date(date)
+    return dateObj.toLocaleDateString('zh-CN')
+  } catch (e) {
+    return date
+  }
+}
+
+// 获取封面图片URL
+const coverImageUrl = computed(() => {
+  if (item.value?.coverImage?.fileUrl) {
+    return item.value.coverImage.fileUrl
+  }
+  return null
+})
 
 // 获取类型样式
 const getTypeStyle = (type) => {
@@ -247,66 +276,44 @@ const handlePrint = () => {
 // 加载新闻详情
 const loadItemDetail = async () => {
   loading.value = true
+  error.value = null
+  
   try {
     const id = route.params.id
     
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // 模拟数据
-    item.value = {
-      id: id,
-      title: '海隆咨询荣获"2024年度优秀咨询企业"称号',
-      type: '企业动态',
-      summary: '近日，在2024年度工程咨询行业表彰大会上，海隆咨询凭借优异的业绩表现和良好的行业口碑，荣获"2024年度优秀咨询企业"称号。这是对公司多年来坚持专业服务、创新发展的充分肯定。',
-      author: '海隆咨询',
-      publishDate: '2024-11-20',
-      views: 856,
-      isTop: true,
-      coverImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=600&fit=crop',
-      content: `
-        <p>近日，在2024年度工程咨询行业表彰大会上，海隆咨询凭借优异的业绩表现和良好的行业口碑，荣获"2024年度优秀咨询企业"称号。这是对公司多年来坚持专业服务、创新发展的充分肯定。</p>
-        
-        <h3>专业铸就品质</h3>
-        <p>海隆咨询自成立以来，始终秉承"专业、诚信、创新、共赢"的经营理念，为客户提供全方位、高质量的工程咨询服务。公司拥有一支经验丰富、专业过硬的咨询团队，涵盖工程造价、招标代理、项目管理等多个领域。</p>
-        
-        <h3>创新驱动发展</h3>
-        <p>面对行业发展的新形势，海隆咨询积极拥抱数字化转型，引入先进的信息化管理系统，提升服务效率和质量。同时，公司不断创新服务模式，为客户提供更加精准、高效的解决方案。</p>
-        
-        <h3>社会责任担当</h3>
-        <p>作为行业领先企业，海隆咨询始终牢记社会责任，积极参与公益事业，为行业发展和社会进步贡献力量。公司多次参与重大基础设施项目咨询工作，为地方经济发展提供有力支撑。</p>
-        
-        <h3>展望未来</h3>
-        <p>荣誉既是肯定，更是鞭策。海隆咨询将以此为新的起点，继续深耕工程咨询领域，不断提升专业能力和服务水平，为客户创造更大价值，为行业发展做出更大贡献。</p>
-        
-        <p>未来，海隆咨询将继续秉承初心，砥砺前行，努力成为工程咨询行业的标杆企业，为推动行业高质量发展贡献更多力量。</p>
-      `,
-      tags: ['企业荣誉', '行业表彰', '优秀企业', '工程咨询']
+    if (!id) {
+      error.value = '新闻ID不存在'
+      return
     }
-
-    // 加载相关新闻
-    relatedItems.value = [
-      {
-        id: 2,
-        title: '公司成功中标某市重大基础设施项目咨询服务',
-        publishDate: '2024-11-15',
-        views: 623
-      },
-      {
-        id: 3,
-        title: '海隆咨询与某高新区签署战略合作协议',
-        publishDate: '2024-11-10',
-        views: 542
-      },
-      {
-        id: 4,
-        title: '公司参加全国工程咨询行业年度峰会',
-        publishDate: '2024-11-05',
-        views: 489
+    
+    // 调用API获取新闻详情
+    const response = await getInfoPublicationDetail(id)
+    
+    if (response.success && response.data) {
+      // 映射后端字段到前端显示
+      item.value = {
+        id: response.data.id,
+        title: response.data.title,
+        type: response.data.category || '企业动态', // 使用category作为type
+        summary: response.data.summary,
+        author: response.data.author,
+        publishDate: formatDate(response.data.publishTime),
+        views: response.data.viewCount || 0,
+        isTop: response.data.isTop || false,
+        coverImage: coverImageUrl.value,
+        content: response.data.content || '',
+        tags: [] // 后端暂无tags字段，可以后续扩展
       }
-    ]
-  } catch (error) {
-    console.error('加载新闻详情失败:', error)
+      
+      // TODO: 加载相关新闻（可以后续实现）
+      relatedItems.value = []
+    } else {
+      error.value = response.message || '获取新闻详情失败'
+      item.value = null
+    }
+  } catch (err) {
+    console.error('加载新闻详情失败:', err)
+    error.value = err.message || '加载新闻详情失败，请稍后重试'
     item.value = null
   } finally {
     loading.value = false

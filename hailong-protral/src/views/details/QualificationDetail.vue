@@ -27,6 +27,14 @@
           <p class="mt-4 text-gray-500">加载中...</p>
         </div>
 
+        <div v-else-if="error" class="text-center py-20">
+          <svg class="w-20 h-20 mx-auto text-red-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-gray-500 mb-4">{{ error }}</p>
+          <router-link to="/about" class="text-hailong-primary hover:underline">返回关于我们</router-link>
+        </div>
+
         <div v-else-if="!qualification" class="text-center py-20">
           <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -163,15 +171,15 @@
 
           <!-- 返回按钮 -->
           <div class="flex justify-center">
-            <router-link
-              to="/about"
+            <button
+              @click="goBack"
               class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium flex items-center gap-2"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              返回关于我们
-            </router-link>
+              返回
+            </button>
           </div>
         </div>
       </div>
@@ -182,111 +190,79 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getQualificationById } from '@/api/config'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 // 资质数据
 const qualification = ref(null)
 const loading = ref(true)
+const error = ref(null)
 const relatedQualifications = ref([])
+
+// 格式化日期
+const formatDate = (date) => {
+  if (!date) return '-'
+  try {
+    const dateObj = new Date(date)
+    return dateObj.toLocaleDateString('zh-CN')
+  } catch (e) {
+    return date
+  }
+}
+
+// 获取证书图片URL
+const certificateImageUrl = computed(() => {
+  return qualification.value?.certificateImageUrl || null
+})
+
+// 返回上一页
+const goBack = () => {
+  router.back()
+}
 
 // 加载资质详情
 const loadQualificationDetail = async () => {
   loading.value = true
+  error.value = null
+  
   try {
     const id = route.params.id
     
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    if (!id) {
+      error.value = '资质ID不存在'
+      return
+    }
     
-    // 模拟数据
-    const qualifications = [
-      {
-        id: 1,
-        name: '政府采购代理机构资格证书',
-        image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&h=800&fit=crop',
-        description: '具备政府采购代理资质，为政府机关提供专业采购服务',
-        certificateNo: 'ZC-2024-001',
-        issueDate: '2024-01-15',
-        validUntil: '2029-01-14'
-      },
-      {
-        id: 2,
-        name: '工程招标代理机构资格证书',
-        image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=800&fit=crop',
-        description: '拥有工程招标代理资质，提供全流程招标代理服务',
-        certificateNo: 'GC-2024-002',
-        issueDate: '2024-02-20',
-        validUntil: '2029-02-19'
-      },
-      {
-        id: 3,
-        name: '工程造价咨询企业资质证书',
-        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop',
-        description: '专业工程造价咨询资质，提供精准造价分析',
-        certificateNo: 'ZJ-2024-003',
-        issueDate: '2024-03-10',
-        validUntil: '2029-03-09'
-      },
-      {
-        id: 4,
-        name: '工程监理企业资质证书',
-        image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&h=800&fit=crop',
-        description: '工程监理资质认证，确保工程质量与安全',
-        certificateNo: 'JL-2024-004',
-        issueDate: '2024-04-05',
-        validUntil: '2029-04-04'
-      },
-      {
-        id: 5,
-        name: 'ISO9001质量管理体系认证',
-        image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&h=800&fit=crop',
-        description: '国际质量管理体系认证，保障服务质量',
-        certificateNo: 'ISO-2024-005',
-        issueDate: '2024-05-15',
-        validUntil: '2027-05-14'
-      },
-      {
-        id: 6,
-        name: 'ISO14001环境管理体系认证',
-        image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=800&fit=crop',
-        description: '环境管理体系认证，践行绿色发展理念',
-        certificateNo: 'ISO-2024-006',
-        issueDate: '2024-06-20',
-        validUntil: '2027-06-19'
-      },
-      {
-        id: 7,
-        name: 'OHSAS18001职业健康安全管理体系认证',
-        image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200&h=800&fit=crop',
-        description: '职业健康安全管理认证，保障员工安全',
-        certificateNo: 'OHSAS-2024-007',
-        issueDate: '2024-07-10',
-        validUntil: '2027-07-09'
-      },
-      {
-        id: 8,
-        name: 'AAA级信用企业',
-        image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800&fit=crop',
-        description: '最高信用等级认证，诚信经营典范',
-        certificateNo: 'AAA-2024-008',
-        issueDate: '2024-08-01',
-        validUntil: '2027-07-31'
+    // 调用API获取资质详情
+    const response = await getQualificationById(id)
+    
+    if (response.success && response.data) {
+      // 映射后端字段到前端显示
+      qualification.value = {
+        id: response.data.id,
+        name: response.data.name,
+        image: response.data.certificateImageUrl, // 证书图片URL
+        description: response.data.description || '',
+        certificateNo: response.data.certificateNumber,
+        issueDate: formatDate(response.data.issueDate),
+        validUntil: formatDate(response.data.expiryDate)
       }
-    ]
-    
-    qualification.value = qualifications.find(q => q.id === parseInt(id)) || qualifications[0]
-    
-    // 加载相关资质（排除当前资质）
-    relatedQualifications.value = qualifications
-      .filter(q => q.id !== qualification.value.id)
-      .slice(0, 3)
-  } catch (error) {
-    console.error('加载资质详情失败:', error)
+      
+      // TODO: 加载相关资质（可以后续实现）
+      relatedQualifications.value = []
+    } else {
+      error.value = response.message || '获取资质详情失败'
+      qualification.value = null
+    }
+  } catch (err) {
+    console.error('加载资质详情失败:', err)
+    error.value = err.message || '加载资质详情失败，请稍后重试'
     qualification.value = null
   } finally {
     loading.value = false

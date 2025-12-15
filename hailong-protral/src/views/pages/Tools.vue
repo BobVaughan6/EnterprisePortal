@@ -47,14 +47,7 @@
                   {{ tool.description }}
                 </p>
                 
-                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div class="flex items-center gap-2 text-xs text-gray-500">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <span>{{ tool.users || 0 }} 人使用</span>
-                  </div>
-                  
+                <div class="flex items-center justify-end pt-4 border-t border-gray-100">
                   <button
                     v-if="tool.status === 'available'"
                     @click="handleToolClick(tool)"
@@ -150,24 +143,21 @@ const tools = [
     name: '招标代理服务费计算工具',
     description: '根据河南省招标代理服务收费指导意见，快速计算工程、货物、服务类项目的代理服务费用',
     icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z',
-    status: 'available',
-    users: 1250
+    status: 'available'
   },
   {
     id: 2,
     name: '造价费用计算工具',
     description: '依据河南省建设工程造价咨询行业服务收费市场参考价格，提供专业的造价咨询费用计算',
     icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    status: 'available',
-    users: 980
+    status: 'available'
   },
   {
     id: 3,
     name: '司法鉴定费用计算工具',
     description: '基于建设工程造价咨询收费基准价，采用差额定率分档累进方法，精确计算工程造价纠纷鉴定等各类咨询项目费用',
     icon: 'M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3',
-    status: 'available',
-    users: 720
+    status: 'coming'
   }
 ]
 
