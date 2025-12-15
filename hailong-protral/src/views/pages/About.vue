@@ -337,9 +337,8 @@ const fetchQualifications = async () => {
           issuingAuthority: item.issuingAuthority || '',
           issueDate: item.issueDate || '',
           expiryDate: item.expiryDate || '',
-          image: item.certificateImageId
-            ? `${API_BASE_URL}/api/attachment/${item.certificateImageId}`
-            : 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop'
+          // 后端返回的 certificateImageUrl 已经是完整URL，直接使用
+          image: item.certificateImageUrl || 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop'
         }))
     } else {
       qualificationsError.value = response.message || '获取企业资质失败'

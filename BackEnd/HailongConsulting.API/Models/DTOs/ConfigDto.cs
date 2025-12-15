@@ -324,6 +324,11 @@ public class CompanyQualificationDto
     public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    
+    /// <summary>
+    /// 证书图片完整URL（由Service层填充）
+    /// </summary>
+    public string? CertificateImageUrl { get; set; }
 }
 
 /// <summary>

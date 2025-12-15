@@ -368,13 +368,42 @@ public class ConfigService : IConfigService
     public async Task<IEnumerable<CompanyQualificationDto>> GetAllQualificationsAsync()
     {
         var qualifications = await _repository.GetAllQualificationsAsync();
-        return _mapper.Map<IEnumerable<CompanyQualificationDto>>(qualifications);
+        var dtos = _mapper.Map<IEnumerable<CompanyQualificationDto>>(qualifications).ToList();
+        
+        // 填充图片URL
+        foreach (var dto in dtos)
+        {
+            if (dto.CertificateImageId.HasValue)
+            {
+                var attachment = await _attachmentService.GetByIdAsync(dto.CertificateImageId.Value);
+                if (attachment != null)
+                {
+                    dto.CertificateImageUrl = attachment.FileUrl;
+                }
+            }
+        }
+        
+        return dtos;
     }
 
     public async Task<CompanyQualificationDto?> GetQualificationByIdAsync(int id)
     {
         var qualification = await _repository.GetQualificationByIdAsync(id);
-        return qualification == null ? null : _mapper.Map<CompanyQualificationDto>(qualification);
+        if (qualification == null) return null;
+        
+        var dto = _mapper.Map<CompanyQualificationDto>(qualification);
+        
+        // 填充图片URL
+        if (dto.CertificateImageId.HasValue)
+        {
+            var attachment = await _attachmentService.GetByIdAsync(dto.CertificateImageId.Value);
+            if (attachment != null)
+            {
+                dto.CertificateImageUrl = attachment.FileUrl;
+            }
+        }
+        
+        return dto;
     }
 
     public async Task<CompanyQualificationDto> CreateQualificationAsync(CreateCompanyQualificationDto dto)
