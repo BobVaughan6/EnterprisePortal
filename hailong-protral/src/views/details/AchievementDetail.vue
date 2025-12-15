@@ -10,10 +10,6 @@
           <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
-          <router-link to="/about" class="hover:text-hailong-primary transition-colors">关于我们</router-link>
-          <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
           <span class="text-gray-900">业绩详情</span>
         </div>
       </div>
@@ -27,12 +23,20 @@
           <p class="mt-4 text-gray-500">加载中...</p>
         </div>
 
+        <div v-else-if="error" class="text-center py-20">
+          <svg class="w-20 h-20 mx-auto text-red-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-gray-500 mb-4">{{ error }}</p>
+          <router-link to="/" class="text-hailong-primary hover:underline">返回首页</router-link>
+        </div>
+
         <div v-else-if="!achievement" class="text-center py-20">
           <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
           </svg>
           <p class="text-gray-500 mb-4">业绩信息不存在</p>
-          <router-link to="/about" class="text-hailong-primary hover:underline">返回关于我们</router-link>
+          <router-link to="/" class="text-hailong-primary hover:underline">返回首页</router-link>
         </div>
 
         <div v-else class="max-w-4xl mx-auto">
@@ -69,8 +73,8 @@
           </div>
 
           <!-- 项目图片 -->
-          <div v-if="achievement.imageUrl" class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
-            <img :src="achievement.imageUrl" :alt="achievement.projectName" class="w-full h-80 object-cover" />
+          <div v-if="achievement.imageUrls && achievement.imageUrls.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+            <img :src="achievement.imageUrls[0]" :alt="achievement.projectName" class="w-full h-80 object-cover" />
           </div>
 
           <!-- 项目信息卡片 -->
@@ -121,15 +125,15 @@
 
           <!-- 返回按钮 -->
           <div class="flex justify-center">
-            <router-link
-              to="/about"
+            <button
+              @click="goBack"
               class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium flex items-center gap-2"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              返回关于我们
-            </router-link>
+              返回
+            </button>
           </div>
         </div>
       </div>
@@ -141,24 +145,32 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { getAchievementById } from '@/api/config'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 // 业绩数据
 const achievement = ref(null)
 const loading = ref(true)
+const error = ref(null)
 
-// 格式化金额
+// 返回上一页
+const goBack = () => {
+  router.back()
+}
+
+// 格式化金额（与首页保持一致）
 const formatAmount = (amount) => {
-  if (!amount) return '-'
-  if (amount >= 10000) {
-    return `¥${(amount / 10000).toFixed(2)}亿`
-  } else {
-    return `¥${amount}万`
+  if (!amount) return '¥0'
+  const numAmount = Number(amount)
+  if (numAmount >= 10000) {
+    return `¥${(numAmount / 10000).toFixed(2)}亿`
   }
+  return `¥${numAmount.toLocaleString()}万`
 }
 
 // 格式化日期
@@ -168,36 +180,40 @@ const formatDate = (date) => {
   if (date instanceof Date) {
     return date.toLocaleDateString('zh-CN')
   }
-  // 如果是字符串，直接返回
-  return date
+  // 如果是字符串，尝试格式化
+  try {
+    const dateObj = new Date(date)
+    return dateObj.toLocaleDateString('zh-CN')
+  } catch (e) {
+    return date
+  }
 }
 
 // 加载业绩详情
 const loadAchievementDetail = async () => {
   loading.value = true
+  error.value = null
+  
   try {
     const id = route.params.id
     
-    // TODO: 替换为实际的API调用
-    // const response = await fetch(`/api/config/achievements/${id}`)
-    // achievement.value = await response.json()
-    
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // 模拟数据 - 对应数据库字段
-    achievement.value = {
-      id: id,
-      projectName: '某市人民医院新院区建设项目全过程造价咨询',
-      projectType: '工程造价咨询',
-      projectAmount: 25000, // 单位：万元
-      clientName: '某市卫生健康委员会',
-      completionDate: '2024-10-15', // completion_date
-      description: '该项目为某市重点民生工程，总建筑面积约15万平方米，包括门诊楼、住院楼、医技楼等主要建筑。我公司为该项目提供了从项目立项到竣工结算的全过程造价咨询服务，通过科学的造价管理和严格的成本控制，为业主节约投资约3000万元，获得了业主的高度认可。',
-      imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&h=600&fit=crop' // 从image_ids获取
+    if (!id) {
+      error.value = '业绩ID不存在'
+      return
     }
-  } catch (error) {
-    console.error('加载业绩详情失败:', error)
+    
+    // 调用API获取业绩详情
+    const response = await getAchievementById(id)
+    
+    if (response.success && response.data) {
+      achievement.value = response.data
+    } else {
+      error.value = response.message || '获取业绩详情失败'
+      achievement.value = null
+    }
+  } catch (err) {
+    console.error('加载业绩详情失败:', err)
+    error.value = err.message || '加载业绩详情失败，请稍后重试'
     achievement.value = null
   } finally {
     loading.value = false

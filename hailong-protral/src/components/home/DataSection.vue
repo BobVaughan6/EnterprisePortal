@@ -260,7 +260,7 @@ const loadStatistics = async () => {
 const formatAmount = (amount) => {
   if (!amount) return '0'
   if (amount >= 10000) {
-    return (amount / 10000).toFixed(1) + '亿'
+    return (amount / 10000).toFixed(2) + '亿'
   }
   return amount.toLocaleString() + '万'
 }
@@ -269,7 +269,7 @@ const formatAmount = (amount) => {
 const formatTotalAmount = (amount) => {
   if (!amount || amount === 0) return '0'
   if (amount >= 10000) {
-    return (amount / 10000).toFixed(1) + '亿'
+    return (amount / 10000).toFixed(2) + '亿'
   }
   return amount.toLocaleString() + '万'
 }
@@ -278,9 +278,9 @@ const formatTotalAmount = (amount) => {
 const formatRegionAmount = (amount) => {
   if (!amount || amount === 0) return '0万'
   if (amount >= 10000) {
-    return (amount / 10000).toFixed(1) + '亿'
+    return (amount / 10000).toFixed(2) + '亿'
   }
-  return (amount / 10000).toFixed(2) + '亿'
+  return amount.toLocaleString() + '万'
 }
 
 
