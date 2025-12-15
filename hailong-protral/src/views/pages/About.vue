@@ -141,32 +141,85 @@
           </div>
         </div>
 
+        <!-- 重要业绩 -->
+        <div v-show="activeTab === 'achievements'" class="animate-fade-in">
+          <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">重要业绩</h2>
+          
+          <div v-if="loadingMajorAchievements" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
+            <p class="mt-4 text-gray-600">加载中...</p>
+          </div>
+          <div v-else-if="majorAchievementsError" class="text-center py-12">
+            <p class="text-red-600">{{ majorAchievementsError }}</p>
+            <button @click="fetchMajorAchievements" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
+              重新加载
+            </button>
+          </div>
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div v-for="achievement in majorAchievements" :key="achievement.id"
+              @click="handleAchievementClick(achievement.id)"
+              class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
+              <div class="h-48 overflow-hidden bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5">
+                <img
+                  :src="achievement.imageUrls && achievement.imageUrls.length > 0 ? achievement.imageUrls[0] : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop'"
+                  :alt="achievement.projectName"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              </div>
+              <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-hailong-primary transition-colors line-clamp-2">
+                  {{ achievement.projectName }}
+                </h3>
+                <div class="space-y-2 text-sm text-gray-600">
+                  <div v-if="achievement.projectType" class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-hailong-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span>{{ achievement.projectType }}</span>
+                  </div>
+                  <div v-if="achievement.clientName" class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-hailong-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span class="line-clamp-1">{{ achievement.clientName }}</span>
+                  </div>
+                  <div v-if="achievement.projectAmount" class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-hailong-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-semibold text-hailong-primary">{{ formatAmount(achievement.projectAmount) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 企业荣誉 -->
         <div v-show="activeTab === 'honors'" class="animate-fade-in">
           <div class="max-w-6xl mx-auto">
             <h2 class="text-4xl font-bold text-hailong-dark mb-12 text-center font-tech">企业荣誉</h2>
             
-            <div v-if="loadingAchievements" class="text-center py-12">
+            <div v-if="loadingHonors" class="text-center py-12">
               <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-hailong-primary"></div>
               <p class="mt-4 text-gray-600">加载中...</p>
             </div>
-            <div v-else-if="achievementsError" class="text-center py-12">
-              <p class="text-red-600">{{ achievementsError }}</p>
-              <button @click="fetchAchievements" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
+            <div v-else-if="honorsError" class="text-center py-12">
+              <p class="text-red-600">{{ honorsError }}</p>
+              <button @click="fetchHonors" class="mt-4 px-6 py-2 bg-hailong-primary text-white rounded-lg hover:bg-hailong-secondary transition-colors">
                 重新加载
               </button>
             </div>
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div v-for="achievement in achievements" :key="achievement.id"
-                @click="openImagePreview(achievement.imageUrl)"
+              <div v-for="honor in honors" :key="honor.id"
+                @click="openImagePreview(honor.imageUrl)"
                 class="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-hailong-primary cursor-pointer">
                 <div class="h-48 overflow-hidden bg-gradient-to-br from-hailong-primary/5 to-hailong-secondary/5">
-                  <img :src="achievement.imageUrl" :alt="achievement.name"
+                  <img :src="honor.imageUrl" :alt="honor.name"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 </div>
                 <div class="p-4">
                   <h3 class="text-sm font-bold text-gray-900 text-center group-hover:text-hailong-primary transition-colors line-clamp-2">
-                    {{ achievement.name }}
+                    {{ honor.name }}
                   </h3>
                 </div>
               </div>
@@ -207,7 +260,8 @@ import {
   getCompanyProfile,
   getBusinessScope,
   getCompanyQualifications,
-  getCompanyHonors
+  getCompanyHonors,
+  getMajorAchievements
 } from '@/api/config'
 
 const router = useRouter()
@@ -220,6 +274,7 @@ const tabs = [
   { id: 'intro', name: '企业简介' },
   { id: 'business', name: '业务范围' },
   { id: 'qualifications', name: '企业资质' },
+  { id: 'achievements', name: '重要业绩' },
   { id: 'honors', name: '企业荣誉' }
 ]
 
@@ -246,9 +301,14 @@ const loadingQualifications = ref(false)
 const qualificationsError = ref('')
 
 // 企业荣誉数据
-const achievements = ref([])
-const loadingAchievements = ref(false)
-const achievementsError = ref('')
+const honors = ref([])
+const loadingHonors = ref(false)
+const honorsError = ref('')
+
+// 重要业绩数据
+const majorAchievements = ref([])
+const loadingMajorAchievements = ref(false)
+const majorAchievementsError = ref('')
 
 // API基础URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
@@ -352,13 +412,13 @@ const fetchQualifications = async () => {
 }
 
 // 获取企业荣誉
-const fetchAchievements = async () => {
-  loadingAchievements.value = true
-  achievementsError.value = ''
+const fetchHonors = async () => {
+  loadingHonors.value = true
+  honorsError.value = ''
   try {
     const response = await getCompanyHonors()
     if (response.success && response.data) {
-      achievements.value = response.data
+      honors.value = response.data
         .filter(item => item.status)
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map(item => ({
@@ -374,13 +434,44 @@ const fetchAchievements = async () => {
             : 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop'
         }))
     } else {
-      achievementsError.value = response.message || '获取企业荣誉失败'
+      honorsError.value = response.message || '获取企业荣誉失败'
     }
   } catch (err) {
     console.error('获取企业荣誉失败:', err)
-    achievementsError.value = '获取企业荣誉失败，请稍后重试'
+    honorsError.value = '获取企业荣誉失败，请稍后重试'
   } finally {
-    loadingAchievements.value = false
+    loadingHonors.value = false
+  }
+}
+
+// 获取重要业绩
+const fetchMajorAchievements = async () => {
+  loadingMajorAchievements.value = true
+  majorAchievementsError.value = ''
+  try {
+    const response = await getMajorAchievements()
+    if (response.success && response.data) {
+      majorAchievements.value = response.data
+        .filter(item => item.status)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(item => ({
+          id: item.id,
+          projectName: item.projectName,
+          projectType: item.projectType || '',
+          clientName: item.clientName || '',
+          projectAmount: item.projectAmount || 0,
+          completionDate: item.completionDate || '',
+          description: item.description || '',
+          imageUrls: item.imageUrls || []
+        }))
+    } else {
+      majorAchievementsError.value = response.message || '获取重要业绩失败'
+    }
+  } catch (err) {
+    console.error('获取重要业绩失败:', err)
+    majorAchievementsError.value = '获取重要业绩失败，请稍后重试'
+  } finally {
+    loadingMajorAchievements.value = false
   }
 }
 
@@ -425,7 +516,7 @@ const handleBusinessClick = (id) => {
 const handleAchievementClick = (id) => {
   router.push({
     path: `/detail/achievement/${id}`,
-    query: { from: 'about', tab: 'honors' }
+    query: { from: 'about', tab: 'achievements' }
   })
 }
 
@@ -447,7 +538,8 @@ onMounted(() => {
   fetchCompanyProfile()
   fetchBusinessScope()
   fetchQualifications()
-  fetchAchievements()
+  fetchMajorAchievements()
+  fetchHonors()
 })
 </script>
 
