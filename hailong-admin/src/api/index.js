@@ -24,5 +24,8 @@ export { default as statisticsApi } from './statistics'
 // 系统管理（用户管理、系统日志、区域字典）
 export { default as systemApi } from './system'
 
+// 用户管理
+export { default as userApi } from './user'
+
 // 请求工具
 export { default as request } from './request'

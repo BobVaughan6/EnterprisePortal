@@ -17,7 +17,7 @@ import request from './request'
  */
 export const getUserList = (params) => {
   return request({
-    url: '/api/system/users',
+    url: '/api/User',
     method: 'get',
     params
   })
@@ -29,7 +29,7 @@ export const getUserList = (params) => {
  */
 export const getUserDetail = (id) => {
   return request({
-    url: `/api/system/users/${id}`,
+    url: `/api/User/${id}`,
     method: 'get'
   })
 }
@@ -47,7 +47,7 @@ export const getUserDetail = (id) => {
  */
 export const createUser = (data) => {
   return request({
-    url: '/api/system/users',
+    url: '/api/User',
     method: 'post',
     data
   })
@@ -60,7 +60,7 @@ export const createUser = (data) => {
  */
 export const updateUser = (id, data) => {
   return request({
-    url: `/api/system/users/${id}`,
+    url: `/api/User/${id}`,
     method: 'put',
     data
   })
@@ -72,7 +72,7 @@ export const updateUser = (id, data) => {
  */
 export const deleteUser = (id) => {
   return request({
-    url: `/api/system/users/${id}`,
+    url: `/api/User/${id}`,
     method: 'delete'
   })
 }
@@ -84,8 +84,8 @@ export const deleteUser = (id) => {
  */
 export const resetUserPassword = (id, newPassword) => {
   return request({
-    url: `/api/system/users/${id}/reset-password`,
-    method: 'put',
+    url: `/api/User/${id}/reset-password`,
+    method: 'post',
     data: { newPassword }
   })
 }
@@ -109,11 +109,10 @@ export const changePassword = (data) => {
  * @param {number} id - 用户ID
  * @param {number} status - 状态：0-禁用，1-启用
  */
-export const toggleUserStatus = (id, status) => {
+export const toggleUserStatus = (id) => {
   return request({
-    url: `/api/system/users/${id}/status`,
-    method: 'put',
-    data: { status }
+    url: `/api/User/${id}/toggle-status`,
+    method: 'post'
   })
 }
 
@@ -132,7 +131,7 @@ export const toggleUserStatus = (id, status) => {
  */
 export const getSystemLogList = (params) => {
   return request({
-    url: '/api/system/logs',
+    url: '/api/SystemLog',
     method: 'get',
     params
   })
@@ -144,7 +143,7 @@ export const getSystemLogList = (params) => {
  */
 export const getSystemLogDetail = (id) => {
   return request({
-    url: `/api/system/logs/${id}`,
+    url: `/api/SystemLog/${id}`,
     method: 'get'
   })
 }
@@ -154,11 +153,10 @@ export const getSystemLogDetail = (id) => {
  * @param {Object} data - 清理参数
  * @param {string} data.beforeDate - 清理此日期之前的日志
  */
-export const clearSystemLogs = (data) => {
+export const clearSystemLogs = () => {
   return request({
-    url: '/api/system/logs/clear',
-    method: 'post',
-    data
+    url: '/api/SystemLog/clear',
+    method: 'delete'
   })
 }
 

@@ -297,7 +297,7 @@ export const exportInfoPublicationStatistics = (params) => {
 }
 
 /**
- * 获取作者发布统计
+ * 获取发布单位统计
  * @param {Object} params - 查询参数
  */
 export const getAuthorPublishStatistics = (params) => {

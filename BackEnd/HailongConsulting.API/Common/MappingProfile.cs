@@ -154,6 +154,16 @@ public class MappingProfile : Profile
         CreateMap<CreateRegionDictionaryDto, RegionDictionary>();
         CreateMap<UpdateRegionDictionaryDto, RegionDictionary>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+        // 用户映射
+        CreateMap<User, UserDto>();
+        CreateMap<CreateUserDto, User>();
+        CreateMap<UpdateUserDto, User>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+        // 系统日志映射
+        CreateMap<SystemLog, SystemLogDto>();
+        CreateMap<CreateSystemLogDto, SystemLog>();
     }
 
     // 辅助方法：序列化和反序列化 JSON

@@ -138,6 +138,14 @@ builder.Services.AddScoped<IVisitStatisticService, VisitStatisticService>();
 builder.Services.AddScoped<IRegionDictionaryRepository, RegionDictionaryRepository>();
 builder.Services.AddScoped<IRegionDictionaryService, RegionDictionaryService>();
 
+// 用户管理服务
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// 系统日志服务
+builder.Services.AddScoped<ISystemLogRepository, SystemLogRepository>();
+builder.Services.AddScoped<ISystemLogService, SystemLogService>();
+
 builder.Services.AddScoped<JwtHelper>();
 
 // 配置Swagger
