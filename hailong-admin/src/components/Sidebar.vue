@@ -40,12 +40,14 @@
         <el-menu-item index="/info-publish/policy-regulation">政策法规</el-menu-item>
       </el-sub-menu>
       
-      <el-menu-item index="/attachments">
+      <!-- 仅管理员可见 -->
+      <el-menu-item v-if="isAdmin" index="/attachments">
         <el-icon><Paperclip /></el-icon>
         <template #title>附件管理</template>
       </el-menu-item>
       
-      <el-sub-menu index="config">
+      <!-- 仅管理员可见 -->
+      <el-sub-menu v-if="isAdmin" index="config">
         <template #title>
           <el-icon><Setting /></el-icon>
           <span>系统配置</span>
@@ -59,7 +61,8 @@
         <!-- <el-menu-item index="/config/friendly-links">友情链接</el-menu-item> -->
       </el-sub-menu>
       
-      <el-sub-menu index="statistics">
+      <!-- 仅管理员可见 -->
+      <el-sub-menu v-if="isAdmin" index="statistics">
         <template #title>
           <el-icon><DataAnalysis /></el-icon>
           <span>统计分析</span>
@@ -74,9 +77,11 @@
           <el-icon><Tools /></el-icon>
           <span>系统管理</span>
         </template>
-        <el-menu-item index="/system/users">用户管理</el-menu-item>
-        <el-menu-item index="/system/logs">系统日志</el-menu-item>
-        <el-menu-item index="/system/regions">区域字典</el-menu-item>
+        <!-- 仅管理员可见 -->
+        <el-menu-item v-if="isAdmin" index="/system/users">用户管理</el-menu-item>
+        <el-menu-item v-if="isAdmin" index="/system/logs">系统日志</el-menu-item>
+        <el-menu-item v-if="isAdmin" index="/system/regions">区域字典</el-menu-item>
+        <!-- 所有用户可见 -->
         <el-menu-item index="/system/change-password">修改密码</el-menu-item>
       </el-sub-menu>
     </el-menu>
@@ -87,6 +92,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Odometer, Document, DocumentCopy, Paperclip, Setting, DataAnalysis, Tools } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
 
 defineProps({
   isCollapse: {
@@ -96,10 +102,21 @@ defineProps({
 })
 
 const route = useRoute()
+const userStore = useUserStore()
 
 // 当前激活的菜单
 const activeMenu = computed(() => {
   return route.path
+})
+
+// 获取用户角色
+const userRole = computed(() => {
+  return userStore.userInfo?.role || 'user'
+})
+
+// 判断是否为管理员
+const isAdmin = computed(() => {
+  return userRole.value === 'admin'
 })
 </script>
 

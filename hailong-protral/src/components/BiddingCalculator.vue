@@ -46,7 +46,7 @@
             type="number"
             step="0.01"
             min="0"
-            placeholder="请输入项目金额"
+            placeholder="请输入项目金额(万元)"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-hailong-primary focus:outline-none transition-colors text-lg"
             @input="calculate"
           />

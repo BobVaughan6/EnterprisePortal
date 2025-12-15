@@ -175,7 +175,7 @@
                 v-model="formData.budgetAmount"
                 :min="0"
                 :precision="2"
-                placeholder="请输入预算金额"
+                placeholder="请输入预算金额(万元)"
                 style="width: 100%;"
                 :controls="false"
               />

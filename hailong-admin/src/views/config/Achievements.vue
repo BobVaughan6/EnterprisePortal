@@ -70,7 +70,7 @@
           <el-input v-model="formData.clientName" placeholder="请输入客户名称" maxlength="200" />
         </el-form-item>
         
-        <el-form-item label="项目金额" prop="projectAmount">
+        <el-form-item label="项目金额(万元)" prop="projectAmount">
           <el-input-number
             v-model="formData.projectAmount"
             :min="0"
