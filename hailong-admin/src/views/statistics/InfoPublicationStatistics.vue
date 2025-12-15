@@ -78,18 +78,31 @@
       </el-col>
     </el-row>
 
+    <!-- 作者发布统计 -->
+    <el-card style="margin-top: 20px;">
+      <template #header>
+        <span>作者发布统计 TOP 10</span>
+      </template>
+      <div ref="authorChartRef" style="height: 400px;"></div>
+    </el-card>
+
     <!-- 热门信息 -->
     <el-card style="margin-top: 20px;">
       <template #header>
         <div class="card-header">
           <span>热门信息 TOP 20</span>
-          <el-radio-group v-model="hotInfoType" size="small" @change="loadHotInfo">
-            <el-radio-button label="">全部</el-radio-button>
-            <el-radio-button label="COMPANY_NEWS">公司公告</el-radio-button>
-            <el-radio-button label="POLICY_REGULATION">政策法规</el-radio-button>
-            <el-radio-button label="POLICY_INFO">政策信息</el-radio-button>
-            <el-radio-button label="NOTICE">通知公告</el-radio-button>
-          </el-radio-group>
+          <div>
+            <el-radio-group v-model="hotInfoType" size="small" @change="loadHotInfo" style="margin-right: 10px;">
+              <el-radio-button label="">全部</el-radio-button>
+              <el-radio-button label="COMPANY_NEWS">公司公告</el-radio-button>
+              <el-radio-button label="POLICY_REGULATION">政策法规</el-radio-button>
+              <el-radio-button label="POLICY_INFO">政策信息</el-radio-button>
+              <el-radio-button label="NOTICE">通知公告</el-radio-button>
+            </el-radio-group>
+            <el-button type="primary" size="small" icon="Download" @click="exportData" :loading="exportLoading">
+              导出统计
+            </el-button>
+          </div>
         </div>
       </template>
       <el-table :data="hotInfo" v-loading="loading" border stripe>
@@ -116,9 +129,11 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { DocumentCopy, Calendar, View, TrendCharts } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
 import * as echarts from 'echarts'
+import { getHorizontalBarChartOption } from '@/utils/chartOptions'
 
 // 概览数据
 const overview = reactive({
@@ -131,14 +146,17 @@ const overview = reactive({
 // 图表实例
 let trendChart = null
 let typeChart = null
+let authorChart = null
 
 const trendChartRef = ref(null)
 const typeChartRef = ref(null)
+const authorChartRef = ref(null)
 
 // 热门信息
 const hotInfo = ref([])
 const loading = ref(false)
 const hotInfoType = ref('')
+const exportLoading = ref(false)
 
 // 类型映射
 const typeNameMap = {
@@ -349,17 +367,89 @@ const loadHotInfo = async () => {
 }
 
 /**
+ * 加载作者统计
+ */
+const loadAuthorStatistics = async () => {
+  try {
+    const res = await statisticsApi.infoPublication.getAuthorStatistics({ limit: 10 })
+    if (res.success && res.data) {
+      renderAuthorChart(res.data)
+    }
+  } catch (error) {
+    console.error('加载作者统计失败:', error)
+  }
+}
+
+/**
+ * 渲染作者统计图表
+ */
+const renderAuthorChart = (data) => {
+  if (!authorChart) {
+    authorChart = echarts.init(authorChartRef.value)
+  }
+  
+  const chartData = data.map(item => ({
+    name: item.author,
+    value: item.count
+  }))
+  
+  const option = getHorizontalBarChartOption(chartData, {
+    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+      { offset: 0, color: '#667eea' },
+      { offset: 1, color: '#764ba2' }
+    ]),
+    showLabel: true
+  })
+  
+  authorChart.setOption(option)
+}
+
+/**
+ * 导出统计数据
+ */
+const exportData = async () => {
+  exportLoading.value = true
+  try {
+    const params = {
+      type: hotInfoType.value || undefined
+    }
+    
+    const res = await statisticsApi.infoPublication.export(params)
+    
+    // 创建下载链接
+    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `信息发布统计_${new Date().getTime()}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('导出成功')
+  } catch (error) {
+    console.error('导出失败:', error)
+    ElMessage.error('导出失败')
+  } finally {
+    exportLoading.value = false
+  }
+}
+
+/**
  * 窗口大小改变时重绘图表
  */
 const handleResize = () => {
   if (trendChart) trendChart.resize()
   if (typeChart) typeChart.resize()
+  if (authorChart) authorChart.resize()
 }
 
 onMounted(() => {
   loadOverview()
   loadTrendData()
   loadTypeDistribution()
+  loadAuthorStatistics()
   loadHotInfo()
   window.addEventListener('resize', handleResize)
 })
@@ -367,6 +457,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (trendChart) trendChart.dispose()
   if (typeChart) typeChart.dispose()
+  if (authorChart) authorChart.dispose()
   window.removeEventListener('resize', handleResize)
 })
 </script>

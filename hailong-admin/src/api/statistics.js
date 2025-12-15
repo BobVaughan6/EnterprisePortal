@@ -2,7 +2,7 @@ import request from './request'
 
 /**
  * 统计分析 API
- * 包含：访问统计、公告统计等
+ * 包含：访问统计、公告统计、信息发布统计等
  */
 
 // ==================== 访问统计 ====================
@@ -13,7 +13,7 @@ import request from './request'
  * @param {number} params.pageSize - 每页数量
  * @param {string} params.startDate - 开始日期
  * @param {string} params.endDate - 结束日期
- * @param {string} params.pageUrl - 页面URL
+ * @param {string} params.pagePath - 页面路径
  */
 export const getVisitStatisticsList = (params) => {
   return request({
@@ -79,6 +79,55 @@ export const recordVisit = (data) => {
     url: '/api/statistics/visits/record',
     method: 'post',
     data
+  })
+}
+
+/**
+ * 导出访问统计数据
+ * @param {Object} params - 查询参数
+ */
+export const exportVisitStatistics = (params) => {
+  return request({
+    url: '/api/statistics/visits/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+
+/**
+ * 获取访问来源统计
+ * @param {Object} params - 查询参数
+ */
+export const getVisitSourceStatistics = (params) => {
+  return request({
+    url: '/api/statistics/visits/sources',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取设备类型统计
+ * @param {Object} params - 查询参数
+ */
+export const getDeviceStatistics = (params) => {
+  return request({
+    url: '/api/statistics/visits/devices',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取浏览器统计
+ * @param {Object} params - 查询参数
+ */
+export const getBrowserStatistics = (params) => {
+  return request({
+    url: '/api/statistics/visits/browsers',
+    method: 'get',
+    params
   })
 }
 
@@ -151,6 +200,43 @@ export const getPopularAnnouncements = (params) => {
   })
 }
 
+/**
+ * 导出公告统计数据
+ * @param {Object} params - 查询参数
+ */
+export const exportAnnouncementStatistics = (params) => {
+  return request({
+    url: '/api/statistics/announcements/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+
+/**
+ * 获取公告状态分布
+ * @param {Object} params - 查询参数
+ */
+export const getAnnouncementStatusDistribution = (params) => {
+  return request({
+    url: '/api/statistics/announcements/status-distribution',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取公告时间段分析
+ * @param {Object} params - 查询参数
+ */
+export const getAnnouncementTimeAnalysis = (params) => {
+  return request({
+    url: '/api/statistics/announcements/time-analysis',
+    method: 'get',
+    params
+  })
+}
+
 // ==================== 信息发布统计 ====================
 /**
  * 获取信息发布统计概览
@@ -185,6 +271,64 @@ export const getInfoPublicationTypeDistribution = (params) => {
   })
 }
 
+/**
+ * 获取热门信息
+ * @param {Object} params - 查询参数
+ */
+export const getPopularInfoPublications = (params) => {
+  return request({
+    url: '/api/statistics/info-publications/popular',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 导出信息发布统计数据
+ * @param {Object} params - 查询参数
+ */
+export const exportInfoPublicationStatistics = (params) => {
+  return request({
+    url: '/api/statistics/info-publications/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+
+/**
+ * 获取作者发布统计
+ * @param {Object} params - 查询参数
+ */
+export const getAuthorPublishStatistics = (params) => {
+  return request({
+    url: '/api/statistics/info-publications/author-statistics',
+    method: 'get',
+    params
+  })
+}
+
+// ==================== 综合统计 ====================
+/**
+ * 获取系统概览统计
+ */
+export const getSystemOverview = () => {
+  return request({
+    url: '/api/statistics/system/overview',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取实时统计数据
+ */
+export const getRealtimeStatistics = () => {
+  return request({
+    url: '/api/statistics/realtime',
+    method: 'get'
+  })
+}
+
 // ==================== 首页统计 ====================
 /**
  * 获取首页统计数据
@@ -196,23 +340,40 @@ export const getHomeStatistics = () => {
   })
 }
 
+// 统一导出对象，按模块组织
 export default {
-  // 访问统计
-  getVisitStatisticsList,
-  getVisitStatisticsOverview,
-  getVisitTrend,
-  getPopularPages,
-  recordVisit,
-  // 公告统计
-  getAnnouncementStatisticsOverview,
-  getAnnouncementPublishTrend,
-  getAnnouncementTypeDistribution,
-  getAnnouncementRegionDistribution,
-  getPopularAnnouncements,
-  // 信息发布统计
-  getInfoPublicationStatisticsOverview,
-  getInfoPublicationPublishTrend,
-  getInfoPublicationTypeDistribution,
-  // 首页统计
-  getHomeStatistics
+  visit: {
+    getList: getVisitStatisticsList,
+    getOverview: getVisitStatisticsOverview,
+    getTrend: getVisitTrend,
+    getHotPages: getPopularPages,
+    record: recordVisit,
+    export: exportVisitStatistics,
+    getSources: getVisitSourceStatistics,
+    getDevices: getDeviceStatistics,
+    getBrowsers: getBrowserStatistics
+  },
+  announcement: {
+    getOverview: getAnnouncementStatisticsOverview,
+    getTrend: getAnnouncementPublishTrend,
+    getTypeDistribution: getAnnouncementTypeDistribution,
+    getRegionDistribution: getAnnouncementRegionDistribution,
+    getHotAnnouncements: getPopularAnnouncements,
+    export: exportAnnouncementStatistics,
+    getStatusDistribution: getAnnouncementStatusDistribution,
+    getTimeAnalysis: getAnnouncementTimeAnalysis
+  },
+  infoPublication: {
+    getOverview: getInfoPublicationStatisticsOverview,
+    getTrend: getInfoPublicationPublishTrend,
+    getTypeDistribution: getInfoPublicationTypeDistribution,
+    getHotInfo: getPopularInfoPublications,
+    export: exportInfoPublicationStatistics,
+    getAuthorStatistics: getAuthorPublishStatistics
+  },
+  system: {
+    getOverview: getSystemOverview,
+    getRealtime: getRealtimeStatistics,
+    getHomeStatistics
+  }
 }

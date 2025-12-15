@@ -78,18 +78,45 @@
       </el-col>
     </el-row>
 
-    <!-- 区域分布 -->
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <!-- 区域分布 -->
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <span>区域分布 TOP 10</span>
+          </template>
+          <div ref="regionChartRef" style="height: 400px;"></div>
+        </el-card>
+      </el-col>
+
+      <!-- 状态分布 -->
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <span>公告状态分布</span>
+          </template>
+          <div ref="statusChartRef" style="height: 400px;"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 时间段分析 -->
     <el-card style="margin-top: 20px;">
       <template #header>
-        <span>区域分布 TOP 10</span>
+        <span>发布时间段分析</span>
       </template>
-      <div ref="regionChartRef" style="height: 400px;"></div>
+      <div ref="timeChartRef" style="height: 300px;"></div>
     </el-card>
 
     <!-- 热门公告 -->
     <el-card style="margin-top: 20px;">
       <template #header>
-        <span>热门公告 TOP 20</span>
+        <div class="card-header">
+          <span>热门公告 TOP 20</span>
+          <el-button type="primary" size="small" icon="Download" @click="exportData" :loading="exportLoading">
+            导出统计
+          </el-button>
+        </div>
       </template>
       <el-table :data="hotAnnouncements" v-loading="loading" border stripe>
         <el-table-column type="index" label="排名" width="80" align="center" />
@@ -116,9 +143,11 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { Document, Calendar, View, TrendCharts } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
 import * as echarts from 'echarts'
+import { getDoughnutChartOption, getHorizontalBarChartOption } from '@/utils/chartOptions'
 
 // 概览数据
 const overview = reactive({
@@ -132,14 +161,19 @@ const overview = reactive({
 let trendChart = null
 let typeChart = null
 let regionChart = null
+let statusChart = null
+let timeChart = null
 
 const trendChartRef = ref(null)
 const typeChartRef = ref(null)
 const regionChartRef = ref(null)
+const statusChartRef = ref(null)
+const timeChartRef = ref(null)
 
 // 热门公告
 const hotAnnouncements = ref([])
 const loading = ref(false)
+const exportLoading = ref(false)
 
 /**
  * 格式化日期
@@ -364,12 +398,149 @@ const loadHotAnnouncements = async () => {
 }
 
 /**
+ * 加载状态分布
+ */
+const loadStatusDistribution = async () => {
+  try {
+    const res = await statisticsApi.announcement.getStatusDistribution()
+    if (res.success && res.data) {
+      renderStatusChart(res.data)
+    }
+  } catch (error) {
+    console.error('加载状态分布失败:', error)
+  }
+}
+
+/**
+ * 渲染状态分布图表
+ */
+const renderStatusChart = (data) => {
+  if (!statusChart) {
+    statusChart = echarts.init(statusChartRef.value)
+  }
+  
+  const chartData = data.map(item => ({
+    name: item.status,
+    value: item.count
+  }))
+  
+  const option = getDoughnutChartOption(chartData, {
+    radius: ['40%', '70%'],
+    center: ['50%', '50%']
+  })
+  
+  statusChart.setOption(option)
+}
+
+/**
+ * 加载时间段分析
+ */
+const loadTimeAnalysis = async () => {
+  try {
+    const res = await statisticsApi.announcement.getTimeAnalysis()
+    if (res.success && res.data) {
+      renderTimeChart(res.data)
+    }
+  } catch (error) {
+    console.error('加载时间段分析失败:', error)
+  }
+}
+
+/**
+ * 渲染时间段分析图表
+ */
+const renderTimeChart = (data) => {
+  if (!timeChart) {
+    timeChart = echarts.init(timeChartRef.value)
+  }
+  
+  const hours = data.map(item => `${item.hour}:00`)
+  const counts = data.map(item => item.count)
+  
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '10%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: hours,
+      axisLabel: {
+        interval: 1,
+        rotate: 0
+      }
+    },
+    yAxis: {
+      type: 'value',
+      name: '发布数量'
+    },
+    series: [
+      {
+        name: '发布数量',
+        type: 'bar',
+        data: counts,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#83bff6' },
+            { offset: 0.5, color: '#188df0' },
+            { offset: 1, color: '#188df0' }
+          ]),
+          borderRadius: [5, 5, 0, 0]
+        },
+        barWidth: '60%'
+      }
+    ]
+  }
+  
+  timeChart.setOption(option)
+}
+
+/**
+ * 导出统计数据
+ */
+const exportData = async () => {
+  exportLoading.value = true
+  try {
+    const res = await statisticsApi.announcement.export()
+    
+    // 创建下载链接
+    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `公告统计_${new Date().getTime()}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('导出成功')
+  } catch (error) {
+    console.error('导出失败:', error)
+    ElMessage.error('导出失败')
+  } finally {
+    exportLoading.value = false
+  }
+}
+
+/**
  * 窗口大小改变时重绘图表
  */
 const handleResize = () => {
   if (trendChart) trendChart.resize()
   if (typeChart) typeChart.resize()
   if (regionChart) regionChart.resize()
+  if (statusChart) statusChart.resize()
+  if (timeChart) timeChart.resize()
 }
 
 onMounted(() => {
@@ -377,6 +548,8 @@ onMounted(() => {
   loadTrendData()
   loadTypeDistribution()
   loadRegionDistribution()
+  loadStatusDistribution()
+  loadTimeAnalysis()
   loadHotAnnouncements()
   window.addEventListener('resize', handleResize)
 })
@@ -385,6 +558,8 @@ onUnmounted(() => {
   if (trendChart) trendChart.dispose()
   if (typeChart) typeChart.dispose()
   if (regionChart) regionChart.dispose()
+  if (statusChart) statusChart.dispose()
+  if (timeChart) timeChart.dispose()
   window.removeEventListener('resize', handleResize)
 })
 </script>
@@ -433,5 +608,11 @@ onUnmounted(() => {
 
 .chart-card {
   margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

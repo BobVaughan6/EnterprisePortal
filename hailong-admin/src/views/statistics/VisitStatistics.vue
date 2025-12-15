@@ -86,12 +86,39 @@
       </el-table>
     </el-card>
 
+    <!-- 访问来源和设备统计 -->
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <span>访问来源 TOP 10</span>
+          </template>
+          <div ref="sourceChartRef" style="height: 300px;"></div>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <span>设备类型分布</span>
+          </template>
+          <div ref="deviceChartRef" style="height: 300px;"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+
     <!-- 访问记录 -->
     <el-card style="margin-top: 20px;">
       <template #header>
         <div class="card-header">
           <span>访问记录</span>
-          <el-button type="primary" size="small" @click="exportData">导出数据</el-button>
+          <div>
+            <el-button type="success" size="small" icon="Refresh" @click="loadTableData" :loading="tableLoading">
+              刷新
+            </el-button>
+            <el-button type="primary" size="small" icon="Download" @click="exportData" :loading="exportLoading">
+              导出数据
+            </el-button>
+          </div>
         </div>
       </template>
       
@@ -148,11 +175,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
 import { View, User, Calendar, TrendCharts } from '@element-plus/icons-vue'
 import { statisticsApi } from '@/api'
 import * as echarts from 'echarts'
+import { getHorizontalBarChartOption, getDoughnutChartOption } from '@/utils/chartOptions'
 
 // 概览数据
 const overview = reactive({
@@ -164,8 +192,15 @@ const overview = reactive({
 
 // 趋势图表
 const trendChartRef = ref(null)
+const sourceChartRef = ref(null)
+const deviceChartRef = ref(null)
 let trendChart = null
+let sourceChart = null
+let deviceChart = null
 const trendPeriod = ref('7')
+
+// 实时数据定时器
+let realtimeTimer = null
 
 // 热门页面
 const hotPages = ref([])
@@ -187,6 +222,7 @@ const pagination = reactive({
 
 const tableData = ref([])
 const tableLoading = ref(false)
+const exportLoading = ref(false)
 
 /**
  * 加载概览数据
@@ -277,6 +313,76 @@ const loadHotPages = async () => {
 }
 
 /**
+ * 加载访问来源统计
+ */
+const loadSourceStatistics = async () => {
+  try {
+    const res = await statisticsApi.visit.getSources({ limit: 10 })
+    if (res.success && res.data) {
+      renderSourceChart(res.data)
+    }
+  } catch (error) {
+    console.error('加载访问来源失败:', error)
+  }
+}
+
+/**
+ * 渲染访问来源图表
+ */
+const renderSourceChart = (data) => {
+  if (!sourceChart) {
+    sourceChart = echarts.init(sourceChartRef.value)
+  }
+  
+  const chartData = data.map(item => ({
+    name: item.source || '直接访问',
+    value: item.count
+  }))
+  
+  const option = getHorizontalBarChartOption(chartData, {
+    color: '#67c23a',
+    showLabel: true
+  })
+  
+  sourceChart.setOption(option)
+}
+
+/**
+ * 加载设备类型统计
+ */
+const loadDeviceStatistics = async () => {
+  try {
+    const res = await statisticsApi.visit.getDevices()
+    if (res.success && res.data) {
+      renderDeviceChart(res.data)
+    }
+  } catch (error) {
+    console.error('加载设备统计失败:', error)
+  }
+}
+
+/**
+ * 渲染设备类型图表
+ */
+const renderDeviceChart = (data) => {
+  if (!deviceChart) {
+    deviceChart = echarts.init(deviceChartRef.value)
+  }
+  
+  const chartData = data.map(item => ({
+    name: item.deviceType,
+    value: item.count
+  }))
+  
+  const option = getDoughnutChartOption(chartData, {
+    radius: ['40%', '70%'],
+    center: ['50%', '50%']
+  })
+  
+  deviceChart.setOption(option)
+}
+
+/**
  * 加载访问记录
  */
 const loadTableData = async () => {
@@ -331,31 +437,105 @@ const handleReset = () => {
 /**
  * 导出数据
  */
-const exportData = () => {
-  ElMessage.info('导出功能开发中...')
+const exportData = async () => {
+  exportLoading.value = true
+  try {
+    if (dateRange.value && dateRange.value.length === 2) {
+      searchForm.startDate = dateRange.value[0]
+      searchForm.endDate = dateRange.value[1]
+    }
+    
+    const params = {
+      pagePath: searchForm.pagePath || undefined,
+      startDate: searchForm.startDate || undefined,
+      endDate: searchForm.endDate || undefined
+    }
+    
+    const res = await statisticsApi.visit.export(params)
+    
+    // 创建下载链接
+    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `访问统计_${new Date().getTime()}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('导出成功')
+  } catch (error) {
+    console.error('导出失败:', error)
+    ElMessage.error('导出失败')
+  } finally {
+    exportLoading.value = false
+  }
+}
+
+/**
+ * 加载实时数据
+ */
+const loadRealtimeData = async () => {
+  try {
+    const res = await statisticsApi.system.getRealtime()
+    if (res.success && res.data) {
+      // 更新概览数据中的今日访问
+      overview.todayVisits = res.data.todayVisits || overview.todayVisits
+    }
+  } catch (error) {
+    console.error('加载实时数据失败:', error)
+  }
+}
+
+/**
+ * 启动实时数据更新
+ */
+const startRealtimeUpdate = () => {
+  // 每30秒更新一次实时数据
+  realtimeTimer = setInterval(() => {
+    loadRealtimeData()
+  }, 30000)
+}
+
+/**
+ * 停止实时数据更新
+ */
+const stopRealtimeUpdate = () => {
+  if (realtimeTimer) {
+    clearInterval(realtimeTimer)
+    realtimeTimer = null
+  }
 }
 
 /**
  * 窗口大小改变时重绘图表
  */
 const handleResize = () => {
-  if (trendChart) {
-    trendChart.resize()
-  }
+  if (trendChart) trendChart.resize()
+  if (sourceChart) sourceChart.resize()
+  if (deviceChart) deviceChart.resize()
 }
 
 onMounted(() => {
   loadOverview()
   loadTrendData()
   loadHotPages()
+  loadSourceStatistics()
+  loadDeviceStatistics()
   loadTableData()
+  startRealtimeUpdate()
   window.addEventListener('resize', handleResize)
 })
 
+onBeforeUnmount(() => {
+  stopRealtimeUpdate()
+})
+
 onUnmounted(() => {
-  if (trendChart) {
-    trendChart.dispose()
-  }
+  if (trendChart) trendChart.dispose()
+  if (sourceChart) sourceChart.dispose()
+  if (deviceChart) deviceChart.dispose()
   window.removeEventListener('resize', handleResize)
 })
 </script>

@@ -59,6 +59,38 @@ const routes = [
         meta: { title: '附件管理', icon: 'FolderOpened' }
       },
       {
+        path: '/statistics',
+        name: 'Statistics',
+        redirect: '/statistics/overview',
+        meta: { title: '统计分析', icon: 'DataLine' },
+        children: [
+          {
+            path: '/statistics/overview',
+            name: 'SystemOverview',
+            component: () => import('@/views/statistics/SystemOverview.vue'),
+            meta: { title: '系统概览' }
+          },
+          {
+            path: '/statistics/visit',
+            name: 'VisitStatistics',
+            component: () => import('@/views/statistics/VisitStatistics.vue'),
+            meta: { title: '访问统计' }
+          },
+          {
+            path: '/statistics/announcement',
+            name: 'AnnouncementStatistics',
+            component: () => import('@/views/statistics/AnnouncementStatistics.vue'),
+            meta: { title: '公告统计' }
+          },
+          {
+            path: '/statistics/info-publication',
+            name: 'InfoPublicationStatistics',
+            component: () => import('@/views/statistics/InfoPublicationStatistics.vue'),
+            meta: { title: '信息发布统计' }
+          }
+        ]
+      },
+      {
         path: '/config',
         name: 'Config',
         redirect: '/config/company-profile',
