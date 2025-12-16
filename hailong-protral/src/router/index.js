@@ -65,6 +65,11 @@ const routes = [
     path: '/contact',
     name: 'Contact',
     component: () => import('@/views/pages/Contact.vue')
+  },
+  {
+    path: '/expert-database',
+    name: 'ExpertDatabase',
+    component: () => import('@/views/pages/ExpertDatabase.vue')
   }
 ]
 
