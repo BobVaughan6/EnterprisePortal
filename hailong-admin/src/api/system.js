@@ -309,7 +309,7 @@ export const importRegions = (regions) => {
 }
 
 export default {
-  // 用户管理
+  // 用户管理 - 直接导出方法（向后兼容）
   getUserList,
   getUserDetail,
   createUser,
@@ -318,11 +318,33 @@ export default {
   resetUserPassword,
   changePassword,
   toggleUserStatus,
-  // 系统日志
+  
+  // 系统日志 - 直接导出方法（向后兼容）
   getSystemLogList,
   getSystemLogDetail,
   clearSystemLogs,
   exportSystemLogs,
+  
+  // 用户管理 - 对象形式
+  users: {
+    getList: getUserList,
+    getDetail: getUserDetail,
+    create: createUser,
+    update: updateUser,
+    delete: deleteUser,
+    resetPassword: resetUserPassword,
+    changePassword: changePassword,
+    toggleStatus: toggleUserStatus
+  },
+  
+  // 系统日志 - 对象形式
+  logs: {
+    getList: getSystemLogList,
+    getDetail: getSystemLogDetail,
+    clear: clearSystemLogs,
+    export: exportSystemLogs
+  },
+  
   // 区域字典
   regions: {
     getList: getRegionList,

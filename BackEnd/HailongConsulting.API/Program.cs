@@ -231,6 +231,9 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// 使用系统日志中间件（在认证授权之后，这样可以获取用户信息）
+app.UseMiddleware<SystemLogMiddleware>();
+
 app.MapControllers();
 
 // 启动日志

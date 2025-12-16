@@ -8,20 +8,24 @@
       <!-- 搜索表单 -->
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="操作类型">
-          <el-select v-model="searchForm.operationType" placeholder="请选择操作类型" clearable>
+          <el-select v-model="searchForm.action" placeholder="请选择操作类型" clearable style="width: 150px;">
             <el-option label="登录" value="LOGIN" />
             <el-option label="登出" value="LOGOUT" />
             <el-option label="创建" value="CREATE" />
             <el-option label="更新" value="UPDATE" />
             <el-option label="删除" value="DELETE" />
             <el-option label="查询" value="QUERY" />
+            <el-option label="错误" value="ERROR" />
           </el-select>
         </el-form-item>
         <el-form-item label="操作人">
-          <el-input v-model="searchForm.operatorName" placeholder="请输入操作人" clearable />
+          <el-input v-model="searchForm.username" placeholder="请输入操作人" clearable style="width: 150px;" />
+        </el-form-item>
+        <el-form-item label="模块">
+          <el-input v-model="searchForm.module" placeholder="请输入模块" clearable style="width: 150px;" />
         </el-form-item>
         <el-form-item label="IP地址">
-          <el-input v-model="searchForm.ipAddress" placeholder="请输入IP地址" clearable />
+          <el-input v-model="searchForm.ipAddress" placeholder="请输入IP地址" clearable style="width: 150px;" />
         </el-form-item>
         <el-form-item label="操作时间">
           <el-date-picker
@@ -32,6 +36,7 @@
             end-placeholder="结束日期"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
+            style="width: 240px;"
           />
         </el-form-item>
         <el-form-item>
@@ -44,19 +49,19 @@
       <!-- 数据表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="operationType" label="操作类型" width="100" align="center">
+        <el-table-column prop="action" label="操作类型" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="getOperationTypeTag(row.operationType)" size="small">
-              {{ getOperationTypeText(row.operationType) }}
+            <el-tag :type="getOperationTypeTag(row.action)" size="small">
+              {{ getOperationTypeText(row.action) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="operatorName" label="操作人" width="120" />
+        <el-table-column prop="username" label="操作人" width="120" />
         <el-table-column prop="module" label="模块" width="120" />
         <el-table-column prop="description" label="操作描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="ipAddress" label="IP地址" width="140" />
         <el-table-column prop="userAgent" label="浏览器" width="150" show-overflow-tooltip />
-        <el-table-column prop="operationTime" label="操作时间" width="160" />
+        <el-table-column prop="createdAt" label="操作时间" width="160" />
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" link @click="handleViewDetail(row)">详情</el-button>
@@ -82,22 +87,25 @@
       <el-descriptions :column="2" border>
         <el-descriptions-item label="ID">{{ detailData.id }}</el-descriptions-item>
         <el-descriptions-item label="操作类型">
-          <el-tag :type="getOperationTypeTag(detailData.operationType)" size="small">
-            {{ getOperationTypeText(detailData.operationType) }}
+          <el-tag :type="getOperationTypeTag(detailData.action)" size="small">
+            {{ getOperationTypeText(detailData.action) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="操作人">{{ detailData.operatorName }}</el-descriptions-item>
-        <el-descriptions-item label="用户ID">{{ detailData.operatorId }}</el-descriptions-item>
+        <el-descriptions-item label="操作人">{{ detailData.username }}</el-descriptions-item>
+        <el-descriptions-item label="用户ID">{{ detailData.userId }}</el-descriptions-item>
         <el-descriptions-item label="模块">{{ detailData.module }}</el-descriptions-item>
-        <el-descriptions-item label="操作时间">{{ detailData.operationTime }}</el-descriptions-item>
+        <el-descriptions-item label="操作时间">{{ detailData.createdAt }}</el-descriptions-item>
         <el-descriptions-item label="IP地址">{{ detailData.ipAddress }}</el-descriptions-item>
-        <el-descriptions-item label="请求方法">{{ detailData.requestMethod }}</el-descriptions-item>
-        <el-descriptions-item label="请求URL" :span="2">{{ detailData.requestUrl }}</el-descriptions-item>
+        <el-descriptions-item label="状态">
+          <el-tag :type="detailData.status === 'Success' ? 'success' : 'danger'" size="small">
+            {{ detailData.status }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="操作描述" :span="2">{{ detailData.description }}</el-descriptions-item>
         <el-descriptions-item label="浏览器信息" :span="2">{{ detailData.userAgent }}</el-descriptions-item>
         <el-descriptions-item label="请求参数" :span="2">
           <el-input 
-            v-model="detailData.requestParams" 
+            v-model="detailData.requestData" 
             type="textarea" 
             :rows="4" 
             readonly
@@ -105,7 +113,7 @@
         </el-descriptions-item>
         <el-descriptions-item label="响应结果" :span="2">
           <el-input 
-            v-model="detailData.responseResult" 
+            v-model="detailData.responseData" 
             type="textarea" 
             :rows="4" 
             readonly
@@ -127,8 +135,9 @@ const detailVisible = ref(false)
 const detailData = ref({})
 
 const searchForm = reactive({
-  operationType: '',
-  operatorName: '',
+  action: '',
+  username: '',
+  module: '',
   ipAddress: '',
   dateRange: []
 })
@@ -146,7 +155,8 @@ const getOperationTypeText = (type) => {
     'CREATE': '创建',
     'UPDATE': '更新',
     'DELETE': '删除',
-    'QUERY': '查询'
+    'QUERY': '查询',
+    'ERROR': '错误'
   }
   return typeMap[type] || type
 }
@@ -158,7 +168,8 @@ const getOperationTypeTag = (type) => {
     'CREATE': 'primary',
     'UPDATE': 'warning',
     'DELETE': 'danger',
-    'QUERY': ''
+    'QUERY': '',
+    'ERROR': 'danger'
   }
   return tagMap[type] || ''
 }
@@ -167,22 +178,26 @@ const loadData = async () => {
   loading.value = true
   try {
     const params = {
-      ...searchForm,
       page: pagination.page,
       pageSize: pagination.pageSize
     }
+    
+    // 添加搜索条件
+    if (searchForm.action) params.action = searchForm.action
+    if (searchForm.username) params.username = searchForm.username
+    if (searchForm.module) params.module = searchForm.module
+    if (searchForm.ipAddress) params.ipAddress = searchForm.ipAddress
     
     // 处理日期范围
     if (searchForm.dateRange && searchForm.dateRange.length === 2) {
       params.startDate = searchForm.dateRange[0]
       params.endDate = searchForm.dateRange[1]
     }
-    delete params.dateRange
     
     const res = await systemApi.logs.getList(params)
     if (res.success) {
       tableData.value = res.data?.items || []
-      pagination.total = res.data?.total || 0
+      pagination.total = res.data?.totalCount || 0
     } else {
       ElMessage.error(res.message || '加载数据失败')
     }
@@ -201,8 +216,9 @@ const handleSearch = () => {
 
 const handleReset = () => {
   Object.assign(searchForm, {
-    operationType: '',
-    operatorName: '',
+    action: '',
+    username: '',
+    module: '',
     ipAddress: '',
     dateRange: []
   })
@@ -253,6 +269,10 @@ onMounted(() => {
 
 .search-form {
   margin-bottom: 20px;
+}
+
+.search-form :deep(.el-form-item) {
+  margin-bottom: 10px;
 }
 
 .pagination {
