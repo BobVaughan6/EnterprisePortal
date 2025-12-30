@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # MySQL数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: hailong-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Hailong@2025
+      MYSQL_DATABASE: hailong_consulting
+      MYSQL_USER: hailong_app
+      MYSQL_PASSWORD: HailongApp@2025
+      TZ: Asia/Shanghai
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./SQL:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - hailong-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 后端API服务
+  api:
+    build:
+      context: ./BackEnd/HailongConsulting.API
+      dockerfile: Dockerfile
+    container_name: hailong-api
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=hailong_consulting;User=hailong_app;Password=HailongApp@2025;CharSet=utf8mb4;
+      - Jwt__Key=your-super-secret-jwt-key-at-least-32-characters-long-for-production-use
+      - Jwt__Issuer=HailongConsulting.API
+      - Jwt__Audience=HailongConsulting.Client
+      - Jwt__ExpireHours=24
+      - TZ=Asia/Shanghai
+    volumes:
+      - api-uploads:/app/wwwroot/uploads
+      - api-logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hailong-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/home/statistics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx服务（前端+反向代理）
+  nginx:
+    image: nginx:alpine
+    container_name: hailong-nginx
+    restart: always
+    ports:
+      - "80:80"        # 前端门户
+      - "8080:8080"    # 后台管理
+      - "5001:5001"    # API代理
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./hailong-admin/dist:/usr/share/nginx/html/admin:ro
+      - ./hailong-protral/dist:/usr/share/nginx/html/portal:ro
+      - api-uploads:/usr/share/nginx/html/uploads:ro
+    depends_on:
+      - api
+    networks:
+      - hailong-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  hailong-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  api-uploads:
+    driver: local
+  api-logs:
+    driver: local

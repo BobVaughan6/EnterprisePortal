@@ -18,14 +18,27 @@
           <div class="p-8 md:p-12">
             <!-- 二维码和公告内容区域 -->
             <div class="mb-8">
-              <!-- 移动端：显示二维码 -->
-              <div class="flex justify-center md:hidden mb-8">
+              <!-- 移动端：显示二维码和填写按钮 -->
+              <div class="flex flex-col items-center md:hidden mb-8 space-y-4">
                 <div class="bg-gradient-to-br from-hailong-primary/10 to-hailong-secondary/10 p-6 rounded-xl border-2 border-hailong-cyan/30">
                   <div class="bg-white rounded-lg p-3">
                     <img :src="qrCodeImage" alt="专家库二维码" class="w-48 h-48 object-contain" />
                     <p class="text-xs text-gray-600 mt-2 text-center font-medium">扫码填写信息</p>
                   </div>
                 </div>
+                <!-- 移动端填写按钮 -->
+                <button
+                  @click="showFormAndScroll"
+                  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-hailong-primary to-hailong-secondary text-white font-semibold rounded-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 w-full max-w-xs justify-center"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  在线填写
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                </button>
               </div>
 
               <!-- 电脑端：公告内容（包含二维码） -->
@@ -123,7 +136,7 @@
                 <div class="text-sm text-blue-800">
                   <p class="font-medium mb-1">温馨提示：</p>
                   <ul class="list-disc list-inside space-y-1 text-blue-700">
-                    <li class="md:hidden">请使用微信扫描上方二维码填写专家信息</li>
+                    <li class="md:hidden">可点击"在线填写"按钮直接填写，或使用微信扫描二维码填写</li>
                     <li class="hidden md:list-item">推荐使用"电脑端填写"按钮在弹窗中直接填写</li>
                     <li class="hidden md:list-item">如不方便使用电脑，可点击"手机端填写"按钮显示二维码，使用手机扫码填写</li>
                     <li>请确保填写信息真实、准确、完整</li>
@@ -140,30 +153,30 @@
     <!-- 页脚 -->
     <Footer />
 
-    <!-- 电脑端：居中弹窗 -->
+    <!-- 表单弹窗（支持移动端和PC端） -->
     <div v-if="showForm"
-      class="hidden md:flex fixed inset-0 z-[100] bg-black/50 animate-fade-in items-center justify-center p-4"
+      class="fixed inset-0 z-[100] bg-black/50 animate-fade-in flex items-center justify-center p-0 md:p-4"
       @click.self="hideForm">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col animate-scale-in">
+      <div class="bg-white rounded-none md:rounded-2xl shadow-2xl w-full h-full md:h-[85vh] md:max-w-4xl flex flex-col animate-scale-in">
         <!-- 标题栏 -->
-        <div class="bg-gradient-to-r from-hailong-primary to-hailong-secondary p-4 flex items-center justify-between shadow-lg rounded-t-2xl">
-          <h3 class="text-xl font-bold text-white flex items-center">
-            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-gradient-to-r from-hailong-primary to-hailong-secondary p-3 md:p-4 flex items-center justify-between shadow-lg rounded-t-none md:rounded-t-2xl">
+          <h3 class="text-lg md:text-xl font-bold text-white flex items-center">
+            <svg class="w-5 h-5 md:w-6 md:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
             </svg>
             填写专家信息
           </h3>
           <button
             @click="hideForm"
-            class="text-white hover:text-gray-200 transition-colors p-2 hover:bg-white/10 rounded-lg"
+            class="text-white hover:text-gray-200 transition-colors p-1.5 md:p-2 hover:bg-white/10 rounded-lg"
             title="关闭表单">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
         <!-- iframe 内容区域 -->
-        <div class="flex-1 overflow-hidden rounded-b-2xl">
+        <div class="flex-1 overflow-hidden rounded-b-none md:rounded-b-2xl">
           <iframe
             src="https://www.wjx.cn/vm/tkPK2g4.aspx"
             class="w-full h-full border-0"
