@@ -240,7 +240,9 @@ const calculate = () => {
     }
   }
   
-  const totalFee = baseTotal * engineering.coefficient
+  // 地区调整系数（当前默认为1.0，后续可扩展为可配置）
+  const regionCoefficient = 1.0
+  const totalFee = baseTotal * engineering.coefficient * regionCoefficient
   
   let report = `鉴定项目：工程造价纠纷鉴定\n`
   report += `工程类别：${engineering.name}\n`
@@ -255,6 +257,7 @@ const calculate = () => {
   report += `------------------------------\n`
   report += `基准价小计：${baseTotal.toFixed(2)}元\n`
   report += `专业调整系数：${engineering.coefficient}\n`
+  report += `地区调整系数：${regionCoefficient}\n`
   report += `------------------------------\n`
   report += `鉴定费用：${totalFee.toFixed(2)}元`
   
@@ -264,6 +267,7 @@ const calculate = () => {
     breakdown: breakdown,
     baseTotal: baseTotal,
     engineeringCoefficient: engineering.coefficient,
+    regionCoefficient: regionCoefficient,
     totalFee: totalFee,
     report: report
   }

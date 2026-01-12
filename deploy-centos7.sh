@@ -11,21 +11,12 @@ set -e  # 遇到错误立即退出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m' 
 
 # 打印函数
-print_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-print_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
+print_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
+print_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 print_step() {
     echo -e "\n${GREEN}========================================${NC}"
     echo -e "${GREEN}$1${NC}"
@@ -41,9 +32,8 @@ fi
 # 获取服务器IP
 SERVER_IP=$(ip addr | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1 | head -n1)
 
-print_step "欢迎使用海隆咨询官网一键部署脚本"
+print_step "欢迎使用海隆咨询官网一键部署脚本 (修复版)"
 echo "服务器IP: $SERVER_IP"
-echo ""
 
 # 询问用户配置
 read -p "请输入MySQL root密码 (默认: Hailong@2025): " MYSQL_ROOT_PASSWORD
@@ -52,94 +42,88 @@ MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-Hailong@2025}
 read -p "请输入MySQL应用密码 (默认: HailongApp@2025): " MYSQL_APP_PASSWORD
 MYSQL_APP_PASSWORD=${MYSQL_APP_PASSWORD:-HailongApp@2025}
 
-read -p "请输入JWT密钥 (至少32字符，默认自动生成): " JWT_SECRET
-if [ -z "$JWT_SECRET" ]; then
-    JWT_SECRET=$(openssl rand -base64 32)
-fi
+read -p "请输入JWT密钥 (默认自动生成): " JWT_SECRET
+if [ -z "$JWT_SECRET" ]; then JWT_SECRET=$(openssl rand -base64 32); fi
 
 read -p "项目文件路径 (默认: /opt/hailong/project): " PROJECT_PATH
 PROJECT_PATH=${PROJECT_PATH:-/opt/hailong/project}
 
 echo ""
-print_info "配置信息："
-echo "  MySQL Root密码: $MYSQL_ROOT_PASSWORD"
-echo "  MySQL应用密码: $MYSQL_APP_PASSWORD"
-echo "  JWT密钥: ${JWT_SECRET:0:20}..."
-echo "  项目路径: $PROJECT_PATH"
-echo ""
-
 read -p "确认开始部署? (y/n): " CONFIRM
-if [ "$CONFIRM" != "y" ]; then
-    print_warn "部署已取消"
-    exit 0
-fi
+if [ "$CONFIRM" != "y" ]; then print_warn "部署已取消"; exit 0; fi
 
 ###############################################################################
-# 第一步：更新系统并安装基础软件
+# 第一步：修复 YUM 源（解决 CentOS 7 停服问题）
 ###############################################################################
-print_step "第一步：更新系统并安装基础软件"
+print_step "第一步：修复 YUM 源并安装基础软件"
 
-print_info "更新系统..."
-yum update -y
+print_info "正在更换阿里云镜像源..."
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup || true
+curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+
+print_info "清理并刷新 YUM 缓存..."
+yum clean all
+yum makecache
 
 print_info "安装基础工具..."
 yum install -y wget curl git unzip vim net-tools
 
 ###############################################################################
-# 第二步：安装.NET 7.0运行时
+# 第二步：安装 .NET 7.0
 ###############################################################################
-print_step "第二步：安装.NET 7.0运行时"
+print_step "第二步：安装 .NET 7.0 运行时"
 
 if ! command -v dotnet &> /dev/null; then
-    print_info "添加Microsoft软件源..."
-    rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
-    
-    print_info "安装.NET运行时和SDK..."
+    rpm -Uvh --force https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm || true
     yum install -y aspnetcore-runtime-7.0 dotnet-sdk-7.0
-    
-    print_info ".NET版本: $(dotnet --version)"
 else
-    print_info ".NET已安装，版本: $(dotnet --version)"
+    print_info ".NET 已安装: $(dotnet --version)"
 fi
 
 ###############################################################################
-# 第三步：安装MySQL 8.0
+# 第三步：安装 MySQL 8.0 (修复 GPG 密钥和冲突问题)
 ###############################################################################
-print_step "第三步：安装MySQL 8.0"
+print_step "第三步：安装 MySQL 8.0"
 
 if ! command -v mysql &> /dev/null; then
-    print_info "下载并安装MySQL..."
-    wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
-    rpm -ivh mysql80-community-release-el7-3.noarch.rpm
-    yum install -y mysql-server
+    print_info "配置 MySQL 仓库..."
+    wget -N https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+    # 使用 -Uvh --force 解决已经安装旧版本导致的冲突
+    rpm -Uvh --force mysql80-community-release-el7-3.noarch.rpm || true
     
-    print_info "启动MySQL..."
+    print_info "导入最新 GPG 密钥..."
+    rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 || true
+    
+    print_info "安装 MySQL 服务 (跳过 GPG 校验)..."
+    yum install -y mysql-community-server --nogpgcheck
+    
+    print_info "启动 MySQL..."
     systemctl start mysqld
     systemctl enable mysqld
     
-    # 获取临时密码
+    # 自动处理临时密码
     TEMP_PASSWORD=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}')
-    print_info "MySQL临时密码: $TEMP_PASSWORD"
-    
-    # 修改root密码
-    print_info "修改MySQL root密码..."
-    mysql --connect-expired-password -u root -p"$TEMP_PASSWORD" <<EOF
+    if [ -n "$TEMP_PASSWORD" ]; then
+        print_info "修改 root 初始密码..."
+        mysql --connect-expired-password -u root -p"$TEMP_PASSWORD" <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
 FLUSH PRIVILEGES;
 EOF
+    fi
 else
-    print_info "MySQL已安装"
+    print_info "MySQL 已存在，跳过安装"
 fi
 
 ###############################################################################
-# 第四步：创建数据库和用户
+# 第四步：创建数据库和用户 (增强幂等性)
 ###############################################################################
 print_step "第四步：创建数据库和用户"
 
-print_info "创建数据库和应用用户..."
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" <<EOF
+# 使用 --force 强制执行，防止因用户已存在导致脚本退出
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" --force <<EOF
 CREATE DATABASE IF NOT EXISTS hailong_consulting CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'hailong_app'@'localhost' IDENTIFIED BY '$MYSQL_APP_PASSWORD';
+DROP USER IF EXISTS 'hailong_app'@'localhost';
+CREATE USER 'hailong_app'@'localhost' IDENTIFIED BY '$MYSQL_APP_PASSWORD';
 GRANT ALL PRIVILEGES ON hailong_consulting.* TO 'hailong_app'@'localhost';
 FLUSH PRIVILEGES;
 EOF
@@ -408,25 +392,21 @@ print_info "重启Nginx..."
 systemctl restart nginx
 
 ###############################################################################
-# 第十步：配置防火墙
+# 第十步：配置防火墙 (增加容错)
 ###############################################################################
 print_step "第十步：配置防火墙"
 
 if command -v firewall-cmd &> /dev/null; then
-    print_info "配置防火墙规则..."
-    systemctl start firewalld
-    systemctl enable firewalld
-    
-    firewall-cmd --permanent --add-port=80/tcp
-    firewall-cmd --permanent --add-port=8080/tcp
-    firewall-cmd --permanent --add-port=5001/tcp
-    firewall-cmd --permanent --add-port=22/tcp
-    firewall-cmd --reload
-    
-    print_info "防火墙配置完成"
-else
-    print_warn "firewalld未安装，跳过防火墙配置"
+    systemctl start firewalld || print_warn "防火墙服务启动失败，请检查系统限制"
+    if systemctl is-active --quiet firewalld; then
+        firewall-cmd --permanent --add-port={80,8080,5001,22}/tcp
+        firewall-cmd --reload
+        print_info "防火墙端口已开放"
+    fi
 fi
+
+print_step "部署完成！"
+echo "请查看 /root/hailong-deploy-info.txt 获取访问信息"
 
 ###############################################################################
 # 部署完成
