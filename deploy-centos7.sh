@@ -155,8 +155,8 @@ fi
 print_step "第六步：安装Node.js"
 
 if ! command -v node &> /dev/null; then
-    print_info "安装Node.js 18..."
-    curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+    print_info "安装 Node.js 16 (CentOS 7 兼容版本)..."
+    curl -sL https://rpm.nodesource.com/setup_16.x | bash -
     yum install -y nodejs
     
     print_info "Node.js版本: $(node --version)"
