@@ -1,0 +1,524 @@
+#!/bin/bash
+
+###############################################################################
+# 海隆咨询官网 - Ubuntu 22.04 Docker一键部署脚本
+# 使用方法: chmod +x deploy-ubuntu22-docker.sh && sudo ./deploy-ubuntu22-docker.sh
+###############################################################################
+
+set -e  # 遇到错误立即退出
+
+# 颜色定义
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# 打印函数
+print_info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+print_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_step() {
+    echo -e "\n${BLUE}========================================${NC}"
+    echo -e "${BLUE}$1${NC}"
+    echo -e "${BLUE}========================================${NC}\n"
+}
+
+# 检查是否为root用户
+if [ "$EUID" -ne 0 ]; then 
+    print_error "请使用root用户运行此脚本"
+    exit 1
+fi
+
+# 获取服务器IP
+SERVER_IP=$(ip addr | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1 | head -n1)
+
+print_step "欢迎使用海隆咨询官网Docker一键部署脚本 (Ubuntu 22.04)"
+echo "服务器IP: $SERVER_IP"
+echo ""
+echo "本脚本将使用Docker容器化部署，包括："
+echo "  - MySQL 8.0 容器"
+echo "  - .NET 7.0 API 容器"
+echo "  - Nginx 容器（前端+反向代理）"
+echo ""
+
+# 询问用户配置
+read -p "请输入MySQL root密码 (默认: Hailong@2025): " MYSQL_ROOT_PASSWORD
+MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-Hailong@2025}
+
+read -p "请输入MySQL应用密码 (默认: HailongApp@2025): " MYSQL_APP_PASSWORD
+MYSQL_APP_PASSWORD=${MYSQL_APP_PASSWORD:-HailongApp@2025}
+
+read -p "请输入JWT密钥 (至少32字符，默认自动生成): " JWT_SECRET
+if [ -z "$JWT_SECRET" ]; then
+    JWT_SECRET=$(openssl rand -base64 32)
+fi
+
+read -p "项目文件路径 (默认: /opt/hailong/project): " PROJECT_PATH
+PROJECT_PATH=${PROJECT_PATH:-/opt/hailong/project}
+
+echo ""
+print_info "配置信息："
+echo "  MySQL Root密码: $MYSQL_ROOT_PASSWORD"
+echo "  MySQL应用密码: $MYSQL_APP_PASSWORD"
+echo "  JWT密钥: ${JWT_SECRET:0:20}..."
+echo "  项目路径: $PROJECT_PATH"
+echo ""
+
+read -p "确认开始部署? (y/n): " CONFIRM
+if [ "$CONFIRM" != "y" ]; then
+    print_warn "部署已取消"
+    exit 0
+fi
+
+###############################################################################
+# 第一步：检查项目文件
+###############################################################################
+print_step "第一步：检查项目文件"
+
+if [ ! -d "$PROJECT_PATH" ]; then
+    print_error "项目路径不存在: $PROJECT_PATH"
+    print_info "请先将项目文件上传到服务器"
+    exit 1
+fi
+
+print_info "检查必需文件..."
+REQUIRED_FILES=(
+    "$PROJECT_PATH/docker-compose.yml"
+    "$PROJECT_PATH/BackEnd/HailongConsulting.API/Dockerfile"
+    "$PROJECT_PATH/nginx/nginx.conf"
+    "$PROJECT_PATH/nginx/conf.d/default.conf"
+)
+
+for file in "${REQUIRED_FILES[@]}"; do
+    if [ ! -f "$file" ]; then
+        print_error "缺少必需文件: $file"
+        exit 1
+    fi
+done
+
+print_info "所有必需文件检查通过"
+
+###############################################################################
+# 第二步：安装Docker
+###############################################################################
+print_step "第二步：安装Docker"
+
+if command -v docker &> /dev/null; then
+    print_info "Docker已安装，版本: $(docker --version)"
+else
+    print_info "安装Docker..."
+    
+    # 更新包索引
+    apt update
+    
+    # 安装依赖
+    apt install -y ca-certificates curl gnupg lsb-release
+    
+    # 添加Docker官方GPG密钥
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    
+    # 设置Docker仓库
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    
+    # 安装Docker Engine
+    apt update
+    apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    
+    # 启动Docker
+    systemctl start docker
+    systemctl enable docker
+    
+    print_info "Docker安装成功: $(docker --version)"
+fi
+
+###############################################################################
+# 第三步：安装Docker Compose
+###############################################################################
+print_step "第三步：安装Docker Compose"
+
+if command -v docker-compose &> /dev/null; then
+    print_info "Docker Compose已安装，版本: $(docker-compose --version)"
+else
+    print_info "安装Docker Compose..."
+    
+    # 下载Docker Compose
+    curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    
+    # 赋予执行权限
+    chmod +x /usr/local/bin/docker-compose
+    
+    # 创建软链接
+    ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
+    
+    print_info "Docker Compose安装成功: $(docker-compose --version)"
+fi
+
+###############################################################################
+# 第四步：安装Node.js（用于构建前端）
+###############################################################################
+print_step "第四步：安装Node.js"
+
+if command -v node &> /dev/null; then
+    print_info "Node.js已安装，版本: $(node --version)"
+else
+    print_info "安装Node.js 18..."
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    apt install -y nodejs
+    
+    print_info "Node.js安装成功: $(node --version)"
+    print_info "npm版本: $(npm --version)"
+fi
+
+###############################################################################
+# 第五步：更新docker-compose.yml配置
+###############################################################################
+print_step "第五步：更新docker-compose.yml配置"
+
+print_info "生成配置文件..."
+
+# 备份原配置
+if [ -f "$PROJECT_PATH/docker-compose.yml" ]; then
+    cp "$PROJECT_PATH/docker-compose.yml" "$PROJECT_PATH/docker-compose.yml.bak"
+fi
+
+# 生成新的docker-compose.yml
+cat > "$PROJECT_PATH/docker-compose.yml" <<EOF
+version: '3.8'
+
+services:
+  # MySQL数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: hailong-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: hailong_consulting
+      MYSQL_USER: hailong_app
+      MYSQL_PASSWORD: $MYSQL_APP_PASSWORD
+      TZ: Asia/Shanghai
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./SQL:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - hailong-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 后端API服务
+  api:
+    build:
+      context: ./BackEnd/HailongConsulting.API
+      dockerfile: Dockerfile
+    container_name: hailong-api
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=hailong_consulting;User=hailong_app;Password=$MYSQL_APP_PASSWORD;CharSet=utf8mb4;
+      - Jwt__Key=$JWT_SECRET
+      - Jwt__Issuer=HailongConsulting.API
+      - Jwt__Audience=HailongConsulting.Client
+      - Jwt__ExpireHours=24
+      - TZ=Asia/Shanghai
+    volumes:
+      - api-uploads:/app/wwwroot/uploads
+      - api-logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hailong-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/home/statistics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx服务（前端+反向代理）
+  nginx:
+    image: nginx:alpine
+    container_name: hailong-nginx
+    restart: always
+    ports:
+      - "80:80"        # 前端门户
+      - "8080:8080"    # 后台管理
+      - "5001:5001"    # API代理
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./hailong-admin/dist:/usr/share/nginx/html/admin:ro
+      - ./hailong-protral/dist:/usr/share/nginx/html/portal:ro
+      - api-uploads:/usr/share/nginx/html/uploads:ro
+    depends_on:
+      - api
+    networks:
+      - hailong-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  hailong-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  api-uploads:
+    driver: local
+  api-logs:
+    driver: local
+EOF
+
+print_info "docker-compose.yml配置完成"
+
+###############################################################################
+# 第六步：构建前端
+###############################################################################
+print_step "第六步：构建前端"
+
+# 构建后台管理系统
+if [ -d "$PROJECT_PATH/hailong-admin" ]; then
+    print_info "构建后台管理系统..."
+    cd "$PROJECT_PATH/hailong-admin"
+    
+    # 配置API地址
+    cat > .env.production <<EOF
+VITE_API_BASE_URL=http://$SERVER_IP:5001
+EOF
+    
+    print_info "安装依赖..."
+    npm install --registry=https://registry.npmmirror.com
+    
+    print_info "构建项目..."
+    npm run build
+    
+    if [ -d "dist" ]; then
+        print_info "后台管理系统构建成功"
+    else
+        print_error "后台管理系统构建失败"
+        exit 1
+    fi
+else
+    print_warn "未找到后台管理系统目录"
+fi
+
+# 构建前端门户
+if [ -d "$PROJECT_PATH/hailong-protral" ]; then
+    print_info "构建前端门户..."
+    cd "$PROJECT_PATH/hailong-protral"
+    
+    cat > .env.production <<EOF
+VITE_API_BASE_URL=http://$SERVER_IP:5001
+EOF
+    
+    npm install --registry=https://registry.npmmirror.com
+    npm run build
+    
+    if [ -d "dist" ]; then
+        print_info "前端门户构建成功"
+    else
+        print_error "前端门户构建失败"
+        exit 1
+    fi
+else
+    print_warn "未找到前端门户目录"
+fi
+
+###############################################################################
+# 第七步：启动Docker容器
+###############################################################################
+print_step "第七步：启动Docker容器"
+
+cd "$PROJECT_PATH"
+
+print_info "停止并删除旧容器（如果存在）..."
+docker-compose down 2>/dev/null || true
+
+print_info "启动所有服务..."
+print_warn "首次启动需要构建镜像，可能需要5-10分钟，请耐心等待..."
+
+docker-compose up -d --build
+
+print_info "等待服务启动..."
+sleep 10
+
+###############################################################################
+# 第八步：验证部署
+###############################################################################
+print_step "第八步：验证部署"
+
+print_info "检查容器状态..."
+docker-compose ps
+
+# 等待MySQL初始化完成
+print_info "等待MySQL初始化完成..."
+for i in {1..30}; do
+    if docker exec hailong-mysql mysqladmin ping -h localhost -p"$MYSQL_ROOT_PASSWORD" &> /dev/null; then
+        print_info "MySQL已就绪"
+        break
+    fi
+    echo -n "."
+    sleep 2
+done
+echo ""
+
+# 等待API启动
+print_info "等待API服务启动..."
+for i in {1..30}; do
+    if curl -s http://localhost:5001/api/home/statistics > /dev/null 2>&1; then
+        print_info "API服务已就绪"
+        break
+    fi
+    echo -n "."
+    sleep 2
+done
+echo ""
+
+# 检查数据库表
+print_info "验证数据库初始化..."
+TABLE_COUNT=$(docker exec hailong-mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "USE hailong_consulting; SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='hailong_consulting';" -s -N 2>/dev/null || echo "0")
+
+if [ "$TABLE_COUNT" -gt "0" ]; then
+    print_info "数据库初始化成功，共 $TABLE_COUNT 张表"
+else
+    print_warn "数据库表数量为0，可能初始化失败"
+    print_info "查看MySQL日志："
+    docker-compose logs mysql | tail -20
+fi
+
+###############################################################################
+# 第九步：配置防火墙
+###############################################################################
+print_step "第九步：配置防火墙"
+
+if command -v ufw &> /dev/null; then
+    print_info "配置UFW防火墙..."
+    ufw allow 80/tcp
+    ufw allow 8080/tcp
+    ufw allow 5001/tcp
+    ufw allow 22/tcp
+    ufw --force enable
+    
+    print_info "防火墙配置完成"
+else
+    print_warn "UFW未安装，跳过防火墙配置"
+fi
+
+###############################################################################
+# 部署完成
+###############################################################################
+print_step "部署完成！"
+
+echo ""
+echo "=========================================="
+echo "  Docker部署信息"
+echo "=========================================="
+echo ""
+echo "服务器IP: $SERVER_IP"
+echo ""
+echo "访问地址："
+echo "  - 前端门户:     http://$SERVER_IP"
+echo "  - 后台管理:     http://$SERVER_IP:8080"
+echo "  - API接口:      http://$SERVER_IP:5001"
+echo ""
+echo "默认登录信息："
+echo "  - 用户名: admin"
+echo "  - 密码: admin123"
+echo ""
+echo "Docker容器："
+echo "  - hailong-mysql  (MySQL 8.0)"
+echo "  - hailong-api    (.NET 7.0 API)"
+echo "  - hailong-nginx  (Nginx)"
+echo ""
+echo "常用Docker命令："
+echo "  - 查看容器状态:  docker-compose ps"
+echo "  - 查看日志:      docker-compose logs -f"
+echo "  - 重启服务:      docker-compose restart"
+echo "  - 停止服务:      docker-compose down"
+echo "  - 启动服务:      docker-compose up -d"
+echo ""
+echo "数据库信息："
+echo "  - 数据库名: hailong_consulting"
+echo "  - Root密码: $MYSQL_ROOT_PASSWORD"
+echo "  - 应用用户: hailong_app"
+echo "  - 应用密码: $MYSQL_APP_PASSWORD"
+echo ""
+echo "项目路径: $PROJECT_PATH"
+echo ""
+echo "=========================================="
+echo ""
+
+print_info "请在浏览器中访问上述地址进行测试"
+print_warn "首次登录后请立即修改默认密码！"
+
+# 保存配置信息
+cat > /root/hailong-docker-deploy-info.txt <<EOF
+海隆咨询官网Docker部署信息 (Ubuntu 22.04)
+部署时间: $(date)
+服务器IP: $SERVER_IP
+
+访问地址:
+- 前端门户: http://$SERVER_IP
+- 后台管理: http://$SERVER_IP:8080
+- API接口: http://$SERVER_IP:5001
+
+Docker容器:
+- hailong-mysql  (MySQL 8.0)
+- hailong-api    (.NET 7.0 API)
+- hailong-nginx  (Nginx)
+
+数据库信息:
+- MySQL Root密码: $MYSQL_ROOT_PASSWORD
+- MySQL应用密码: $MYSQL_APP_PASSWORD
+- 数据库名: hailong_consulting
+- 用户名: hailong_app
+
+JWT密钥: $JWT_SECRET
+
+项目路径: $PROJECT_PATH
+
+常用命令:
+cd $PROJECT_PATH
+docker-compose ps              # 查看容器状态
+docker-compose logs -f         # 查看日志
+docker-compose restart api     # 重启API
+docker-compose restart nginx   # 重启Nginx
+docker-compose down            # 停止所有服务
+docker-compose up -d           # 启动所有服务
+
+备份命令:
+docker exec hailong-mysql mysqldump -u root -p$MYSQL_ROOT_PASSWORD hailong_consulting > backup.sql
+EOF
+
+print_info "部署信息已保存到: /root/hailong-docker-deploy-info.txt"
+
+# 显示容器状态
+echo ""
+print_info "当前容器状态："
+docker-compose ps
+
+echo ""
+print_info "如需查看详细日志，请执行："
+echo "  cd $PROJECT_PATH && docker-compose logs -f"
