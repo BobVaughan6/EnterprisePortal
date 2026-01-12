@@ -109,14 +109,33 @@ done
 print_info "所有必需文件检查通过"
 
 ###############################################################################
-# 第二步：安装Docker
+# 第二步：安装Docker（最新版本）
 ###############################################################################
 print_step "第二步：安装Docker"
 
 if command -v docker &> /dev/null; then
-    print_info "Docker已安装，版本: $(docker --version)"
-else
-    print_info "安装Docker..."
+    DOCKER_VERSION=$(docker version --format '{{.Server.Version}}' 2>/dev/null || echo "unknown")
+    print_info "Docker已安装，版本: $DOCKER_VERSION"
+    
+    # 检查是否需要升级
+    print_warn "检查Docker版本兼容性..."
+    if docker version &> /dev/null; then
+        print_info "Docker版本正常"
+    else
+        print_warn "Docker版本可能过旧，建议升级"
+        read -p "是否重新安装最新版Docker? (y/n): " REINSTALL
+        if [ "$REINSTALL" == "y" ]; then
+            print_info "卸载旧版Docker..."
+            apt remove -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io 2>/dev/null || true
+            apt autoremove -y
+        else
+            print_warn "继续使用当前版本"
+        fi
+    fi
+fi
+
+if ! command -v docker &> /dev/null; then
+    print_info "安装最新版Docker..."
     
     # 更新包索引
     apt update
@@ -145,26 +164,38 @@ else
 fi
 
 ###############################################################################
-# 第三步：安装Docker Compose
+# 第三步：检测Docker Compose命令
 ###############################################################################
-print_step "第三步：安装Docker Compose"
+print_step "第三步：检测Docker Compose"
 
-if command -v docker-compose &> /dev/null; then
-    print_info "Docker Compose已安装，版本: $(docker-compose --version)"
+# 优先使用 docker compose (新版插件)
+if docker compose version &> /dev/null; then
+    COMPOSE_CMD="docker compose"
+    print_info "使用Docker Compose插件: $(docker compose version)"
+# 回退到 docker-compose (独立版本)
+elif command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+    print_info "使用独立Docker Compose: $(docker-compose --version)"
 else
-    print_info "安装Docker Compose..."
+    print_warn "未检测到Docker Compose，开始安装..."
     
-    # 下载Docker Compose
-    curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    # 下载最新版Docker Compose
+    COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d\" -f4)
+    if [ -z "$COMPOSE_VERSION" ]; then
+        COMPOSE_VERSION="v2.24.0"
+    fi
     
-    # 赋予执行权限
+    print_info "安装Docker Compose $COMPOSE_VERSION..."
+    curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    
     chmod +x /usr/local/bin/docker-compose
-    
-    # 创建软链接
     ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
     
+    COMPOSE_CMD="docker-compose"
     print_info "Docker Compose安装成功: $(docker-compose --version)"
 fi
+
+print_info "将使用命令: $COMPOSE_CMD"
 
 ###############################################################################
 # 第四步：安装Node.js（用于构建前端）
@@ -191,7 +222,7 @@ print_info "生成配置文件..."
 
 # 备份原配置
 if [ -f "$PROJECT_PATH/docker-compose.yml" ]; then
-    cp "$PROJECT_PATH/docker-compose.yml" "$PROJECT_PATH/docker-compose.yml.bak"
+    cp "$PROJECT_PATH/docker-compose.yml" "$PROJECT_PATH/docker-compose.yml.bak.$(date +%Y%m%d_%H%M%S)"
 fi
 
 # 生成新的docker-compose.yml
@@ -354,12 +385,12 @@ print_step "第七步：启动Docker容器"
 cd "$PROJECT_PATH"
 
 print_info "停止并删除旧容器（如果存在）..."
-docker-compose down 2>/dev/null || true
+$COMPOSE_CMD down 2>/dev/null || true
 
 print_info "启动所有服务..."
 print_warn "首次启动需要构建镜像，可能需要5-10分钟，请耐心等待..."
 
-docker-compose up -d --build
+$COMPOSE_CMD up -d --build
 
 print_info "等待服务启动..."
 sleep 10
@@ -370,7 +401,7 @@ sleep 10
 print_step "第八步：验证部署"
 
 print_info "检查容器状态..."
-docker-compose ps
+$COMPOSE_CMD ps
 
 # 等待MySQL初始化完成
 print_info "等待MySQL初始化完成..."
@@ -405,7 +436,7 @@ if [ "$TABLE_COUNT" -gt "0" ]; then
 else
     print_warn "数据库表数量为0，可能初始化失败"
     print_info "查看MySQL日志："
-    docker-compose logs mysql | tail -20
+    $COMPOSE_CMD logs mysql | tail -20
 fi
 
 ###############################################################################
@@ -453,11 +484,11 @@ echo "  - hailong-api    (.NET 7.0 API)"
 echo "  - hailong-nginx  (Nginx)"
 echo ""
 echo "常用Docker命令："
-echo "  - 查看容器状态:  docker-compose ps"
-echo "  - 查看日志:      docker-compose logs -f"
-echo "  - 重启服务:      docker-compose restart"
-echo "  - 停止服务:      docker-compose down"
-echo "  - 启动服务:      docker-compose up -d"
+echo "  - 查看容器状态:  $COMPOSE_CMD ps"
+echo "  - 查看日志:      $COMPOSE_CMD logs -f"
+echo "  - 重启服务:      $COMPOSE_CMD restart"
+echo "  - 停止服务:      $COMPOSE_CMD down"
+echo "  - 启动服务:      $COMPOSE_CMD up -d"
 echo ""
 echo "数据库信息："
 echo "  - 数据库名: hailong_consulting"
@@ -478,6 +509,7 @@ cat > /root/hailong-docker-deploy-info.txt <<EOF
 海隆咨询官网Docker部署信息 (Ubuntu 22.04)
 部署时间: $(date)
 服务器IP: $SERVER_IP
+使用命令: $COMPOSE_CMD
 
 访问地址:
 - 前端门户: http://$SERVER_IP
@@ -501,12 +533,12 @@ JWT密钥: $JWT_SECRET
 
 常用命令:
 cd $PROJECT_PATH
-docker-compose ps              # 查看容器状态
-docker-compose logs -f         # 查看日志
-docker-compose restart api     # 重启API
-docker-compose restart nginx   # 重启Nginx
-docker-compose down            # 停止所有服务
-docker-compose up -d           # 启动所有服务
+$COMPOSE_CMD ps              # 查看容器状态
+$COMPOSE_CMD logs -f         # 查看日志
+$COMPOSE_CMD restart api     # 重启API
+$COMPOSE_CMD restart nginx   # 重启Nginx
+$COMPOSE_CMD down            # 停止所有服务
+$COMPOSE_CMD up -d           # 启动所有服务
 
 备份命令:
 docker exec hailong-mysql mysqldump -u root -p$MYSQL_ROOT_PASSWORD hailong_consulting > backup.sql
@@ -517,8 +549,8 @@ print_info "部署信息已保存到: /root/hailong-docker-deploy-info.txt"
 # 显示容器状态
 echo ""
 print_info "当前容器状态："
-docker-compose ps
+$COMPOSE_CMD ps
 
 echo ""
 print_info "如需查看详细日志，请执行："
-echo "  cd $PROJECT_PATH && docker-compose logs -f"
+echo "  cd $PROJECT_PATH && $COMPOSE_CMD logs -f"

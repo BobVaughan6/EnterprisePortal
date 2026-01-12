@@ -104,7 +104,7 @@ sudo apt install -y git
 # 克隆项目
 sudo mkdir -p /opt/hailong
 cd /opt/hailong
-sudo git clone https://github.com/yourusername/Protral.git project
+sudo git clone https://github.com/BobVaughan6/EnterprisePortal.git project
 ```
 
 **方式二：使用SCP上传**
@@ -116,20 +116,26 @@ scp -r /path/to/Protral root@服务器IP:/opt/hailong/project
 
 ### 快速部署
 
-#### 第1步：上传部署脚本
+#### 第1步：进入项目目录
 
-将 [`deploy-ubuntu22.sh`](deploy-ubuntu22.sh) 上传到服务器的 `/root/` 目录。
+```Bash
+cd /opt/hailong/project
+```
+
 
 #### 第2步：赋予执行权限
 
-```bash
-cd /root
-chmod +x deploy-ubuntu22.sh
+直接对项目根目录下的脚本进行授权：
+
+```Bash
+sudo chmod +x deploy-ubuntu22.sh
 ```
 
 #### 第3步：运行部署脚本
 
-```bash
+由于脚本在当前目录，直接执行即可：
+
+```Bash
 sudo ./deploy-ubuntu22.sh
 ```
 
@@ -189,20 +195,26 @@ ip addr show
 
 ### 快速部署
 
-#### 第1步：上传部署脚本
+#### 第1步：进入项目目录
 
-将 [`deploy-ubuntu22-docker.sh`](deploy-ubuntu22-docker.sh) 上传到服务器的 `/root/` 目录。
+```Bash
+cd /opt/hailong/project
+```
+
 
 #### 第2步：赋予执行权限
 
-```bash
-cd /root
-chmod +x deploy-ubuntu22-docker.sh
+直接对项目根目录下的脚本进行授权：
+
+```Bash
+sudo chmod +x deploy-ubuntu22-docker.sh
 ```
 
 #### 第3步：运行部署脚本
 
-```bash
+由于脚本在当前目录，直接执行即可：
+
+```Bash
 sudo ./deploy-ubuntu22-docker.sh
 ```
 
