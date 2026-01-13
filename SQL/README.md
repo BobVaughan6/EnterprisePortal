@@ -2,8 +2,16 @@
 
 ## 文件说明
 
-### 1. hailong_consulting_init_data.sql
-**主初始化文件**，包含：
+**重要提示：** 所有 SQL 文件已按执行顺序编号（01-05），MySQL Docker 容器会按字母顺序自动执行。
+
+### 1. 01_hailong_consulting_schema.sql
+**数据库结构文件**，包含：
+- 数据库创建语句
+- 所有表的创建语句（CREATE TABLE）
+- 索引和视图定义
+
+### 2. 02_hailong_consulting_init_data.sql
+**主初始化数据文件**，包含：
 - 用户账号数据（管理员和测试账号）
 - 河南省完整的省市区三级数据
 - 安徽省部分城市数据
@@ -11,14 +19,14 @@
 - 示例公告和信息发布数据
 - 友情链接数据
 
-### 2. region_dictionary_supplement.sql
+### 3. 03_region_dictionary_supplement.sql
 **区域字典补充文件（第一部分）**，包含：
 - 北京市、天津市、上海市、重庆市（4个直辖市）
 - 河北、山西、内蒙古、辽宁、吉林、黑龙江（华北、东北地区）
 - 江苏、浙江、福建、江西、山东（华东地区部分省份）
 - 共计16个省级行政区及其主要城市
 
-### 3. region_dictionary_supplement_part2.sql
+### 4. 04_region_dictionary_supplement_part2.sql
 **区域字典补充文件（第二部分）**，包含：
 - 湖北、湖南、广东、广西、海南（华中、华南地区）
 - 四川、贵州、云南、西藏（西南地区）
@@ -26,7 +34,7 @@
 - 香港、澳门、台湾（特别行政区）
 - 共计18个省级行政区及其主要城市
 
-### 4. region_dictionary_districts.sql
+### 5. 05_region_dictionary_districts.sql
 **全国主要城市区县数据**，包含：
 - 4个直辖市的完整区县数据（北京、天津、上海、重庆）
 - 各省主要城市的区县数据
@@ -35,31 +43,35 @@
 
 ## 执行顺序
 
-**重要：必须按照以下顺序执行SQL文件**
+**Docker 部署：** 文件已按执行顺序编号（01-05），MySQL 容器启动时会自动按顺序执行，无需手动操作。
+
+**手动执行顺序：**
 
 ```bash
-# 1. 首先执行主初始化文件
-mysql -u root -p hailong_consulting < hailong_consulting_init_data.sql
+# 1. 首先执行数据库结构文件
+mysql -u root -p < 01_hailong_consulting_schema.sql
 
-# 2. 然后执行第一部分补充文件
-mysql -u root -p hailong_consulting < region_dictionary_supplement.sql
+# 2. 执行主初始化数据文件
+mysql -u root -p hailong_consulting < 02_hailong_consulting_init_data.sql
 
-# 3. 执行第二部分补充文件
-mysql -u root -p hailong_consulting < region_dictionary_supplement_part2.sql
+# 3. 执行第一部分区域补充文件
+mysql -u root -p hailong_consulting < 03_region_dictionary_supplement.sql
 
-# 4. 最后执行区县数据补充文件
-mysql -u root -p hailong_consulting < region_dictionary_districts.sql
+# 4. 执行第二部分区域补充文件
+mysql -u root -p hailong_consulting < 04_region_dictionary_supplement_part2.sql
+
+# 5. 执行区县数据补充文件
+mysql -u root -p hailong_consulting < 05_region_dictionary_districts.sql
 ```
 
 或者在MySQL客户端中执行：
 
 ```sql
-USE hailong_consulting;
-
-SOURCE /path/to/hailong_consulting_init_data.sql;
-SOURCE /path/to/region_dictionary_supplement.sql;
-SOURCE /path/to/region_dictionary_supplement_part2.sql;
-SOURCE /path/to/region_dictionary_districts.sql;
+SOURCE /path/to/01_hailong_consulting_schema.sql;
+SOURCE /path/to/02_hailong_consulting_init_data.sql;
+SOURCE /path/to/03_region_dictionary_supplement.sql;
+SOURCE /path/to/04_region_dictionary_supplement_part2.sql;
+SOURCE /path/to/05_region_dictionary_districts.sql;
 ```
 
 ## 数据覆盖范围

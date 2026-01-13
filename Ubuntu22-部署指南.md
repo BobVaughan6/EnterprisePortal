@@ -105,6 +105,10 @@ sudo apt install -y git
 sudo mkdir -p /opt/hailong
 cd /opt/hailong
 sudo git clone https://github.com/BobVaughan6/EnterprisePortal.git project
+
+# 更新项目
+cd /opt/hailong/project
+sudo git pull
 ```
 
 **方式二：使用SCP上传**
