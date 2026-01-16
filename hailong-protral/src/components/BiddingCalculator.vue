@@ -97,14 +97,24 @@
               </div>
             </div>
 
-            <div class="flex justify-between items-center py-3 border-b border-gray-200">
-              <span class="text-gray-700 font-medium">标准收费：</span>
-              <span class="text-2xl font-bold text-hailong-primary">{{ formatCurrency(result.standardFee) }}</span>
+            <div v-if="result.breakdown.length > 0" class="border-t border-hailong-primary/20 pt-3 mb-3">
+              <div class="text-xs text-gray-600 mb-2 font-semibold">分档计算明细：</div>
+              <div class="space-y-1">
+                <div v-for="(item, index) in result.breakdown" :key="index" class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600">{{ item.range }} ({{ item.rate }}%)</span>
+                  <span class="text-gray-800 font-medium">{{ formatCurrency(item.amount) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center py-3 border-t border-gray-200">
+              <span class="text-gray-700 font-medium">标准收费小计：</span>
+              <span class="text-xl font-bold text-gray-800">{{ formatCurrency(result.standardFee) }}</span>
             </div>
             
-            <div class="flex justify-between items-center py-3 bg-green-50 rounded-lg px-3">
-              <span class="text-gray-700 font-medium">优惠后收费：</span>
-              <span class="text-2xl font-bold text-green-600">{{ formatCurrency(result.discountedFee) }}</span>
+            <div class="flex justify-between items-center py-3 bg-blue-50 rounded-lg px-3">
+              <span class="text-gray-700 font-medium">{{ formData.discount < 100 ? '优惠后收费：' : '最终收费：' }}</span>
+              <span class="text-2xl font-bold text-blue-700">{{ formatCurrency(result.discountedFee) }}</span>
             </div>
           </div>
         </div>
@@ -162,17 +172,49 @@ const formData = reactive({
 const result = reactive({
   standardFee: 0,
   discountedFee: 0,
-  report: ''
+  report: '',
+  breakdown: []
 })
 
-// 费率配置（分段累进）
-const feeRates = [
-  { min: 0, max: 100, rate: 1.500 },
-  { min: 100, max: 500, rate: 0.800 },
-  { min: 500, max: 1000, rate: 0.450 },
-  { min: 1000, max: 5000, rate: 0.250 },
-  { min: 5000, max: 10000, rate: 0.100 }
-]
+// 费率配置（根据河南省招标代理服务收费指导意见）
+const feeRates = {
+  engineering: [
+    { min: 0, max: 100, rate: 1.2 },
+    { min: 100, max: 500, rate: 1.0 },
+    { min: 500, max: 1000, rate: 0.7 },
+    { min: 1000, max: 5000, rate: 0.4 },
+    { min: 5000, max: 10000, rate: 0.25 },
+    { min: 10000, max: 50000, rate: 0.10 },
+    { min: 50000, max: 100000, rate: 0.045 },
+    { min: 100000, max: 500000, rate: 0.01 },
+    { min: 500000, max: 1000000, rate: 0.008 },
+    { min: 1000000, max: Infinity, rate: 0.004 }
+  ],
+  goods: [
+    { min: 0, max: 100, rate: 1.7 },
+    { min: 100, max: 500, rate: 1.2 },
+    { min: 500, max: 1000, rate: 0.8 },
+    { min: 1000, max: 5000, rate: 0.5 },
+    { min: 5000, max: 10000, rate: 0.30 },
+    { min: 10000, max: 50000, rate: 0.10 },
+    { min: 50000, max: 100000, rate: 0.045 },
+    { min: 100000, max: 500000, rate: 0.01 },
+    { min: 500000, max: 1000000, rate: 0.008 },
+    { min: 1000000, max: Infinity, rate: 0.004 }
+  ],
+  service: [
+    { min: 0, max: 100, rate: 1.7 },
+    { min: 100, max: 500, rate: 1.2 },
+    { min: 500, max: 1000, rate: 0.7 },
+    { min: 1000, max: 5000, rate: 0.4 },
+    { min: 5000, max: 10000, rate: 0.250 },
+    { min: 10000, max: 50000, rate: 0.10 },
+    { min: 50000, max: 100000, rate: 0.045 },
+    { min: 100000, max: 500500, rate: 0.010 },
+    { min: 500500, max: 1000000, rate: 0.008 },
+    { min: 1000000, max: Infinity, rate: 0.004 }
+  ]
+}
 
 // 计算费用
 const calculate = () => {
@@ -180,16 +222,18 @@ const calculate = () => {
     result.standardFee = 0
     result.discountedFee = 0
     result.report = ''
+    result.breakdown = []
     return
   }
 
-  let amount = formData.amount
+  const amount = formData.amount
+  const currentFeeRates = feeRates[formData.serviceType]
   let totalFee = 0
-  let details = []
+  let breakdown = []
 
   // 分段计算
-  for (let i = 0; i < feeRates.length; i++) {
-    const rate = feeRates[i]
+  for (let i = 0; i < currentFeeRates.length; i++) {
+    const rate = currentFeeRates[i]
     
     if (amount <= 0) break
     
@@ -202,26 +246,30 @@ const calculate = () => {
         segmentAmount = amount - rate.min
       }
       
+      // 计算当前区间的费用（注意费率是百分比，所以要除以100）
       const segmentFee = segmentAmount * 10000 * (rate.rate / 100)
-      totalFee += segmentFee
       
-      details.push({
-        range: `${rate.min}---${rate.max}`,
-        amount: segmentAmount,
-        rate: rate.rate,
-        fee: segmentFee
-      })
+      // 只添加有金额的区间
+      if (segmentAmount > 0) {
+        totalFee += segmentFee
+        
+        // 生成分段描述
+        let rangeLabel = ''
+        if (rate.min === 0) {
+          rangeLabel = `X≤${rate.max}万元`
+        } else if (rate.max === Infinity) {
+          rangeLabel = `X＞${rate.min}万元`
+        } else {
+          rangeLabel = `${rate.min}＜X≤${rate.max}万元`
+        }
+        
+        breakdown.push({
+          range: rangeLabel,
+          amount: segmentFee,
+          rate: rate.rate
+        })
+      }
     }
-  }
-
-  // 如果超过10000万元
-  if (amount > 10000) {
-    details.push({
-      range: '10000以上',
-      amount: amount - 10000,
-      rate: '面议',
-      fee: 0
-    })
   }
 
   // 应用折扣
@@ -230,26 +278,31 @@ const calculate = () => {
 
   // 生成报告
   const serviceTypeLabel = serviceTypes.find(t => t.value === formData.serviceType)?.label || '服务'
-  let report = `计算类型为：${serviceTypeLabel}招标\n`
-  report += `中标金额为：${formData.amount}万元\n`
+  let report = `计算类型：${serviceTypeLabel}招标\n`
+  report += `项目金额：${formData.amount.toFixed(2)}万元\n`
   report += `------------------------------\n`
+  report += `分档计算明细：\n`
   
-  details.forEach(detail => {
-    if (detail.rate !== '面议') {
-      report += `${detail.range}：${detail.amount}×${detail.rate}％=${detail.fee.toFixed(2)}元\n`
-    }
+  breakdown.forEach(item => {
+    report += `${item.range}：${item.rate}% = ${item.amount.toFixed(2)}元\n`
   })
   
   report += `------------------------------\n`
-  report += `各项结果累计得：${totalFee.toFixed(2)}元\n`
+  report += `标准收费小计：${totalFee.toFixed(2)}元\n`
   
   if (discount < 100) {
-    report += `按${discount}％计算得：${discountedFee.toFixed(2)}元`
+    report += `优惠折扣：${discount}%\n`
+    report += `------------------------------\n`
+    report += `优惠后收费：${discountedFee.toFixed(2)}元`
+  } else {
+    report += `------------------------------\n`
+    report += `最终收费：${discountedFee.toFixed(2)}元`
   }
 
   result.standardFee = totalFee
   result.discountedFee = discountedFee
   result.report = report
+  result.breakdown = breakdown
 }
 
 // 获取服务类型标签
