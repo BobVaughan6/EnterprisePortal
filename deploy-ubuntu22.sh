@@ -87,9 +87,9 @@ print_info "安装基础工具..."
 apt install -y wget curl git unzip vim net-tools software-properties-common
 
 ###############################################################################
-# 第二步：安装.NET 7.0运行时
+# 第二步：安装.NET 8.0运行时
 ###############################################################################
-print_step "第二步：安装.NET 7.0运行时"
+print_step "第二步：安装.NET 8.0运行时"
 
 if ! command -v dotnet &> /dev/null; then
     print_info "添加Microsoft软件源..."
@@ -100,7 +100,7 @@ if ! command -v dotnet &> /dev/null; then
     apt update
     
     print_info "安装.NET运行时和SDK..."
-    apt install -y aspnetcore-runtime-7.0 dotnet-sdk-7.0
+    apt install -y aspnetcore-runtime-8.0 dotnet-sdk-8.0
     
     print_info ".NET版本: $(dotnet --version)"
 else

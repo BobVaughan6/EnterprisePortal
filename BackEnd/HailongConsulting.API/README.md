@@ -1,6 +1,6 @@
 # 海隆咨询官网后端API
 
-基于 .NET 7 Web API 构建的海隆咨询官网后端服务系统。
+基于 .NET 8 Web API 构建的海隆咨询官网后端服务系统。
 
 ## 📋 项目概述
 
@@ -121,7 +121,7 @@ HailongConsulting.API/
 
 ### 1. 环境要求
 
-- **.NET 7 SDK** - [下载地址](https://dotnet.microsoft.com/download/dotnet/7.0)
+- **.NET 8 SDK** - [下载地址](https://dotnet.microsoft.com/download/dotnet/8.0)
 - **MySQL 8.0+** - 数据库服务器
 - **Visual Studio 2022** 或 **VS Code** - 开发工具
 

@@ -1,7 +1,7 @@
 # 使用多阶段构建优化镜像大小
 
 # 第一阶段：构建应用
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # 复制项目文件并还原依赖
@@ -19,7 +19,7 @@ FROM build AS publish
 RUN dotnet publish "HailongConsulting.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # 第二阶段：运行时镜像
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
 # 安装curl用于健康检查

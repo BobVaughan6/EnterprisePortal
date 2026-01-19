@@ -159,7 +159,7 @@ sudo ./deploy-ubuntu22.sh
 
 脚本会自动完成：
 - ✅ 系统更新
-- ✅ 安装.NET 7.0运行时
+- ✅ 安装.NET 8.0运行时
 - ✅ 安装MySQL 8.0
 - ✅ 安装Nginx
 - ✅ 安装Node.js
@@ -234,7 +234,7 @@ sudo ./deploy-ubuntu22-docker.sh
 - ✅ 安装Docker和Docker Compose
 - ✅ 安装Node.js
 - ✅ 构建前端项目
-- ✅ 生成docker-compose.yml配置
+- ✅ 生成docker compose.yml配置
 - ✅ 构建并启动所有Docker容器
 - ✅ 配置防火墙
 
@@ -245,20 +245,158 @@ sudo ./deploy-ubuntu22-docker.sh
 cd /opt/hailong/project
 
 # 查看容器状态
-docker-compose ps
+docker compose ps
 
 # 查看日志
-docker-compose logs -f
+docker compose logs -f
 
 # 重启服务
-docker-compose restart
+docker compose restart
 
 # 停止服务
-docker-compose down
+docker compose down
 
 # 启动服务
-docker-compose up -d
+docker compose up -d
 ```
+
+### 更新代码和重新部署
+
+当需要更新前后端代码或修改docker compose配置后，按以下步骤重新部署：
+
+#### 方式一：完整更新（推荐）
+
+```bash
+# 1. 进入项目目录
+cd /opt/hailong/project
+
+# 2. 拉取最新代码
+sudo git pull
+
+# 3. 停止并删除所有容器
+docker compose down
+
+# 4. 重新构建前端（如果前端代码有更新）
+cd hailong-protral
+npm install
+npm run build
+cd ..
+
+# 5. 重新构建并启动所有容器
+docker compose build --no-cache
+docker compose up -d
+
+# 6. 查看容器状态
+docker compose ps
+
+# 7. 查看日志确认启动成功
+docker compose logs -f
+```
+
+#### 方式二：仅更新前端
+
+```bash
+# 1. 进入项目目录
+cd /opt/hailong/project
+
+# 2. 拉取最新代码
+sudo git pull
+
+# 3. 重新构建前端
+cd hailong-protral
+npm install
+npm run build
+cd ..
+
+# 4. 重启Nginx容器
+docker compose restart nginx
+
+# 5. 查看日志
+docker compose logs -f nginx
+```
+
+#### 方式三：仅更新后端
+
+```bash
+# 1. 进入项目目录
+cd /opt/hailong/project
+
+# 2. 拉取最新代码
+sudo git pull
+
+# 3. 停止后端容器
+docker compose stop api
+
+# 4. 重新构建后端容器
+docker compose build --no-cache api
+
+# 5. 启动后端容器
+docker compose up -d api
+
+# 6. 查看日志
+docker compose logs -f api
+```
+
+#### 方式四：仅更新docker compose配置
+
+```bash
+# 1. 进入项目目录
+cd /opt/hailong/project
+
+# 2. 拉取最新代码或手动修改docker compose.yml
+sudo git pull
+# 或
+sudo nano docker compose.yml
+
+# 3. 重新加载配置并重启
+docker compose down
+docker compose up -d
+
+# 4. 查看容器状态
+docker compose ps
+```
+
+#### 更新注意事项
+
+⚠️ **重要提示**：
+
+1. **数据备份**：更新前建议备份数据库
+   ```bash
+   # 备份数据库
+   docker exec hailong-mysql mysqldump -u root -p密码 hailong_consulting > backup_$(date +%Y%m%d_%H%M%S).sql
+   ```
+
+2. **查看变更**：更新前查看代码变更
+   ```bash
+   git fetch
+   git log HEAD..origin/main --oneline
+   ```
+
+3. **清理资源**：如遇到问题，可清理Docker资源
+   ```bash
+   # 清理未使用的镜像
+   docker image prune -a
+   
+   # 清理未使用的容器
+   docker container prune
+   
+   # 清理未使用的卷（谨慎使用，会删除数据）
+   docker volume prune
+   ```
+
+4. **回滚操作**：如更新后出现问题，可回滚到之前版本
+   ```bash
+   # 查看提交历史
+   git log --oneline
+   
+   # 回滚到指定版本
+   git reset --hard <commit-id>
+   
+   # 重新部署
+   docker compose down
+   docker compose build --no-cache
+   docker compose up -d
+   ```
 
 ---
 
@@ -333,14 +471,14 @@ sudo netstat -tlnp | grep :5000
 
 ```bash
 # 查看容器日志
-docker-compose logs 容器名
+docker compose logs 容器名
 
 # 检查Docker服务
 sudo systemctl status docker
 
 # 重新构建
-docker-compose build --no-cache
-docker-compose up -d
+docker compose build --no-cache
+docker compose up -d
 ```
 
 ### 问题4：npm install失败
@@ -396,11 +534,11 @@ sudo netstat -tlnp | grep :8080
 cd /opt/hailong/project
 
 # 容器管理
-docker-compose ps
-docker-compose logs -f
-docker-compose restart
-docker-compose down
-docker-compose up -d
+docker compose ps
+docker compose logs -f
+docker compose restart
+docker compose down
+docker compose up -d
 
 # 进入容器
 docker exec -it hailong-api bash

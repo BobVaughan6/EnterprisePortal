@@ -47,7 +47,7 @@ echo "服务器IP: $SERVER_IP"
 echo ""
 echo "本脚本将使用Docker容器化部署，包括："
 echo "  - MySQL 8.0 容器"
-echo "  - .NET 7.0 API 容器"
+echo "  - .NET 8.0 API 容器"
 echo "  - Nginx 容器（前端+反向代理）"
 echo ""
 
@@ -480,7 +480,7 @@ echo "  - 密码: admin123"
 echo ""
 echo "Docker容器："
 echo "  - hailong-mysql  (MySQL 8.0)"
-echo "  - hailong-api    (.NET 7.0 API)"
+echo "  - hailong-api    (.NET 8.0 API)"
 echo "  - hailong-nginx  (Nginx)"
 echo ""
 echo "常用Docker命令："
@@ -518,7 +518,7 @@ cat > /root/hailong-docker-deploy-info.txt <<EOF
 
 Docker容器:
 - hailong-mysql  (MySQL 8.0)
-- hailong-api    (.NET 7.0 API)
+- hailong-api    (.NET 8.0 API)
 - hailong-nginx  (Nginx)
 
 数据库信息:

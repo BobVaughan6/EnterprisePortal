@@ -85,7 +85,7 @@ chmod +x deploy-centos7-docker.sh
 - **数据持久化**: mysql-data卷
 
 ### 2. hailong-api
-- **镜像**: 自动构建（基于.NET 7.0）
+- **镜像**: 自动构建（基于.NET 8.0）
 - **端口**: 5000（内部）
 - **功能**: 后端API服务
 - **数据持久化**: api-uploads卷、api-logs卷

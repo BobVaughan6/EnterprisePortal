@@ -25,7 +25,7 @@
 ```
 Protral/
 ├── BackEnd/                          # 后端项目
-│   └── HailongConsulting.API/       # .NET 7 Web API
+│   └── HailongConsulting.API/       # .NET 8 Web API
 │       ├── Controllers/             # API控制器
 │       ├── Services/                # 业务逻辑层
 │       ├── Repositories/            # 数据访问层
@@ -62,12 +62,12 @@ Protral/
 
 | 技术 | 版本 | 用途 |
 |------|------|------|
-| .NET | 7.0 | Web API框架 |
-| Entity Framework Core | 7.0.14 | ORM框架 |
+| .NET | 8.0 | Web API框架 |
+| Entity Framework Core | 8.0.0 | ORM框架 |
 | MySQL | 8.0+ | 关系型数据库 |
-| JWT | 7.0.14 | 身份认证 |
-| AutoMapper | 12.0.1 | 对象映射 |
-| Serilog | 7.0.0 | 日志记录 |
+| JWT | 8.0.0 | 身份认证 |
+| AutoMapper | 13.0.1 | 对象映射 |
+| Serilog | 8.0.0 | 日志记录 |
 | Swagger | 6.5.0 | API文档 |
 
 ### 前端技术
@@ -88,7 +88,7 @@ Protral/
 
 ### 1. 后端API (HailongConsulting.API)
 
-**技术**: .NET 7 Web API + Entity Framework Core + MySQL
+**技术**: .NET 8 Web API + Entity Framework Core + MySQL
 
 **主要功能**:
 - ✅ JWT身份认证和授权
