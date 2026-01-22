@@ -161,6 +161,54 @@ if ! command -v docker &> /dev/null; then
     systemctl enable docker
     
     print_info "Docker安装成功: $(docker --version)"
+    
+    # 配置Docker镜像加速器（中国大陆）
+    print_info "配置Docker镜像加速器..."
+    mkdir -p /etc/docker
+    cat > /etc/docker/daemon.json <<DOCKER_CONFIG
+{
+  "registry-mirrors": [
+    "https://docker.mirrors.ustc.edu.cn",
+    "https://hub-mirror.c.163.com",
+    "https://mirror.baidubce.com"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "3"
+  }
+}
+DOCKER_CONFIG
+    
+    # 重启Docker使配置生效
+    systemctl daemon-reload
+    systemctl restart docker
+    
+    print_info "Docker镜像加速器配置完成"
+fi
+
+# 如果Docker已安装但未配置镜像加速器，则配置
+if [ ! -f /etc/docker/daemon.json ]; then
+    print_info "配置Docker镜像加速器..."
+    mkdir -p /etc/docker
+    cat > /etc/docker/daemon.json <<DOCKER_CONFIG
+{
+  "registry-mirrors": [
+    "https://docker.mirrors.ustc.edu.cn",
+    "https://hub-mirror.c.163.com",
+    "https://mirror.baidubce.com"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "3"
+  }
+}
+DOCKER_CONFIG
+    
+    systemctl daemon-reload
+    systemctl restart docker
+    print_info "Docker镜像加速器配置完成"
 fi
 
 ###############################################################################
@@ -227,8 +275,6 @@ fi
 
 # 生成新的docker-compose.yml
 cat > "$PROJECT_PATH/docker-compose.yml" <<EOF
-version: '3.8'
-
 services:
   # MySQL数据库服务
   mysql:
