@@ -168,10 +168,11 @@ if ! command -v docker &> /dev/null; then
     cat > /etc/docker/daemon.json <<DOCKER_CONFIG
 {
   "registry-mirrors": [
-    "https://docker.mirrors.ustc.edu.cn",
-    "https://hub-mirror.c.163.com",
-    "https://mirror.baidubce.com"
+    "https://dockerproxy.com",
+    "https://docker.nju.edu.cn",
+    "https://docker.m.daocloud.io"
   ],
+  "dns": ["8.8.8.8", "114.114.114.114"],
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "100m",
@@ -194,10 +195,11 @@ if [ ! -f /etc/docker/daemon.json ]; then
     cat > /etc/docker/daemon.json <<DOCKER_CONFIG
 {
   "registry-mirrors": [
-    "https://docker.mirrors.ustc.edu.cn",
-    "https://hub-mirror.c.163.com",
-    "https://mirror.baidubce.com"
+    "https://dockerproxy.com",
+    "https://docker.nju.edu.cn",
+    "https://docker.m.daocloud.io"
   ],
+  "dns": ["8.8.8.8", "114.114.114.114"],
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "100m",

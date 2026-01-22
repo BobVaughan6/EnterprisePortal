@@ -639,10 +639,11 @@ sudo mkdir -p /etc/docker
 sudo tee /etc/docker/daemon.json <<EOF
 {
   "registry-mirrors": [
-    "https://docker.mirrors.ustc.edu.cn",
-    "https://hub-mirror.c.163.com",
-    "https://mirror.baidubce.com"
-  ]
+    "https://dockerproxy.com",
+    "https://docker.nju.edu.cn",
+    "https://docker.m.daocloud.io"
+  ],
+  "dns": ["8.8.8.8", "114.114.114.114"]
 }
 EOF
 
@@ -653,10 +654,34 @@ sudo systemctl restart docker
 # 验证配置
 docker info | grep -A 5 "Registry Mirrors"
 
+# 测试网络连接
+ping -c 3 dockerproxy.com
+
 # 重新拉取镜像
 cd /opt/hailong/project
 docker compose pull
 docker compose up -d
+```
+
+**备选方案：手动下载镜像**
+
+如果镜像加速器仍然无法使用，可以手动下载镜像：
+
+```bash
+# 方案1：使用阿里云镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/library/mysql:8.0
+docker tag registry.cn-hangzhou.aliyuncs.com/library/mysql:8.0 mysql:8.0
+
+docker pull registry.cn-hangzhou.aliyuncs.com/library/nginx:alpine
+docker tag registry.cn-hangzhou.aliyuncs.com/library/nginx:alpine nginx:alpine
+
+# 方案2：从其他服务器传输
+# 在有网络的服务器上
+docker save mysql:8.0 nginx:alpine -o images.tar
+scp images.tar root@目标服务器IP:/tmp/
+
+# 在目标服务器上
+docker load -i /tmp/images.tar
 ```
 
 ### 问题3：容器无法启动
