@@ -825,7 +825,144 @@ docker builder prune
 docker system prune -a --volumes
 ```
 
-### 问题9：权限问题
+### 问题9：Docker权限被拒绝
+
+**症状**：`permission denied while trying to connect to the Docker daemon socket`
+
+**原因**：当前用户没有权限访问Docker socket
+
+**解决方案**：
+
+**方案一：使用sudo（推荐）**
+
+```bash
+# 所有docker命令前加sudo
+sudo docker compose ps
+sudo docker compose logs -f
+sudo docker compose restart
+```
+
+**方案二：将用户添加到docker组**
+
+```bash
+# 1. 将当前用户添加到docker组
+sudo usermod -aG docker $USER
+
+# 2. 刷新组权限（选择其一）
+# 方法1：重新登录SSH
+exit
+# 然后重新SSH连接
+
+# 方法2：使用newgrp
+newgrp docker
+
+# 方法3：重启系统
+sudo reboot
+
+# 3. 验证权限
+docker ps
+docker compose ps
+```
+
+**方案三：临时使用root用户**
+
+```bash
+# 切换到root用户
+sudo su -
+
+# 进入项目目录
+cd /opt/hailong/project
+
+# 执行docker命令
+docker compose ps
+```
+
+**注意事项**：
+- 部署脚本必须使用 `sudo` 运行
+- 如果使用非root用户，建议添加到docker组
+- 添加到docker组后需要重新登录才能生效
+
+### 问题10：上传图片404无法访问
+
+**症状**：访问 `http://服务器IP/uploads/...` 返回404错误
+
+**原因**：Nginx配置中前端门户和后台管理没有配置 `/uploads/` 路径
+
+**解决方案**：
+
+```bash
+# 1. 检查uploads目录是否存在
+sudo docker exec hailong-nginx ls -la /usr/share/nginx/html/uploads/
+
+# 2. 检查Nginx配置
+sudo docker exec hailong-nginx cat /etc/nginx/conf.d/default.conf | grep -A 5 "location /uploads"
+
+# 3. 如果配置缺失，更新nginx配置文件
+cd /opt/hailong/project
+sudo nano nginx/conf.d/default.conf
+
+# 在前端门户(80端口)和后台管理(8080端口)的server块中添加：
+# location /uploads/ {
+#     alias /usr/share/nginx/html/uploads/;
+#     expires 30d;
+#     add_header Cache-Control "public, immutable";
+#     add_header Access-Control-Allow-Origin *;
+# }
+
+# 4. 重启Nginx容器
+sudo docker compose restart nginx
+
+# 5. 验证配置
+curl -I http://localhost/uploads/test.jpg
+```
+
+**完整的Nginx配置示例**：
+
+```nginx
+# 前端门户
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html/portal;
+    index index.html;
+
+    # 上传文件访问（必须添加）
+    location /uploads/ {
+        alias /usr/share/nginx/html/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        add_header Access-Control-Allow-Origin *;
+    }
+
+    # SPA路由支持
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+# 后台管理系统
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html/admin;
+    index index.html;
+
+    # 上传文件访问（必须添加）
+    location /uploads/ {
+        alias /usr/share/nginx/html/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        add_header Access-Control-Allow-Origin *;
+    }
+
+    # SPA路由支持
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+### 问题11：文件权限问题
 
 **症状**：文件访问被拒绝或权限不足
 
@@ -841,10 +978,6 @@ ls -la /opt/hailong/project
 # 3. 修复权限
 sudo chown -R root:root /opt/hailong/project
 sudo chmod -R 755 /opt/hailong/project
-
-# 4. 检查Docker权限
-sudo usermod -aG docker $USER
-# 需要重新登录生效
 ```
 
 ---
