@@ -451,6 +451,7 @@ cd /opt/hailong/project
 docker exec hailong-mysql mysqldump -u root -pHailong@2025 hailong_consulting > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # 3. 拉取最新代码
+sudo git reset --hard HEAD
 sudo git pull
 
 # 4. 停止并删除所有容器
