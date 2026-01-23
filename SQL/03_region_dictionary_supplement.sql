@@ -6,6 +6,10 @@
 -- 使用方法：在执行完 hailong_consulting_init_data.sql 后执行本文件
 -- ============================================
 
+-- 设置字符集
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 USE `hailong_consulting`;
 
 -- ============================================

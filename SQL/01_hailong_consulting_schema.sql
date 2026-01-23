@@ -6,6 +6,10 @@
 -- 更新时间：2025-12-08
 -- ============================================
 
+-- 设置字符集
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS `hailong_consulting` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

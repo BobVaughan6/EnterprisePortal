@@ -124,7 +124,7 @@ cd project
 
 ```bash
 cd /opt/hailong/project
-sudo git pull origin main
+sudo git pull
 ```
 
 ### 第3步：检查项目结构

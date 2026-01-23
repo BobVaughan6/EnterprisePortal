@@ -6,6 +6,10 @@
 -- 使用方法：在执行完补充文件后执行本文件
 -- ============================================
 
+-- 设置字符集
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 USE `hailong_consulting`;
 
 INSERT INTO `region_dictionary` (`region_code`, `region_name`, `region_level`, `parent_code`, `sort_order`) VALUES
