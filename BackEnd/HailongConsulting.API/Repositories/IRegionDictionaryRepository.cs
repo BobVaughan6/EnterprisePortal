@@ -51,4 +51,9 @@ public interface IRegionDictionaryRepository : IRepository<RegionDictionary>
     /// 获取区域树形结构
     /// </summary>
     Task<List<RegionDictionary>> GetTreeAsync();
+
+    /// <summary>
+    /// 根据区域名称获取区域
+    /// </summary>
+    Task<RegionDictionary?> GetByRegionNameAsync(string regionName);
 }

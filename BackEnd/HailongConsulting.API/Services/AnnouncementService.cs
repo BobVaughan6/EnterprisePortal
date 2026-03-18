@@ -55,6 +55,34 @@ public class AnnouncementService : IAnnouncementService
             if (announcement == null)
                 return null;
 
+            // 将区域名称转换回区域编码（如果传入的是名称）
+            if (!string.IsNullOrEmpty(updateDto.Province))
+            {
+                var province = await _unitOfWork.RegionDictionaries.GetByRegionNameAsync(updateDto.Province);
+                if (province != null)
+                {
+                    updateDto.Province = province.RegionCode;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(updateDto.City))
+            {
+                var city = await _unitOfWork.RegionDictionaries.GetByRegionNameAsync(updateDto.City);
+                if (city != null)
+                {
+                    updateDto.City = city.RegionCode;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(updateDto.District))
+            {
+                var district = await _unitOfWork.RegionDictionaries.GetByRegionNameAsync(updateDto.District);
+                if (district != null)
+                {
+                    updateDto.District = district.RegionCode;
+                }
+            }
+
             _mapper.Map(updateDto, announcement);
             announcement.UpdatedAt = DateTime.UtcNow;
 
