@@ -107,8 +107,16 @@
 </template>
 
 <script setup>
-onMounted(() => {
-  loadStatistics()
+import { ref, computed, onMounted } from 'vue'
+import { getStatisticsOverview } from '@/api/home'
+
+// 统计数据
+const statisticsLoading = ref(false)
+const statistics = ref({
+  totalProjects: 0,
+  totalAmount: 0,
+  projectTypes: [],
+  regionRanking: []
 })
 
 // 交易类型占比 - 过滤掉"政府采购"主类型，只显示4个细分类型
@@ -159,8 +167,6 @@ const getProjectTypeCount = (type) => {
   const projectType = statistics.value.projectTypes?.find(item => item.type === type)
   return projectType ? projectType.count : 0
 }
-
-// 加载重要业绩
 
 // 加载统计数据
 const loadStatistics = async () => {
@@ -213,22 +219,4 @@ const formatRegionAmount = (amount) => {
 onMounted(() => {
   loadStatistics()
 })
-
-@keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-scroll {
-  animation: scroll 30s linear infinite;
-}
-
-.animate-scroll:hover {
-  animation-play-state: paused;
-}
-</style>
+</script>
