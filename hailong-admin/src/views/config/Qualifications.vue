@@ -11,6 +11,7 @@
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" border stripe>
         <el-table-column type="index" label="序号" width="60" />
+        <el-table-column prop="sortOrder" label="排序" width="80" align="center" />
         <el-table-column prop="name" label="资质名称" min-width="200" />
         <el-table-column prop="certificateNumber" label="证书编号" width="180" />
         <el-table-column prop="issueDate" label="颁发日期" width="120" align="center">
@@ -117,8 +118,8 @@
         </el-form-item>
         
         <el-form-item label="资质描述">
-          <el-input 
-            v-model="formData.description" 
+          <el-input
+            v-model="formData.description"
             type="textarea"
             :rows="4"
             placeholder="请输入资质描述（最多500个字符）"
@@ -126,7 +127,18 @@
             show-word-limit
           />
         </el-form-item>
-        
+
+        <el-form-item label="排序">
+          <el-input-number
+            v-model="formData.sortOrder"
+            :min="0"
+            :step="1"
+            controls-position="right"
+            style="width: 200px;"
+          />
+          <div class="form-tip">数字越小越靠前，相同数字按颁发日期排序</div>
+        </el-form-item>
+
         <el-form-item label="状态">
           <el-radio-group v-model="formData.status">
             <el-radio :value="true">有效</el-radio>
@@ -169,6 +181,7 @@ const formData = reactive({
   expiryDate: '',
   certificateImageId: [],
   description: '',
+  sortOrder: 0,
   status: true
 })
 
@@ -233,6 +246,7 @@ const handleAdd = () => {
     expiryDate: '',
     certificateImageId: [],
     description: '',
+    sortOrder: 0,
     status: true
   })
   dialogVisible.value = true
@@ -255,6 +269,7 @@ const handleEdit = async (row) => {
         expiryDate: res.data.expiryDate,
         certificateImageId: res.data.certificateImageId ? [res.data.certificateImageId] : [],
         description: res.data.description || '',
+        sortOrder: res.data.sortOrder || 0,
         status: res.data.status
       })
       dialogVisible.value = true
@@ -322,6 +337,7 @@ const handleSubmit = async () => {
         ? formData.certificateImageId[0]
         : null,
       description: formData.description || null,
+      sortOrder: formData.sortOrder || 0,
       status: formData.status
     }
     
