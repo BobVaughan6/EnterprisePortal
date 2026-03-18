@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -maxdepth 2 -type d -name *server* -o -name *backend* -o -name *api*)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

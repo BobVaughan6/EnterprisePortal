@@ -429,9 +429,8 @@ const fetchHonors = async () => {
           awardDate: item.awardDate || '',
           certificateNo: item.certificateNo || '',
           honorLevel: item.honorLevel || '',
-          imageUrl: item.imageId
-            ? `${API_BASE_URL}/api/attachment/${item.imageId}`
-            : 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop'
+          // 后端返回的 imageUrl 已经是完整URL，直接使用（与业务范围保持一致）
+          imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop'
         }))
     } else {
       honorsError.value = response.message || '获取企业荣誉失败'

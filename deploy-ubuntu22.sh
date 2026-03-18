@@ -274,10 +274,8 @@ if [ -d "$PROJECT_PATH/hailong-admin" ]; then
     print_info "构建后台管理系统..."
     cd "$PROJECT_PATH/hailong-admin"
     
-    # 配置API地址
-    cat > .env.production <<EOF
-VITE_API_BASE_URL=http://$SERVER_IP:5001
-EOF
+    # 使用相对路径配置，无需修改.env.production
+    print_info "使用相对路径配置（/api）..."
     
     print_info "安装依赖..."
     npm install --registry=https://registry.npmmirror.com
@@ -299,9 +297,8 @@ if [ -d "$PROJECT_PATH/hailong-protral" ]; then
     print_info "构建前端门户..."
     cd "$PROJECT_PATH/hailong-protral"
     
-    cat > .env.production <<EOF
-VITE_API_BASE_URL=http://$SERVER_IP:5001
-EOF
+    # 使用相对路径配置，无需修改.env.production
+    print_info "使用相对路径配置（/api）..."
     
     npm install --registry=https://registry.npmmirror.com
     npm run build
@@ -361,6 +358,33 @@ server {
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/json;
 
+    # API代理 - 使用相对路径访问
+    location /api/ {
+        proxy_pass http://localhost:5000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        # 超时设置
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # 上传文件访问
+    location ^~ /uploads/ {
+        alias /var/www/hailong-api/wwwroot/uploads/;
+        charset utf-8;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        add_header Access-Control-Allow-Origin *;
+    }
+
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -385,6 +409,33 @@ server {
     gzip_vary on;
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/json;
+
+    # API代理 - 使用相对路径访问
+    location /api/ {
+        proxy_pass http://localhost:5000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        # 超时设置
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # 上传文件访问
+    location ^~ /uploads/ {
+        alias /var/www/hailong-api/wwwroot/uploads/;
+        charset utf-8;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        add_header Access-Control-Allow-Origin *;
+    }
 
     location / {
         try_files $uri $uri/ /index.html;

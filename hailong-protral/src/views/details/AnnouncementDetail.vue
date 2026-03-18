@@ -382,6 +382,35 @@ onMounted(() => {
   line-height: 1.75;
 }
 
+/* 表格样式 */
+.prose :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  border: 1px solid #e5e7eb;
+}
+
+.prose :deep(table th),
+.prose :deep(table td) {
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.prose :deep(table th) {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.prose :deep(table tr:nth-child(even)) {
+  background-color: #f9fafb;
+}
+
+.prose :deep(table tr:hover) {
+  background-color: #f3f4f6;
+}
+
 @media print {
   header, footer, .no-print {
     display: none !important;

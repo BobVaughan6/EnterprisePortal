@@ -383,10 +383,8 @@ if [ -d "$PROJECT_PATH/hailong-admin" ]; then
     print_info "构建后台管理系统..."
     cd "$PROJECT_PATH/hailong-admin"
     
-    # 配置API地址
-    cat > .env.production <<EOF
-VITE_API_BASE_URL=http://$SERVER_IP:5001
-EOF
+    # 使用相对路径配置，无需修改.env.production
+    print_info "使用相对路径配置（/api）..."
     
     print_info "安装依赖..."
     npm install --registry=https://registry.npmmirror.com
@@ -409,9 +407,8 @@ if [ -d "$PROJECT_PATH/hailong-protral" ]; then
     print_info "构建前端门户..."
     cd "$PROJECT_PATH/hailong-protral"
     
-    cat > .env.production <<EOF
-VITE_API_BASE_URL=http://$SERVER_IP:5001
-EOF
+    # 使用相对路径配置，无需修改.env.production
+    print_info "使用相对路径配置（/api）..."
     
     npm install --registry=https://registry.npmmirror.com
     npm run build

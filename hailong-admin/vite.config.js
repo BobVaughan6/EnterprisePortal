@@ -12,9 +12,12 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      // 开发环境API代理
       '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true
+        target: 'https://localhost:49522',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

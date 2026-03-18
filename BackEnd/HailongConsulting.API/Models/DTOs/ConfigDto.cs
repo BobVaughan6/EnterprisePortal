@@ -202,6 +202,7 @@ public class CompanyHonorDto
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int? ImageId { get; set; }
+    public string? ImageUrl { get; set; }
     public string? AwardOrganization { get; set; }
     public DateOnly? AwardDate { get; set; }
     public string? CertificateNo { get; set; }

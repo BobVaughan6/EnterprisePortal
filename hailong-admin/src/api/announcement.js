@@ -9,7 +9,7 @@ import request from './request'
 /**
  * 获取公告列表
  * @param {Object} params - 查询参数
- * @param {number} params.page - 页码
+ * @param {number} params.pageNumber - 页码
  * @param {number} params.pageSize - 每页数量
  * @param {string} params.businessType - 业务类型：GOV_PROCUREMENT/CONSTRUCTION
  * @param {string} params.noticeType - 公告类型：bidding/correction/result

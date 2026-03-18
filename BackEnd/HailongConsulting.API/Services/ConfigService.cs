@@ -166,13 +166,42 @@ public class ConfigService : IConfigService
     public async Task<IEnumerable<CompanyHonorDto>> GetAllHonorsAsync()
     {
         var honors = await _repository.GetAllHonorsAsync();
-        return _mapper.Map<IEnumerable<CompanyHonorDto>>(honors);
+        var dtos = _mapper.Map<IEnumerable<CompanyHonorDto>>(honors).ToList();
+
+        // 填充图片URL
+        foreach (var dto in dtos)
+        {
+            if (dto.ImageId.HasValue && dto.ImageId.Value > 0)
+            {
+                var attachment = await _attachmentService.GetByIdAsync(dto.ImageId.Value);
+                if (attachment != null)
+                {
+                    dto.ImageUrl = attachment.FileUrl;
+                }
+            }
+        }
+
+        return dtos;
     }
 
     public async Task<CompanyHonorDto?> GetHonorByIdAsync(int id)
     {
         var honor = await _repository.GetHonorByIdAsync(id);
-        return honor == null ? null : _mapper.Map<CompanyHonorDto>(honor);
+        if (honor == null) return null;
+
+        var dto = _mapper.Map<CompanyHonorDto>(honor);
+
+        // 填充图片URL
+        if (dto.ImageId.HasValue && dto.ImageId.Value > 0)
+        {
+            var attachment = await _attachmentService.GetByIdAsync(dto.ImageId.Value);
+            if (attachment != null)
+            {
+                dto.ImageUrl = attachment.FileUrl;
+            }
+        }
+
+        return dto;
     }
 
     public async Task<CompanyHonorDto> CreateHonorAsync(CreateCompanyHonorDto dto)

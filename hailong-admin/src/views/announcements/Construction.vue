@@ -336,7 +336,7 @@ const loadData = async () => {
       district: searchForm.districtCode || undefined,
       startDate: searchForm.startDate || undefined,
       endDate: searchForm.endDate || undefined,
-      page: pagination.pageIndex,
+      pageNumber: pagination.pageIndex,
       pageSize: pagination.pageSize
     }
     
