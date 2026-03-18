@@ -39,7 +39,10 @@ const companyInfo = computed(() => getCompanyInfo())
 // 获取页脚配置
 const navigation = computed(() => getNavigation())
 const footerSections = computed(() => navigation.value.footer.sections)
-const footerCopyright = computed(() => navigation.value.footer.copyright)
+const footerCopyright = computed(() => {
+  const currentYear = new Date().getFullYear()
+  return `© ${currentYear} ${companyInfo.value.fullName} 版权所有`
+})
 </script>
 
 <style scoped>
