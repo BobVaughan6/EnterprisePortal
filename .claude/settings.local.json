@@ -9,7 +9,11 @@
       "Read(//tmp/**)",
       "Bash(sed -i '1,47d' DataVisualization.vue)",
       "Bash(sed -i '1i<template>' DataVisualization.vue)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(rm DataVisualization.vue)",
+      "Bash(mv DataVisualization_new.vue DataVisualization.vue)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
