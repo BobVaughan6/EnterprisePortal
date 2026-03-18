@@ -124,6 +124,7 @@ import ContactInfo from '@/components/home/modules/ContactInfo.vue'
 
 const router = useRouter()
 const showContactModal = ref(false)
+const contactInfo = computed(() => getContactInfo())
 
 // 组件映射
 const moduleComponents = {
